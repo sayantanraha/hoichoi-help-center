@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>hoichoi Help Center</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<!-- ── Nugget Chat SDK ─────────────────────────────────────────────────────────
+  Replace the placeholder below with the actual embed snippet from Nugget.
+  Once added, openNuggetChat() will launch the live chat widget.
+  ──────────────────────────────────────────────────────────────────────────── -->
+<!-- <script src="YOUR_NUGGET_SDK_URL"></script> -->
+
+<style>
+  :root {
+    --bg: #F0F3FA; --surface: #FFFFFF; --surface2: #F8FAFC;
+    --border: #E4E8F0; --text-1: #0F172A; --text-2: #475569; --text-3: #94A3B8;
+    --topbar-bg: #FFFFFF; --hover: rgba(0,0,0,0.04);
+    --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.1); --shadow-lg: 0 8px 40px rgba(0,0,0,0.18);
+    --accent: #d20820; --accent2: #6d0550;
+  }
+  [data-theme="dark"] {
+    --bg: #07090F; --surface: #0C1120; --surface2: #111827;
+    --border: #1C2A3E; --text-1: #E8EDF5; --text-2: #8896AB; --text-3: #3D5068;
+    --topbar-bg: #080D18; --hover: rgba(255,255,255,0.04);
+    --shadow: 0 1px 4px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+    --shadow-md: 0 4px 24px rgba(0,0,0,0.5); --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
+  }
+  * { font-family: 'Inter', sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text-1); transition: background 0.25s, color 0.25s; }
+  .gradient-text { background: linear-gradient(135deg,#d20820,#6d0550); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .btn-primary { background: linear-gradient(135deg,#d20820,#6d0550) !important; box-shadow: 0 2px 8px rgba(210,8,32,0.25); color: #fff !important; border: none; cursor: pointer; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-ghost { background: var(--surface); border: 1.5px solid var(--border); color: var(--text-1); cursor: pointer; }
+  .btn-ghost:hover { background: var(--hover); }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 9999px; }
+  .topbar { background: var(--topbar-bg); border-bottom: 1.5px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+  .hero-gradient { background: linear-gradient(135deg, #d20820 0%, #6d0550 100%); }
+  .category-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .article-card:hover { background: var(--hover); }
+  .like-btn:hover { background: #DCFCE7; color: #16A34A; border-color: #16A34A; }
+  .dislike-btn:hover { background: #FEE2E2; color: #DC2626; border-color: #DC2626; }
+  .like-active { background: #DCFCE7 !important; color: #16A34A !important; border-color: #16A34A !important; }
+  .dislike-active { background: #FEE2E2 !important; color: #DC2626 !important; border-color: #DC2626 !important; }
+  [data-theme="dark"] .like-btn:hover, [data-theme="dark"] .like-active { background: rgba(22,163,74,0.15) !important; }
+  [data-theme="dark"] .dislike-btn:hover, [data-theme="dark"] .dislike-active { background: rgba(220,38,38,0.15) !important; }
+  .video-card:hover .play-overlay { opacity: 1; }
+  .play-overlay { opacity: 0; transition: opacity 0.2s; }
+  .search-input:focus, .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(210,8,32,0.12); }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fadeIn 0.25s ease; }
+  .tag { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .tag-new { background: #EFF6FF; color: #2563EB; }
+  .tag-popular { background: #FFF7ED; color: #EA580C; }
+  [data-theme="dark"] .tag-new { background: rgba(37,99,235,0.15); color: #60A5FA; }
+  [data-theme="dark"] .tag-popular { background: rgba(234,88,12,0.15); color: #FB923C; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 24px; }
+  .modal-box { background: var(--surface); border-radius: 18px; width: 100%; max-width: 600px; box-shadow: var(--shadow-lg); margin: auto; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 10px 14px; color: var(--text-1); font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s; font-family: 'Inter', sans-serif;
+  }
+  .form-select { appearance: none; -webkit-appearance: none; cursor: pointer; }
+  .form-textarea { resize: vertical; min-height: 100px; }
+  .form-label { color: var(--text-2); font-size: 13px; font-weight: 600; margin-bottom: 6px; display: block; }
+  .form-label .req { color: var(--accent); margin-left: 2px; }
+  .field-error { color: #DC2626; font-size: 12px; margin-top: 4px; }
+  .upload-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; }
+  .upload-zone:hover, .upload-zone.dragging { border-color: var(--accent); background: rgba(210,8,32,0.04); }
+  .upload-zone.has-file { border-color: #16A34A; background: rgba(22,163,74,0.04); border-style: solid; }
+  .progress-bar { height: 3px; background: linear-gradient(135deg,#d20820,#6d0550); border-radius: 999px; transition: width 0.3s; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .spin { animation: spin 0.8s linear infinite; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .slide-up { animation: slideUp 0.3s ease; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+// ── Firebase ─────────────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyDbaSdfHpLbcKFLu0gP6Ftji6PXW1VJ5Jk",
+  authDomain: "hoichoi-help-center.firebaseapp.com",
+  projectId: "hoichoi-help-center",
+  storageBucket: "hoichoi-help-center.firebasestorage.app",
+  messagingSenderId: "100762044374",
+  appId: "1:100762044374:web:43757f995a95c71e530677"
+};
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ── Nugget Chat ───────────────────────────────────────────────────────────────
+// Wire up the Nugget SDK here once you have the embed snippet.
+// Replace the alert with: window.NuggetChat?.open() or equivalent SDK call.
+function openNuggetChat() {
+  if (window.NuggetChat) {
+    window.NuggetChat.open();
+  } else {
+    alert('Chat coming soon — please raise a ticket or email support@hoichoi.tv');
+  }
+}
+
+// ── KB Data ───────────────────────────────────────────────────────────────────
+const CATEGORIES = [
+  { id: 'account',   icon: '👤', label: 'Account & Login',          labelBn: 'অ্যাকাউন্ট ও লগইন',         count: 12, color: '#3B82F6' },
+  { id: 'billing',   icon: '💳', label: 'Subscription & Payments',  labelBn: 'সাবস্ক্রিপশন ও পেমেন্ট',    count: 17, color: '#8B5CF6' },
+  { id: 'streaming', icon: '▶️', label: 'Streaming & Playback',     labelBn: 'স্ট্রিমিং ও প্লেব্যাক',      count: 11, color: '#10B981' },
+  { id: 'downloads', icon: '⬇️', label: 'Downloads & Offline',      labelBn: 'ডাউনলোড ও অফলাইন',          count: 4,  color: '#F59E0B' },
+  { id: 'tv',        icon: '📺', label: 'Smart TV & Devices',       labelBn: 'স্মার্ট টিভি ও ডিভাইস',      count: 7,  color: '#EF4444' },
+  { id: 'cancel',    icon: '🔄', label: 'Cancellation & Refund',    labelBn: 'বাতিল ও রিফান্ড',            count: 6,  color: '#EC4899' },
+  { id: 'app',       icon: '⚙️', label: 'App & Technical Issues',   labelBn: 'অ্যাপ ও প্রযুক্তিগত সমস্যা', count: 9,  color: '#14B8A6' },
+  { id: 'payment',   icon: '💰', label: 'Payment Methods',          labelBn: 'পেমেন্ট পদ্ধতি',             count: 8,  color: '#6366F1' },
+];
+
+const ARTICLES = {
+  account: [
+    { id: 'a1', title: 'How to reset your hoichoi password',       titleBn: 'পাসওয়ার্ড রিসেট করবেন কীভাবে',            views: 4820, likes: 312, dislikes: 18, tag: 'popular', readTime: '2 min' },
+    { id: 'a2', title: 'How to sign up for a new hoichoi account', titleBn: 'নতুন অ্যাকাউন্ট তৈরি করবেন কীভাবে',       views: 3201, likes: 245, dislikes: 9,  tag: null,      readTime: '2 min' },
+    { id: 'a3', title: "I can't log in — what should I do?",       titleBn: 'লগইন হচ্ছে না — কী করব?',                  views: 5640, likes: 389, dislikes: 42, tag: 'popular', readTime: '3 min' },
+    { id: 'a4', title: 'How to update your email address',         titleBn: 'ইমেইল পরিবর্তন করবেন কীভাবে',             views: 1890, likes: 134, dislikes: 5,  tag: null,      readTime: '2 min' },
+    { id: 'a5', title: 'Managing devices linked to your account',  titleBn: 'অ্যাকাউন্টে যুক্ত ডিভাইস ম্যানেজ করুন',  views: 2130, likes: 178, dislikes: 12, tag: 'new',     readTime: '3 min' },
+  ],
+  billing: [
+    { id: 'b1', title: 'How to upgrade or change your subscription plan', titleBn: 'সাবস্ক্রিপশন পরিবর্তন করবেন কীভাবে', views: 6210, likes: 421, dislikes: 31, tag: 'popular', readTime: '3 min' },
+    { id: 'b2', title: 'Subscription plans and pricing explained',         titleBn: 'সাবস্ক্রিপশন প্ল্যান ও দাম',          views: 4350, likes: 298, dislikes: 14, tag: null,      readTime: '4 min' },
+    { id: 'b3', title: 'Why was I charged twice?',                         titleBn: 'দুইবার চার্জ হলো কেন?',               views: 3100, likes: 201, dislikes: 67, tag: null,      readTime: '3 min' },
+  ],
+  streaming: [
+    { id: 's1', title: 'Video keeps buffering or pausing — fix it', titleBn: 'ভিডিও বারবার আটকে যাচ্ছে — সমাধান', views: 8920, likes: 612, dislikes: 88, tag: 'popular', readTime: '4 min' },
+    { id: 's2', title: 'How to change video quality / resolution',  titleBn: 'ভিডিও কোয়ালিটি পরিবর্তন করুন',       views: 3450, likes: 267, dislikes: 11, tag: null,      readTime: '2 min' },
+    { id: 's3', title: 'How to turn on Bengali / English subtitles',titleBn: 'সাবটাইটেল চালু করবেন কীভাবে',          views: 5120, likes: 388, dislikes: 20, tag: 'new',     readTime: '2 min' },
+  ],
+  tv: [
+    { id: 't1', title: 'How to activate hoichoi on your Smart TV', titleBn: 'স্মার্ট টিভিতে hoichoi চালু করুন',   views: 7840, likes: 534, dislikes: 62, tag: 'popular', readTime: '5 min' },
+    { id: 't2', title: 'Fire Stick setup guide for hoichoi',        titleBn: 'Fire Stick-এ hoichoi সেটআপ গাইড',   views: 4230, likes: 312, dislikes: 28, tag: null,      readTime: '4 min' },
+    { id: 't3', title: 'Activate TV with code from hoichoi app',   titleBn: 'কোড দিয়ে টিভি অ্যাক্টিভেট করুন',   views: 6100, likes: 445, dislikes: 41, tag: 'popular', readTime: '3 min' },
+  ],
+  cancel: [
+    { id: 'c1', title: 'How to cancel your hoichoi subscription', titleBn: 'সাবস্ক্রিপশন বাতিল করবেন কীভাবে', views: 5430, likes: 287, dislikes: 19, tag: 'popular', readTime: '3 min' },
+    { id: 'c2', title: 'How to turn off auto-renewal',            titleBn: 'অটো-রিনিউয়াল বন্ধ করুন',           views: 3890, likes: 234, dislikes: 15, tag: null,      readTime: '3 min' },
+    { id: 'c3', title: "Refund policy — what am I eligible for?", titleBn: 'রিফান্ড পলিসি কী?',                  views: 4120, likes: 198, dislikes: 45, tag: null,      readTime: '4 min' },
+  ],
+  downloads: [
+    { id: 'd1', title: 'How to download content for offline viewing',   titleBn: 'অফলাইনে দেখার জন্য ডাউনলোড করুন',  views: 3210, likes: 234, dislikes: 8,  tag: 'new',  readTime: '3 min' },
+    { id: 'd2', title: "Downloaded content not playing — fix it",       titleBn: 'ডাউনলোড করা কন্টেন্ট চলছে না',     views: 2100, likes: 145, dislikes: 22, tag: null,   readTime: '3 min' },
+  ],
+  app: [
+    { id: 'p1', title: 'How to add or manage profiles',   titleBn: 'প্রোফাইল যোগ বা পরিবর্তন করুন',  views: 2890, likes: 210, dislikes: 7,  tag: null,  readTime: '2 min' },
+    { id: 'p2', title: 'How to set parental controls',    titleBn: 'পেরেন্টাল কন্ট্রোল সেট করুন',     views: 1980, likes: 167, dislikes: 4,  tag: 'new', readTime: '3 min' },
+  ],
+  payment: [
+    { id: 'py1', title: 'Paying with bKash — step by step guide',  titleBn: 'bKash দিয়ে পেমেন্ট করুন',             views: 9120, likes: 678, dislikes: 34, tag: 'popular', readTime: '3 min' },
+    { id: 'py2', title: 'Paying with Google Play / iTunes',         titleBn: 'Google Play / iTunes দিয়ে পেমেন্ট', views: 4210, likes: 312, dislikes: 18, tag: null,      readTime: '3 min' },
+    { id: 'py3', title: 'My payment failed — what to do?',          titleBn: 'পেমেন্ট ব্যর্থ হলে কী করব?',           views: 5640, likes: 389, dislikes: 55, tag: 'popular', readTime: '4 min' },
+    { id: 'py4', title: 'How to pay with debit/credit card',        titleBn: 'ডেবিট/ক্রেডিট কার্ডে পেমেন্ট',       views: 3450, likes: 245, dislikes: 11, tag: null,      readTime: '2 min' },
+  ],
+};
+
+const ARTICLE_CONTENT = {
+  a1: {
+    title: 'How to reset your hoichoi password',
+    content: `If you've forgotten your hoichoi password, resetting it takes less than 2 minutes.\n\n**Step 1 — Go to the login page**\nOpen the hoichoi app or visit hoichoi.tv. Tap "Log In", then tap "Forgot Password?" below the login button.\n\n**Step 2 — Enter your registered email**\nType the email address linked to your hoichoi account. Make sure there are no typos. Tap "Send Reset Link."\n\n**Step 3 — Check your inbox**\nYou'll receive an email from hoichoi within 2 minutes. Check your spam/junk folder if you don't see it.\n\n**Step 4 — Create a new password**\nClick the link in the email. You'll be taken to a page where you can set a new password. Your password must be at least 8 characters.\n\n**Step 5 — Log in with your new password**\nOnce reset, log in across all your devices with your new password.\n\n---\n\n**Still not receiving the email?**\nMake sure the email address you entered is exactly the one used to sign up. If the issue persists, contact our support team.`,
+    relatedArticles: ['a2', 'a3', 'a4'],
+  },
+  t1: {
+    title: 'How to activate hoichoi on your Smart TV',
+    content: `You can watch hoichoi on any Android TV, Samsung Smart TV, or LG TV. Here's how to set it up.\n\n**Method 1 — Install from TV App Store**\n1. Open the App Store / Google Play on your TV\n2. Search for "hoichoi"\n3. Install the hoichoi app\n4. Open the app and log in with your hoichoi credentials\n\n**Method 2 — Activate with a code (recommended)**\n1. Open the hoichoi app on your phone or computer\n2. Go to Profile → Manage Devices → "Link a TV"\n3. A 6-digit code will appear on screen\n4. Open hoichoi on your TV, select "Activate with Code"\n5. Enter the 6-digit code from your phone\n6. Your TV is now linked — no need to type your password on TV\n\n---\n\n**TV not finding the hoichoi app?**\nMake sure your TV firmware is up to date. If the app isn't available in your region's store, use a Fire Stick which supports hoichoi globally.`,
+    relatedArticles: ['t2', 't3'],
+  },
+  py1: {
+    title: 'Paying with bKash — step by step guide',
+    content: `bKash is the easiest way to pay for hoichoi if you're in Bangladesh.\n\n**Step 1 — Go to the subscription page**\nOpen hoichoi app → tap your profile icon → tap "Subscription" → choose a plan → tap "Subscribe."\n\n**Step 2 — Select bKash as payment method**\nOn the payment screen, select "bKash" from the list of payment options.\n\n**Step 3 — Enter your bKash number**\nType your bKash mobile number (11 digits). Tap "Proceed."\n\n**Step 4 — Approve in bKash app**\nYou'll get a payment request in your bKash app. Open bKash, approve the payment, and enter your bKash PIN.\n\n**Step 5 — Confirmation**\nYou'll see a success screen in hoichoi within seconds. Your subscription is now active.\n\n---\n\n**Tips:**\n- Make sure your bKash account has sufficient balance before starting\n- The payment request expires in 3 minutes — act quickly\n- If the payment deducted but subscription didn't activate, wait 5 minutes and check again. If still not resolved, contact support with your bKash transaction ID.`,
+    relatedArticles: ['py2', 'py3', 'b1'],
+  },
+  s1: {
+    title: 'Video keeps buffering or pausing — fix it',
+    content: `Buffering is usually caused by a slow internet connection or a temporary app glitch. Try these steps in order.\n\n**Quick fixes (try these first)**\n1. Pause the video for 30 seconds — let the buffer fill up, then play again\n2. Reduce the video quality: tap the settings icon → Video Quality → choose 480p or Auto\n3. Check your internet speed — hoichoi needs at least 5 Mbps for HD, 25 Mbps for 4K\n\n**Step 2 — Check your network**\n- Move closer to your WiFi router\n- Switch from WiFi to mobile data (or vice versa) to isolate the issue\n- Restart your router: unplug for 30 seconds, plug back in\n\n**Step 3 — Clear cache**\nOn Android: Settings → Apps → hoichoi → Storage → Clear Cache\nOn iOS: Delete and reinstall the hoichoi app (your account and watchlist are saved in the cloud)\n\n**Step 4 — Update the app**\nMake sure you have the latest version of hoichoi from your app store.\n\n---\n\n**Still buffering after all this?**\nOur servers might be experiencing temporary high load. Contact support with your device model and internet speed.`,
+    relatedArticles: ['s2', 's3', 't1'],
+  },
+};
+
+const POPULAR_ARTICLES = [
+  { id: 'py1', catId: 'payment',  title: 'Paying with bKash — step by step' },
+  { id: 'a1',  catId: 'account',  title: 'How to reset your password' },
+  { id: 't1',  catId: 'tv',       title: 'Activate hoichoi on Smart TV' },
+  { id: 's1',  catId: 'streaming',title: 'Fix buffering and slow playback' },
+  { id: 'b1',  catId: 'billing',  title: 'Upgrade or change your subscription plan' },
+  { id: 'c1',  catId: 'cancel',   title: 'How to cancel your subscription' },
+];
+
+const VIDEOS = [
+  { id: 'v1', title: 'How to activate hoichoi on Smart TV',      titleBn: 'স্মার্ট টিভিতে activate করুন',      duration: '2:34', thumb: '📺', category: 'Smart TV',    views: '12.4K' },
+  { id: 'v2', title: 'How to pay with bKash',                    titleBn: 'bKash দিয়ে পেমেন্ট করুন',           duration: '1:48', thumb: '💰', category: 'Payment',     views: '18.2K' },
+  { id: 'v3', title: 'How to change your subscription plan',     titleBn: 'সাবস্ক্রিপশন পরিবর্তন করুন',        duration: '2:12', thumb: '🔄', category: 'Subscription',views: '8.9K'  },
+  { id: 'v4', title: 'How to download for offline viewing',      titleBn: 'অফলাইনে দেখার জন্য ডাউনলোড করুন',  duration: '1:55', thumb: '⬇️', category: 'Downloads',   views: '6.1K'  },
+  { id: 'v5', title: 'How to turn off auto-renewal',             titleBn: 'অটো-রিনিউয়াল বন্ধ করুন',            duration: '1:22', thumb: '⏹️', category: 'Subscription',views: '14.7K' },
+  { id: 'v6', title: 'Fire Stick setup — complete guide',        titleBn: 'Fire Stick সেটআপ — পুরো গাইড',      duration: '3:45', thumb: '🔥', category: 'Smart TV',    views: '9.3K'  },
+  { id: 'v7', title: 'Fix buffering and slow playback',          titleBn: 'buffering ঠিক করুন',                 duration: '2:08', thumb: '▶️', category: 'Playback',    views: '21.5K' },
+  { id: 'v8', title: 'Adding profiles for family members',       titleBn: 'পরিবারের জন্য প্রোফাইল যোগ করুন',  duration: '1:30', thumb: '👨‍👩‍👧', category: 'Profile',     views: '5.2K'  },
+];
+
+// ── Ticket Form Data ──────────────────────────────────────────────────────────
+const FORM_CATEGORIES = [
+  {
+    id: 'account', label: 'Account & Login',
+    deviceTriggerSubs: ['TV activation issue', 'Device limit reached', 'Remove a linked device'],
+    attachmentTriggerSubs: [],
+    subs: [
+      "Can't log in / Login error", "OTP not received", "Reset password",
+      "TV activation issue", "Account hacked / unauthorized access", "Forced logout",
+      "Device limit reached", "Remove a linked device", "Update account info",
+      "Delete my account", "Parental control issues", "Can't log in from another country",
+    ],
+  },
+  {
+    id: 'billing', label: 'Subscription & Payments',
+    deviceTriggerSubs: [],
+    attachmentTriggerSubs: [
+      'Payment deducted but subscription not activated',
+      'Already subscribed but asked to subscribe again',
+      'Duplicate charge',
+      'Refund request',
+    ],
+    subs: [
+      'How to subscribe / available plans', 'UPI payment failed', 'Card payment failed',
+      'Play Store / App Store payment failed', 'bKash payment failed',
+      'Payment deducted but subscription not activated',
+      'Already subscribed but asked to subscribe again',
+      'Duplicate charge', 'Refund request', 'Cancel auto-renewal', 'Cancel subscription',
+      'Auto-renewed despite cancellation', 'Subscription code not working',
+      'Upgrade / change plan', 'Invoice request', 'Plan or price confusion',
+      'Subscription status check',
+    ],
+  },
+  {
+    id: 'offers', label: 'Offers & Promotions',
+    deviceTriggerSubs: [],
+    attachmentTriggerSubs: ['Discount code not working', 'Offer not applying at checkout'],
+    subs: ['Discount code not working', 'Offer not applying at checkout', 'Expired offer query'],
+  },
+  {
+    id: 'streaming', label: 'Streaming & Playback',
+    deviceTriggerAll: true,
+    attachmentTriggerSubs: [
+      'Video not loading / black screen', 'Error code during playback',
+      'DRM license error', 'Content blocked in my region', 'Chromecast / AirPlay issue',
+      'Audio/video out of sync', 'Wrong audio track', 'Colour distortion',
+    ],
+    subs: [
+      'Video not loading / black screen', 'Buffering or freezing', 'No audio / audio not working',
+      'Wrong audio track', 'Audio/video out of sync', 'Subtitle missing or not working',
+      'Subtitle out of sync', 'Poor video quality', 'Colour distortion',
+      'Error code during playback', 'DRM license error', 'Content blocked in my region',
+      'Chromecast / AirPlay issue',
+    ],
+  },
+  {
+    id: 'content', label: 'Content',
+    deviceTriggerSubs: [],
+    attachmentTriggerSubs: [],
+    subs: [
+      'Content not available in my region', 'Episode missing or locked', 'Wrong episode order',
+      'Release date / upcoming content query', 'Content removed from platform',
+      'Show or movie not listed', 'Incorrect title or description',
+    ],
+  },
+  {
+    id: 'downloads', label: 'Downloads',
+    deviceTriggerAll: true,
+    attachmentTriggerSubs: ["Downloaded content won't play", "Can't download content"],
+    subs: ["Can't download content", "Downloaded content won't play", "Download other issues"],
+  },
+  {
+    id: 'app', label: 'App & Technical Issues',
+    deviceTriggerAll: true,
+    attachmentTriggerSubs: [
+      'App crashing', 'App not installing or updating',
+      'Website not loading', 'Error on app opening', 'App update failed',
+    ],
+    subs: [
+      'App crashing', 'App not installing or updating', 'App update failed',
+      'Website not loading', 'Error on app opening', 'Continue watching not working',
+      'Watchlist issue', 'Service outage', 'Unsupported device or OS',
+    ],
+  },
+  {
+    id: 'bundle', label: 'hoichoi via Jio, Airtel & Other Bundles',
+    deviceTriggerSubs: [],
+    attachmentTriggerSubs: [],
+    subs: [
+      'Jio (STB / Mobile)', 'Airtel Xstream', 'Amazon Prime Video / Amazon.in',
+      'Daraz', 'Grameenphone (GP)', 'Banglalink', 'Other bundle / partner',
+    ],
+  },
+  {
+    id: 'general', label: 'General & Feedback',
+    deviceTriggerSubs: [],
+    attachmentTriggerSubs: [],
+    subs: [
+      'How to use hoichoi', 'Language or subtitle settings', 'Feature request',
+      'App or content feedback', 'Service complaint', 'Other query',
+    ],
+  },
+];
+
+const DEVICES = [
+  'Android Phone', 'iPhone / iPad', 'Android TV / Smart TV', 'Amazon Fire Stick',
+  'Samsung Smart TV', 'LG Smart TV', 'Web Browser (Chrome / Firefox / Safari)',
+  'Windows PC / Laptop', 'Mac', 'Other (please describe in issue)',
+];
+
+const COUNTRY_CODES = [
+  { code: '+91',  label: '🇮🇳 +91  India' },
+  { code: '+880', label: '🇧🇩 +880 Bangladesh' },
+  { code: '+44',  label: '🇬🇧 +44  United Kingdom' },
+  { code: '+1',   label: '🇺🇸 +1   USA / Canada' },
+  { code: '+61',  label: '🇦🇺 +61  Australia' },
+  { code: '+971', label: '🇦🇪 +971 UAE' },
+  { code: '+65',  label: '🇸🇬 +65  Singapore' },
+  { code: '+60',  label: '🇲🇾 +60  Malaysia' },
+  { code: '+49',  label: '🇩🇪 +49  Germany' },
+  { code: '+31',  label: '🇳🇱 +31  Netherlands' },
+  { code: '+33',  label: '🇫🇷 +33  France' },
+  { code: '+39',  label: '🇮🇹 +39  Italy' },
+  { code: '+966', label: '🇸🇦 +966 Saudi Arabia' },
+  { code: '+92',  label: '🇵🇰 +92  Pakistan' },
+  { code: '+94',  label: '🇱🇰 +94  Sri Lanka' },
+  { code: '+977', label: '🇳🇵 +977 Nepal' },
+  { code: '+66',  label: '🇹🇭 +66  Thailand' },
+  { code: '+81',  label: '🇯🇵 +81  Japan' },
+  { code: '+82',  label: '🇰🇷 +82  South Korea' },
+];
+
+// ── SVG Icons ─────────────────────────────────────────────────────────────────
+const Icon = ({ name, size = 16, style = {}, className = '' }) => {
+  const s = { display: 'inline-block', verticalAlign: 'middle', flexShrink: 0, ...style };
+  const p = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round', style: s, className };
+  const icons = {
+    search:       <svg {...p}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+    moon:         <svg {...p}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>,
+    sun:          <svg {...p}><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>,
+    chat:         <svg {...p}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
+    ticket:       <svg {...p}><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 17v2M13 11v2"/></svg>,
+    chevronRight: <svg {...p}><polyline points="9 18 15 12 9 6"/></svg>,
+    thumbUp:      <svg {...p}><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>,
+    thumbDown:    <svg {...p}><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>,
+    eye:          <svg {...p}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
+    clock:        <svg {...p}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+    play:         <svg {...p} fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>,
+    globe:        <svg {...p}><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
+    check:        <svg {...p}><polyline points="20 6 9 17 4 12"/></svg>,
+    x:            <svg {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    upload:       <svg {...p}><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>,
+    paperclip:    <svg {...p}><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>,
+    alertCircle:  <svg {...p}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
+    loader:       <svg {...p} className={`spin ${className}`}><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>,
+    checkCircle:  <svg {...p}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
+  };
+  return icons[name] || null;
+};
+
+// ── Support CTA Bar ───────────────────────────────────────────────────────────
+const SupportBar = ({ compact = false, onOpenTicket }) => (
+  <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: compact ? '14px 18px' : '20px 24px' }}
+    className="flex items-center justify-between gap-4 flex-wrap">
+    <div>
+      <p style={{ color: 'var(--text-1)', fontWeight: 600, fontSize: compact ? 14 : 15 }}>
+        {compact ? 'Still need help?' : "Couldn't find what you were looking for?"}
+      </p>
+      <p style={{ color: 'var(--text-2)', fontSize: 13, marginTop: 2 }}>
+        Our support team is available Mon–Sat, 9 AM–9 PM IST / BST
+      </p>
+    </div>
+    <div className="flex items-center gap-3">
+      <button onClick={openNuggetChat}
+        className="btn-ghost flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all"
+        style={{ fontSize: 13 }}>
+        <Icon name="chat" size={15} /> Chat with us
+      </button>
+      <button onClick={onOpenTicket}
+        className="btn-primary flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all"
+        style={{ fontSize: 13 }}>
+        <Icon name="ticket" size={15} /> Raise a ticket
+      </button>
+    </div>
+  </div>
+);
+
+// ── Article Feedback (Firebase-wired) ─────────────────────────────────────────
+const ArticleFeedback = ({ articleId, initialLikes, initialDislikes }) => {
+  const [vote, setVote] = useState(() => localStorage.getItem(`hc_vote_${articleId}`));
+  const [likes, setLikes] = useState(initialLikes);
+  const [dislikes, setDislikes] = useState(initialDislikes);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedback, setFeedback] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch live counts from Firestore on mount
+  useEffect(() => {
+    db.collection('articleFeedback').doc(articleId).get()
+      .then(doc => {
+        if (doc.exists) {
+          const d = doc.data();
+          if (d.likes !== undefined)    setLikes(d.likes);
+          if (d.dislikes !== undefined) setDislikes(d.dislikes);
+        }
+      })
+      .catch(() => {});
+  }, [articleId]);
+
+  const handleVote = async (v) => {
+    if (loading) return;
+    const prevVote = vote;
+    const newVote = prevVote === v ? null : v;
+
+    // Optimistic UI
+    if (prevVote === 'like')    setLikes(l => l - 1);
+    if (prevVote === 'dislike') setDislikes(d => d - 1);
+    if (newVote === 'like')     setLikes(l => l + 1);
+    if (newVote === 'dislike')  setDislikes(d => d + 1);
+    setVote(newVote);
+    if (newVote === 'dislike') setShowFeedback(true);
+    else setShowFeedback(false);
+    if (newVote) localStorage.setItem(`hc_vote_${articleId}`, newVote);
+    else localStorage.removeItem(`hc_vote_${articleId}`);
+
+    // Firestore update
+    setLoading(true);
+    try {
+      const ref = db.collection('articleFeedback').doc(articleId);
+      const inc = firebase.firestore.FieldValue.increment;
+      const updates = {};
+      if (prevVote === 'like')    updates.likes    = inc(-1);
+      if (prevVote === 'dislike') updates.dislikes = inc(-1);
+      if (newVote === 'like')     updates.likes    = inc(1);
+      if (newVote === 'dislike')  updates.dislikes = inc(1);
+      if (Object.keys(updates).length > 0) await ref.set(updates, { merge: true });
+    } catch (e) {}
+    setLoading(false);
+  };
+
+  const submitFeedback = async () => {
+    try {
+      await db.collection('articleFeedbackText').add({
+        articleId, feedback, vote, createdAt: Date.now(),
+      });
+    } catch (e) {}
+    setSubmitted(true);
+    setShowFeedback(false);
+  };
+
+  if (submitted) return (
+    <div style={{ borderTop: '1.5px solid var(--border)', paddingTop: 24, marginTop: 32 }}>
+      <p style={{ color: '#16A34A', fontSize: 13, fontWeight: 500 }}>
+        <Icon name="checkCircle" size={14} style={{ marginRight: 6 }} /> Thank you — your feedback helps us improve our articles.
+      </p>
+    </div>
+  );
+
+  return (
+    <div style={{ borderTop: '1.5px solid var(--border)', paddingTop: 24, marginTop: 32 }}>
+      <p style={{ color: 'var(--text-2)', fontSize: 14, fontWeight: 500, marginBottom: 12 }}>Was this article helpful?</p>
+      <div className="flex items-center gap-3 flex-wrap">
+        <button onClick={() => handleVote('like')}
+          className={`like-btn flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium cursor-pointer transition-all ${vote === 'like' ? 'like-active' : ''}`}
+          style={{ background: 'var(--surface2)', color: 'var(--text-2)', borderColor: 'var(--border)' }}>
+          <Icon name="thumbUp" size={15} /> Yes, it helped
+          <span style={{ color: 'var(--text-3)', marginLeft: 2 }}>({likes})</span>
+        </button>
+        <button onClick={() => handleVote('dislike')}
+          className={`dislike-btn flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium cursor-pointer transition-all ${vote === 'dislike' ? 'dislike-active' : ''}`}
+          style={{ background: 'var(--surface2)', color: 'var(--text-2)', borderColor: 'var(--border)' }}>
+          <Icon name="thumbDown" size={15} /> Not really
+          <span style={{ color: 'var(--text-3)', marginLeft: 2 }}>({dislikes})</span>
+        </button>
+      </div>
+      {vote === 'like' && !showFeedback && (
+        <p style={{ color: '#16A34A', fontSize: 13, marginTop: 10, fontWeight: 500 }}>
+          <Icon name="check" size={13} style={{ marginRight: 4 }} /> Thanks for the feedback!
+        </p>
+      )}
+      {showFeedback && (
+        <div className="fade-in" style={{ marginTop: 14 }}>
+          <p style={{ color: 'var(--text-2)', fontSize: 13, marginBottom: 8 }}>What was missing or unclear? (optional)</p>
+          <textarea value={feedback} onChange={e => setFeedback(e.target.value)}
+            placeholder="Tell us what we could improve..."
+            rows={3} className="form-textarea" style={{ maxWidth: 480 }} />
+          <div className="flex gap-2 mt-2">
+            <button onClick={submitFeedback} className="btn-primary px-4 py-2 rounded-lg text-sm font-medium">Submit</button>
+            <button onClick={() => { setSubmitted(true); setShowFeedback(false); }}
+              style={{ color: 'var(--text-3)', background: 'transparent', border: 'none', fontSize: 13, cursor: 'pointer' }}>
+              Skip
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ── Ticket Modal ──────────────────────────────────────────────────────────────
+const TicketModal = ({ onClose }) => {
+  const [form, setForm] = useState({
+    name: '', email: '', countryCode: '+91', phone: '',
+    category: '', subcategory: '', device: '', description: '',
+  });
+  const [file, setFile] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileRef = useRef();
+
+  const selectedCat = FORM_CATEGORIES.find(c => c.id === form.category);
+
+  const needsDevice = selectedCat && (
+    selectedCat.deviceTriggerAll ||
+    (selectedCat.deviceTriggerSubs || []).includes(form.subcategory)
+  );
+
+  const needsAttachment = selectedCat && form.subcategory &&
+    (selectedCat.attachmentTriggerSubs || []).includes(form.subcategory);
+
+  const set = (k, v) => {
+    setForm(f => ({ ...f, [k]: v }));
+    setErrors(e => ({ ...e, [k]: '' }));
+  };
+
+  const handleCategoryChange = (v) => {
+    setForm(f => ({ ...f, category: v, subcategory: '', device: '' }));
+    setErrors(e => ({ ...e, category: '', subcategory: '', device: '' }));
+    setFile(null);
+  };
+
+  const handleFile = (f) => {
+    if (!f) return;
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
+    if (!allowed.includes(f.type)) { setErrors(e => ({ ...e, file: 'Only JPG, PNG, WEBP, GIF or PDF allowed.' })); return; }
+    if (f.size > 5 * 1024 * 1024)  { setErrors(e => ({ ...e, file: 'File must be under 5MB.' })); return; }
+    setFile(f);
+    setErrors(e => ({ ...e, file: '' }));
+  };
+
+  const validate = () => {
+    const e = {};
+    if (!form.name.trim())        e.name = 'Full name is required.';
+    if (!form.email.trim())       e.email = 'Email is required.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Enter a valid email address.';
+    if (!form.phone.trim())       e.phone = 'Phone number is required.';
+    else if (!/^\d{6,15}$/.test(form.phone.replace(/\s/g,''))) e.phone = 'Enter a valid phone number (digits only).';
+    if (!form.category)           e.category = 'Please select a category.';
+    if (!form.subcategory)        e.subcategory = 'Please select an issue type.';
+    if (needsDevice && !form.device) e.device = 'Please select your device.';
+    if (!form.description.trim()) e.description = 'Please describe your issue.';
+    else if (form.description.trim().length < 20) e.description = 'Please provide at least 20 characters.';
+    if (needsAttachment && !file) e.file = 'A screenshot or attachment is required for this issue type.';
+    return e;
+  };
+
+  const toBase64 = (f) => new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload  = () => res(reader.result.split(',')[1]);
+    reader.onerror = rej;
+    reader.readAsDataURL(f);
+  });
+
+  const handleSubmit = async () => {
+    const e = validate();
+    if (Object.keys(e).length > 0) { setErrors(e); return; }
+    setSubmitting(true);
+    try {
+      let attachment = null;
+      if (file) {
+        const base64 = await toBase64(file);
+        attachment = { base64, name: file.name, type: file.type };
+      }
+      const payload = {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: `${form.countryCode} ${form.phone.trim()}`,
+        category: selectedCat?.label || form.category,
+        subcategory: form.subcategory,
+        device: form.device || null,
+        description: form.description.trim(),
+        attachment,
+      };
+      const res = await fetch('/api/send-ticket', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('Server error');
+      setSubmitted(true);
+    } catch (err) {
+      setErrors({ submit: 'Something went wrong. Please try again or email support@hoichoi.tv directly.' });
+    }
+    setSubmitting(false);
+  };
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal-box slide-up">
+        {/* Header */}
+        <div style={{ padding: '20px 24px 16px', borderBottom: '1.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 17 }}>Raise a support ticket</p>
+            <p style={{ color: 'var(--text-3)', fontSize: 12, marginTop: 2 }}>We'll respond to your registered email within 24 hours</p>
+          </div>
+          <button onClick={onClose} style={{ background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-2)' }}>
+            <Icon name="x" size={16} />
+          </button>
+        </div>
+
+        {submitted ? (
+          <div style={{ padding: '48px 24px', textAlign: 'center' }}>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(22,163,74,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', color: '#16A34A' }}>
+              <Icon name="checkCircle" size={32} />
+            </div>
+            <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 18, marginBottom: 8 }}>Ticket submitted!</p>
+            <p style={{ color: 'var(--text-2)', fontSize: 14, lineHeight: 1.6, maxWidth: 380, margin: '0 auto 24px' }}>
+              We've received your query and will respond to <strong>{form.email}</strong> within 24 hours.
+            </p>
+            <button onClick={onClose} className="btn-primary px-6 py-2.5 rounded-xl font-semibold" style={{ fontSize: 14 }}>
+              Done
+            </button>
+          </div>
+        ) : (
+          <div style={{ padding: '20px 24px 24px', display: 'flex', flexDirection: 'column', gap: 16, maxHeight: '80vh', overflowY: 'auto' }}>
+
+            {/* Name */}
+            <div>
+              <label className="form-label">Full Name <span className="req">*</span></label>
+              <input value={form.name} onChange={e => set('name', e.target.value)} className="form-input" placeholder="Your full name" />
+              {errors.name && <p className="field-error">{errors.name}</p>}
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="form-label">Email Address <span className="req">*</span></label>
+              <input type="email" value={form.email} onChange={e => set('email', e.target.value)} className="form-input" placeholder="you@example.com" />
+              {errors.email && <p className="field-error">{errors.email}</p>}
+            </div>
+
+            {/* Phone */}
+            <div>
+              <label className="form-label">Registered Mobile Number <span className="req">*</span></label>
+              <div className="flex gap-2">
+                <div style={{ position: 'relative', flexShrink: 0 }}>
+                  <select value={form.countryCode} onChange={e => set('countryCode', e.target.value)}
+                    className="form-select" style={{ paddingRight: 28, minWidth: 140 }}>
+                    {COUNTRY_CODES.map(c => <option key={c.code} value={c.code}>{c.label}</option>)}
+                  </select>
+                  <div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-3)' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+                <input value={form.phone} onChange={e => set('phone', e.target.value.replace(/\D/g,''))}
+                  className="form-input" placeholder="Phone number" style={{ flex: 1 }} maxLength={15} />
+              </div>
+              {errors.phone && <p className="field-error">{errors.phone}</p>}
+            </div>
+
+            {/* Category */}
+            <div>
+              <label className="form-label">Issue Category <span className="req">*</span></label>
+              <div style={{ position: 'relative' }}>
+                <select value={form.category} onChange={e => handleCategoryChange(e.target.value)} className="form-select" style={{ paddingRight: 28 }}>
+                  <option value="">Select a category</option>
+                  {FORM_CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                </select>
+                <div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-3)' }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+              </div>
+              {errors.category && <p className="field-error">{errors.category}</p>}
+            </div>
+
+            {/* Subcategory */}
+            {form.category && (
+              <div className="fade-in">
+                <label className="form-label">Issue Type <span className="req">*</span></label>
+                <div style={{ position: 'relative' }}>
+                  <select value={form.subcategory} onChange={e => { set('subcategory', e.target.value); setFile(null); }} className="form-select" style={{ paddingRight: 28 }}>
+                    <option value="">Select issue type</option>
+                    {(selectedCat?.subs || []).map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                  <div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-3)' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+                {errors.subcategory && <p className="field-error">{errors.subcategory}</p>}
+              </div>
+            )}
+
+            {/* Device — conditional */}
+            {needsDevice && (
+              <div className="fade-in">
+                <label className="form-label">Device <span className="req">*</span></label>
+                <div style={{ position: 'relative' }}>
+                  <select value={form.device} onChange={e => set('device', e.target.value)} className="form-select" style={{ paddingRight: 28 }}>
+                    <option value="">Select your device</option>
+                    {DEVICES.map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                  <div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-3)' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+                {errors.device && <p className="field-error">{errors.device}</p>}
+              </div>
+            )}
+
+            {/* Description */}
+            <div>
+              <label className="form-label">Describe your issue <span className="req">*</span></label>
+              <textarea value={form.description} onChange={e => set('description', e.target.value)}
+                className="form-textarea" placeholder="Please describe what happened, what you expected, and any error messages you saw..." rows={4} />
+              <div className="flex justify-between mt-1">
+                {errors.description
+                  ? <p className="field-error">{errors.description}</p>
+                  : <span />}
+                <span style={{ color: 'var(--text-3)', fontSize: 11 }}>{form.description.length} chars</span>
+              </div>
+            </div>
+
+            {/* Attachment */}
+            <div>
+              <label className="form-label">
+                Attachment {needsAttachment ? <span className="req">*</span> : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>(optional)</span>}
+              </label>
+              {needsAttachment && (
+                <div className="flex items-start gap-2 mb-2 p-3 rounded-lg" style={{ background: 'rgba(210,8,32,0.06)', border: '1px solid rgba(210,8,32,0.2)' }}>
+                  <Icon name="alertCircle" size={14} style={{ color: 'var(--accent)', marginTop: 1, flexShrink: 0 }} />
+                  <p style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 500 }}>
+                    A screenshot of the error or payment confirmation is required for this issue type. This helps us resolve your ticket faster.
+                  </p>
+                </div>
+              )}
+              <div
+                className={`upload-zone ${dragOver ? 'dragging' : ''} ${file ? 'has-file' : ''}`}
+                onClick={() => fileRef.current?.click()}
+                onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
+              >
+                <input ref={fileRef} type="file" accept="image/*,.pdf" style={{ display: 'none' }}
+                  onChange={e => handleFile(e.target.files[0])} />
+                {file ? (
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <Icon name="paperclip" size={16} style={{ color: '#16A34A' }} />
+                      <div>
+                        <p style={{ color: '#16A34A', fontSize: 13, fontWeight: 600 }}>{file.name}</p>
+                        <p style={{ color: 'var(--text-3)', fontSize: 11 }}>{(file.size / 1024).toFixed(0)} KB</p>
+                      </div>
+                    </div>
+                    <button onClick={e => { e.stopPropagation(); setFile(null); }}
+                      style={{ color: 'var(--text-3)', background: 'none', border: 'none', cursor: 'pointer' }}>
+                      <Icon name="x" size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <Icon name="upload" size={22} style={{ color: 'var(--text-3)', marginBottom: 8 }} />
+                    <p style={{ color: 'var(--text-2)', fontSize: 13, fontWeight: 500 }}>Click or drag a file here</p>
+                    <p style={{ color: 'var(--text-3)', fontSize: 12, marginTop: 3 }}>JPG, PNG, PDF — max 5MB</p>
+                  </div>
+                )}
+              </div>
+              {errors.file && <p className="field-error">{errors.file}</p>}
+            </div>
+
+            {/* Submit error */}
+            {errors.submit && (
+              <div className="flex items-start gap-2 p-3 rounded-lg" style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.2)' }}>
+                <Icon name="alertCircle" size={14} style={{ color: '#DC2626', marginTop: 1 }} />
+                <p style={{ color: '#DC2626', fontSize: 13 }}>{errors.submit}</p>
+              </div>
+            )}
+
+            {/* Submit */}
+            <button onClick={handleSubmit} disabled={submitting}
+              className="btn-primary flex items-center justify-center gap-2 rounded-xl font-semibold"
+              style={{ padding: '12px 24px', fontSize: 15, opacity: submitting ? 0.7 : 1, marginTop: 4 }}>
+              {submitting ? <><Icon name="loader" size={16} /> Submitting…</> : <><Icon name="ticket" size={16} /> Submit ticket</>}
+            </button>
+
+            <p style={{ color: 'var(--text-3)', fontSize: 12, textAlign: 'center' }}>
+              Or email us directly at <a href="mailto:support@hoichoi.tv" style={{ color: 'var(--accent)', textDecoration: 'none' }}>support@hoichoi.tv</a>
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ── Topbar ────────────────────────────────────────────────────────────────────
+const Topbar = ({ theme, setTheme, lang, setLang, searchQuery, setSearchQuery, navigate, onOpenTicket }) => (
+  <div className="topbar">
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', height: 62, display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div className="flex items-center gap-2 cursor-pointer flex-shrink-0" onClick={() => navigate({ view: 'home' })}>
+        <div style={{ background: 'linear-gradient(135deg,#d20820,#6d0550)', borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ color: '#fff', fontWeight: 800, fontSize: 12 }}>h</span>
+        </div>
+        <div>
+          <span style={{ fontWeight: 800, fontSize: 16, letterSpacing: '-0.3px', color: 'var(--text-1)' }}>hoichoi</span>
+          <span style={{ color: 'var(--text-3)', fontSize: 12, marginLeft: 6 }}>Help Center</span>
+        </div>
+      </div>
+
+      <div className="hidden md:flex items-center gap-1" style={{ marginLeft: 4 }}>
+        {[{ label: 'Get Started', view: 'getstarted' }, { label: 'Knowledge Base', view: 'home' }, { label: 'Video Library', view: 'videos' }].map(item => (
+          <button key={item.view} onClick={() => navigate({ view: item.view })}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition-all"
+            style={{ color: 'var(--text-2)', background: 'transparent', border: 'none', fontSize: 13 }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--hover)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+            {item.label}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ flex: 1, maxWidth: 360, position: 'relative' }}>
+        <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-3)' }}>
+          <Icon name="search" size={15} />
+        </div>
+        <input className="search-input form-input" value={searchQuery}
+          onChange={e => { setSearchQuery(e.target.value); if (e.target.value) navigate({ view: 'search' }); }}
+          placeholder="Search help articles..."
+          style={{ paddingLeft: 36, paddingRight: 12, height: 36, borderRadius: 10 }} />
+      </div>
+
+      <div className="flex items-center gap-2 ml-auto flex-shrink-0">
+        <button onClick={() => setLang(l => l === 'en' ? 'bn' : 'en')}
+          className="btn-ghost flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+          style={{ fontSize: 12, height: 34 }}>
+          <Icon name="globe" size={13} /> {lang === 'en' ? 'বাংলা' : 'English'}
+        </button>
+        <button onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}
+          style={{ background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 8, width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-2)' }}>
+          <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={15} />
+        </button>
+        <button onClick={openNuggetChat}
+          className="btn-ghost flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all"
+          style={{ fontSize: 13, height: 34 }}>
+          <Icon name="chat" size={14} /> <span className="hidden md:inline">Chat</span>
+        </button>
+        <button onClick={onOpenTicket}
+          className="btn-primary flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all"
+          style={{ fontSize: 13, height: 34 }}>
+          <Icon name="ticket" size={14} /> <span className="hidden md:inline">Raise a Ticket</span>
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+// ── Content renderer ──────────────────────────────────────────────────────────
+const renderContent = (text) => {
+  if (!text) return <p style={{ color: 'var(--text-2)' }}>Article content coming soon.</p>;
+  return text.split('\n').map((line, i) => {
+    if (line.startsWith('**') && line.endsWith('**'))
+      return <h3 key={i} style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 15, marginTop: 24, marginBottom: 8 }}>{line.slice(2,-2)}</h3>;
+    if (line.startsWith('---'))
+      return <hr key={i} style={{ borderColor: 'var(--border)', marginTop: 24, marginBottom: 20 }} />;
+    if (/^\d+\./.test(line))
+      return <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
+        <span style={{ background: 'linear-gradient(135deg,#d20820,#6d0550)', color: '#fff', width: 22, height: 22, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0, marginTop: 1 }}>
+          {line.match(/^(\d+)/)[1]}
+        </span>
+        <p style={{ color: 'var(--text-1)', fontSize: 14, lineHeight: 1.65, margin: 0 }}
+          dangerouslySetInnerHTML={{ __html: line.replace(/^\d+\.\s*/,'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') }} />
+      </div>;
+    if (line.startsWith('- '))
+      return <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 6 }}>
+        <span style={{ color: 'var(--accent)', fontWeight: 700, flexShrink: 0, marginTop: 1 }}>•</span>
+        <p style={{ color: 'var(--text-1)', fontSize: 14, lineHeight: 1.65, margin: 0 }}
+          dangerouslySetInnerHTML={{ __html: line.slice(2).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') }} />
+      </div>;
+    if (!line.trim()) return <div key={i} style={{ height: 6 }} />;
+    return <p key={i} style={{ color: 'var(--text-1)', fontSize: 14, lineHeight: 1.75, marginBottom: 8 }}
+      dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') }} />;
+  });
+};
+
+// ── Views ─────────────────────────────────────────────────────────────────────
+const HomeView = ({ navigate, lang, onOpenTicket }) => {
+  const [query, setQuery] = useState('');
+  return (
+    <div className="fade-in">
+      <div className="hero-gradient" style={{ padding: '48px 24px 56px' }}>
+        <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 12, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 12 }}>Help Center</p>
+          <h1 style={{ color: '#fff', fontSize: 32, fontWeight: 800, letterSpacing: '-0.5px', marginBottom: 8 }}>How can we help?</h1>
+          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 15, marginBottom: 28 }}>Search our knowledge base or browse categories below</p>
+          <div style={{ position: 'relative', maxWidth: 520, margin: '0 auto' }}>
+            <div style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(0,0,0,0.4)' }}>
+              <Icon name="search" size={18} />
+            </div>
+            <input value={query} onChange={e => setQuery(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && query.trim() && navigate({ view: 'search', query })}
+              placeholder="e.g. reset password, bKash payment, Smart TV..."
+              style={{ width: '100%', height: 52, paddingLeft: 48, paddingRight: 100, borderRadius: 14, border: 'none', fontSize: 15, color: '#0F172A', background: '#fff', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', outline: 'none' }} />
+            <button onClick={() => query.trim() && navigate({ view: 'search', query })}
+              style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'linear-gradient(135deg,#d20820,#6d0550)', color: '#fff', border: 'none', borderRadius: 10, height: 36, paddingInline: 16, fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
+              Search
+            </button>
+          </div>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 16, flexWrap: 'wrap' }}>
+            {['Reset password', 'bKash payment', 'Cancel subscription', 'Smart TV setup'].map(s => (
+              <button key={s} onClick={() => navigate({ view: 'search', query: s })}
+                style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 999, color: '#fff', fontSize: 12, fontWeight: 500, padding: '5px 14px', cursor: 'pointer' }}>
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px 60px' }}>
+        <h2 style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 20, marginBottom: 20 }}>Browse by category</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 14 }}>
+          {CATEGORIES.map(cat => (
+            <div key={cat.id} className="category-card cursor-pointer transition-all"
+              onClick={() => navigate({ view: 'category', catId: cat.id })}
+              style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: 20, boxShadow: 'var(--shadow)', transition: 'transform 0.18s, box-shadow 0.18s' }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', background: cat.color + '18', marginBottom: 12, fontSize: 22 }}>{cat.icon}</div>
+              <p style={{ color: 'var(--text-1)', fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{lang === 'bn' ? cat.labelBn : cat.label}</p>
+              <p style={{ color: 'var(--text-3)', fontSize: 12 }}>{cat.count} articles</p>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ marginTop: 48 }}>
+          <h2 style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 20, marginBottom: 20 }}>Popular articles</h2>
+          <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
+            {POPULAR_ARTICLES.map((a, i) => {
+              const cat = CATEGORIES.find(c => c.id === a.catId);
+              return (
+                <div key={a.id} className="article-card cursor-pointer flex items-center gap-4"
+                  onClick={() => navigate({ view: 'article', articleId: a.id, catId: a.catId })}
+                  style={{ padding: '16px 20px', borderBottom: i < POPULAR_ARTICLES.length - 1 ? '1px solid var(--border)' : 'none', transition: 'background 0.15s' }}>
+                  <span style={{ fontSize: 18, flexShrink: 0 }}>{cat?.icon}</span>
+                  <span style={{ color: 'var(--text-1)', fontSize: 14, fontWeight: 500, flex: 1 }}>{a.title}</span>
+                  <div className="flex items-center gap-2">
+                    <span style={{ color: 'var(--text-3)', fontSize: 12 }}>{cat?.label}</span>
+                    <Icon name="chevronRight" size={15} style={{ color: 'var(--text-3)' }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div style={{ marginTop: 48 }}><SupportBar onOpenTicket={onOpenTicket} /></div>
+      </div>
+    </div>
+  );
+};
+
+const GetStartedView = ({ navigate, lang, onOpenTicket }) => {
+  const steps = [
+    { step: 1, icon: '📧', title: 'Create your account',       titleBn: 'অ্যাকাউন্ট তৈরি করুন',          desc: 'Sign up with your email or phone at hoichoi.tv or on the app', articleId: 'a2', catId: 'account' },
+    { step: 2, icon: '💳', title: 'Pick a plan & pay',          titleBn: 'প্ল্যান বেছে নিন',              desc: 'Choose Monthly or Annual. Pay via bKash, card, Google Play, or iTunes', articleId: 'b2', catId: 'billing' },
+    { step: 3, icon: '📺', title: 'Set up your device',         titleBn: 'ডিভাইস সেটআপ করুন',            desc: 'Install on your phone, Smart TV, or Fire Stick and log in', articleId: 't1', catId: 'tv' },
+    { step: 4, icon: '👨‍👩‍👧', title: 'Add profiles',              titleBn: 'প্রোফাইল যোগ করুন',            desc: 'Create up to 5 profiles for different family members', articleId: 'p1', catId: 'app' },
+    { step: 5, icon: '⬇️', title: 'Download for offline',       titleBn: 'অফলাইনের জন্য ডাউনলোড করুন',  desc: 'Save your favourite content to watch without internet', articleId: 'd1', catId: 'downloads' },
+  ];
+  return (
+    <div className="fade-in">
+      <div style={{ background: 'var(--surface)', borderBottom: '1.5px solid var(--border)', padding: '40px 24px' }}>
+        <div style={{ maxWidth: 760, margin: '0 auto' }}>
+          <p style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 8 }}>Getting Started</p>
+          <h1 style={{ color: 'var(--text-1)', fontSize: 28, fontWeight: 800, letterSpacing: '-0.4px', marginBottom: 8 }}>New to hoichoi? Here's everything you need.</h1>
+          <p style={{ color: 'var(--text-2)', fontSize: 15, lineHeight: 1.6 }}>From signing up to streaming your first show — set up in minutes.</p>
+        </div>
+      </div>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 24px 60px' }}>
+        <div style={{ display: 'grid', gap: 14 }}>
+          {steps.map(s => (
+            <div key={s.step} style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: '22px 24px', boxShadow: 'var(--shadow)', display: 'flex', alignItems: 'center', gap: 20 }}>
+              <div style={{ width: 48, height: 48, borderRadius: 12, flexShrink: 0, background: 'linear-gradient(135deg,#d20820,#6d0550)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 16 }}>{s.step}</div>
+              <div style={{ fontSize: 28, flexShrink: 0 }}>{s.icon}</div>
+              <div style={{ flex: 1 }}>
+                <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 15 }}>{lang === 'bn' ? s.titleBn : s.title}</p>
+                <p style={{ color: 'var(--text-2)', fontSize: 13, marginTop: 3 }}>{s.desc}</p>
+              </div>
+              <button onClick={() => navigate({ view: 'article', articleId: s.articleId, catId: s.catId })}
+                style={{ background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 600, color: 'var(--text-1)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                Learn more
+              </button>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 44 }}><SupportBar onOpenTicket={onOpenTicket} /></div>
+      </div>
+    </div>
+  );
+};
+
+const CategoryView = ({ catId, navigate, lang, onOpenTicket }) => {
+  const cat = CATEGORIES.find(c => c.id === catId);
+  const articles = ARTICLES[catId] || [];
+  return (
+    <div className="fade-in" style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 24px 60px' }}>
+      <div className="flex items-center gap-2 mb-6" style={{ fontSize: 13, color: 'var(--text-3)' }}>
+        <span className="cursor-pointer" style={{ color: 'var(--accent)' }} onClick={() => navigate({ view: 'home' })}>Knowledge Base</span>
+        <span>/</span>
+        <span style={{ color: 'var(--text-2)' }}>{lang === 'bn' ? cat?.labelBn : cat?.label}</span>
+      </div>
+      <div className="flex items-center gap-4 mb-8">
+        <div style={{ width: 52, height: 52, borderRadius: 14, background: cat?.color + '18', fontSize: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cat?.icon}</div>
+        <div>
+          <h1 style={{ color: 'var(--text-1)', fontWeight: 800, fontSize: 24, marginBottom: 2 }}>{lang === 'bn' ? cat?.labelBn : cat?.label}</h1>
+          <p style={{ color: 'var(--text-3)', fontSize: 13 }}>{articles.length} articles</p>
+        </div>
+      </div>
+      <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
+        {articles.map((a, i) => (
+          <div key={a.id} className="article-card cursor-pointer flex items-center gap-4"
+            onClick={() => navigate({ view: 'article', articleId: a.id, catId })}
+            style={{ padding: '16px 20px', borderBottom: i < articles.length - 1 ? '1px solid var(--border)' : 'none', transition: 'background 0.15s' }}>
+            <div style={{ flex: 1 }}>
+              <div className="flex items-center gap-2 mb-1">
+                <span style={{ color: 'var(--text-1)', fontSize: 14, fontWeight: 600 }}>{lang === 'bn' ? a.titleBn : a.title}</span>
+                {a.tag && <span className={`tag ${a.tag === 'new' ? 'tag-new' : 'tag-popular'}`}>{a.tag}</span>}
+              </div>
+              <div className="flex items-center gap-4" style={{ color: 'var(--text-3)', fontSize: 12 }}>
+                <span className="flex items-center gap-1"><Icon name="eye" size={11} /> {(a.views/1000).toFixed(1)}K</span>
+                <span className="flex items-center gap-1"><Icon name="clock" size={11} /> {a.readTime}</span>
+                <span className="flex items-center gap-1"><Icon name="thumbUp" size={11} /> {a.likes}</span>
+              </div>
+            </div>
+            <Icon name="chevronRight" size={16} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+          </div>
+        ))}
+      </div>
+      <div style={{ marginTop: 40 }}><SupportBar compact onOpenTicket={onOpenTicket} /></div>
+    </div>
+  );
+};
+
+const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket }) => {
+  const cat = CATEGORIES.find(c => c.id === catId);
+  const allArticles = ARTICLES[catId] || [];
+  const articleMeta = allArticles.find(a => a.id === articleId) || {};
+  const content = ARTICLE_CONTENT[articleId];
+  const relatedIds = content?.relatedArticles || [];
+  const relatedArticles = relatedIds.map(id => {
+    for (const [cId, arts] of Object.entries(ARTICLES)) {
+      const found = arts.find(a => a.id === id);
+      if (found) return { ...found, catId: cId };
+    }
+    return null;
+  }).filter(Boolean);
+  const title = lang === 'bn' ? (articleMeta.titleBn || content?.title) : (content?.title || articleMeta.title);
+
+  return (
+    <div className="fade-in" style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 24px 60px', display: 'grid', gridTemplateColumns: '1fr 300px', gap: 32, alignItems: 'start' }}>
+      <div>
+        <div className="flex items-center gap-2 mb-6" style={{ fontSize: 13, color: 'var(--text-3)' }}>
+          <span className="cursor-pointer" style={{ color: 'var(--accent)' }} onClick={() => navigate({ view: 'home' })}>Knowledge Base</span>
+          <span>/</span>
+          <span className="cursor-pointer" style={{ color: 'var(--accent)' }} onClick={() => navigate({ view: 'category', catId })}>{cat?.label}</span>
+          <span>/</span>
+          <span style={{ color: 'var(--text-2)' }}>Article</span>
+        </div>
+        <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 16, padding: 32, boxShadow: 'var(--shadow)' }}>
+          <div className="flex items-center gap-2 mb-4 flex-wrap">
+            <span style={{ background: cat?.color + '18', color: cat?.color, padding: '3px 10px', borderRadius: 999, fontSize: 12, fontWeight: 600 }}>{cat?.icon} {cat?.label}</span>
+            {articleMeta.tag && <span className={`tag ${articleMeta.tag === 'new' ? 'tag-new' : 'tag-popular'}`}>{articleMeta.tag}</span>}
+            <span style={{ color: 'var(--text-3)', fontSize: 12, marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Icon name="clock" size={12} /> {articleMeta.readTime}
+            </span>
+          </div>
+          <h1 style={{ color: 'var(--text-1)', fontWeight: 800, fontSize: 22, letterSpacing: '-0.3px', marginBottom: 12 }}>{title}</h1>
+          <div className="flex gap-4 mb-6 pb-5 flex-wrap" style={{ borderBottom: '1px solid var(--border)' }}>
+            {articleMeta.views && <span className="flex items-center gap-1.5" style={{ color: 'var(--text-3)', fontSize: 12 }}><Icon name="eye" size={13} />{(articleMeta.views/1000).toFixed(1)}K views</span>}
+            {articleMeta.likes && <span className="flex items-center gap-1.5" style={{ color: 'var(--text-3)', fontSize: 12 }}><Icon name="thumbUp" size={13} />{articleMeta.likes}</span>}
+          </div>
+          <div>{renderContent(content?.content)}</div>
+          {articleMeta.likes !== undefined && (
+            <ArticleFeedback articleId={articleId} initialLikes={articleMeta.likes} initialDislikes={articleMeta.dislikes} />
+          )}
+        </div>
+        <div style={{ marginTop: 24 }}><SupportBar compact onOpenTicket={onOpenTicket} /></div>
+      </div>
+
+      <div style={{ position: 'sticky', top: 80, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {relatedArticles.length > 0 && (
+          <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: 20, boxShadow: 'var(--shadow)' }}>
+            <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 14, marginBottom: 14 }}>Related articles</p>
+            {relatedArticles.map((a, i) => {
+              const rc = CATEGORIES.find(c => c.id === a.catId);
+              return (
+                <div key={a.id} className="cursor-pointer flex items-center gap-3 py-2"
+                  onClick={() => navigate({ view: 'article', articleId: a.id, catId: a.catId })}
+                  style={{ borderBottom: i < relatedArticles.length-1 ? '1px solid var(--border)' : 'none' }}
+                  onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
+                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
+                  <span style={{ fontSize: 16 }}>{rc?.icon}</span>
+                  <span style={{ fontSize: 13, color: 'var(--text-2)', flex: 1, lineHeight: 1.4 }}>{a.title}</span>
+                  <Icon name="chevronRight" size={13} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+                </div>
+              );
+            })}
+          </div>
+        )}
+        <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: 20, boxShadow: 'var(--shadow)' }}>
+          <div className="flex items-center justify-between mb-4">
+            <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 14 }}>In this category</p>
+            <span style={{ color: 'var(--accent)', fontSize: 12, cursor: 'pointer' }} onClick={() => navigate({ view: 'category', catId })}>See all</span>
+          </div>
+          {allArticles.slice(0,5).map((a, i) => (
+            <div key={a.id} className="cursor-pointer flex items-center gap-2 py-2"
+              onClick={() => navigate({ view: 'article', articleId: a.id, catId })}
+              style={{ borderBottom: i < Math.min(4, allArticles.length-1) ? '1px solid var(--border)' : 'none' }}>
+              {a.id === articleId && <div style={{ width: 3, height: 16, background: 'var(--accent)', borderRadius: 3, flexShrink: 0 }} />}
+              <span style={{ fontSize: 13, lineHeight: 1.4, color: a.id === articleId ? 'var(--accent)' : 'var(--text-2)', fontWeight: a.id === articleId ? 600 : 400 }}>{a.title}</span>
+            </div>
+          ))}
+        </div>
+        {/* Inline support CTA in sidebar */}
+        <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: 20, boxShadow: 'var(--shadow)' }}>
+          <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 14, marginBottom: 6 }}>Need more help?</p>
+          <p style={{ color: 'var(--text-2)', fontSize: 12, marginBottom: 14, lineHeight: 1.5 }}>Our support team is ready to help Mon–Sat, 9 AM–9 PM</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <button onClick={openNuggetChat} className="btn-ghost flex items-center justify-center gap-2 rounded-lg w-full" style={{ padding: '8px 12px', fontSize: 13 }}>
+              <Icon name="chat" size={14} /> Chat with us
+            </button>
+            <button onClick={onOpenTicket} className="btn-primary flex items-center justify-center gap-2 rounded-lg w-full" style={{ padding: '8px 12px', fontSize: 13 }}>
+              <Icon name="ticket" size={14} /> Raise a ticket
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const VideoLibraryView = ({ navigate, lang, onOpenTicket }) => {
+  const [activeFilter, setActiveFilter] = useState('All');
+  const filters = ['All', 'Smart TV', 'Payment', 'Subscription', 'Downloads', 'Playback', 'Profile'];
+  const filtered = activeFilter === 'All' ? VIDEOS : VIDEOS.filter(v => v.category === activeFilter);
+  return (
+    <div className="fade-in">
+      <div style={{ background: 'var(--surface)', borderBottom: '1.5px solid var(--border)', padding: '36px 24px 28px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <p style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 8 }}>How-to Videos</p>
+          <h1 style={{ color: 'var(--text-1)', fontWeight: 800, fontSize: 26, letterSpacing: '-0.4px', marginBottom: 6 }}>Visual step-by-step guides</h1>
+          <p style={{ color: 'var(--text-2)', fontSize: 14 }}>Short, clear videos showing exactly how to use hoichoi</p>
+        </div>
+      </div>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px 60px' }}>
+        <div className="flex gap-2 mb-8 flex-wrap">
+          {filters.map(f => (
+            <button key={f} onClick={() => setActiveFilter(f)}
+              style={{ padding: '7px 16px', borderRadius: 999, fontSize: 13, fontWeight: 500, cursor: 'pointer', border: '1.5px solid', background: activeFilter === f ? 'linear-gradient(135deg,#d20820,#6d0550)' : 'var(--surface)', color: activeFilter === f ? '#fff' : 'var(--text-2)', borderColor: activeFilter === f ? 'transparent' : 'var(--border)' }}>
+              {f}
+            </button>
+          ))}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 18 }}>
+          {filtered.map(v => (
+            <div key={v.id} className="video-card cursor-pointer"
+              style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, overflow: 'hidden', boxShadow: 'var(--shadow)', transition: 'transform 0.18s, box-shadow 0.18s' }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = 'var(--shadow)'; }}>
+              <div style={{ height: 140, background: 'linear-gradient(135deg,#1a0a10,#1a0520)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', fontSize: 48 }}>
+                {v.thumb}
+                <div className="play-overlay" style={{ position: 'absolute', inset: 0, background: 'rgba(210,8,32,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Icon name="play" size={20} style={{ color: '#d20820', marginLeft: 3 }} />
+                  </div>
+                </div>
+                <div style={{ position: 'absolute', bottom: 8, right: 10, background: 'rgba(0,0,0,0.75)', color: '#fff', fontSize: 11, fontWeight: 600, padding: '2px 7px', borderRadius: 6 }}>{v.duration}</div>
+              </div>
+              <div style={{ padding: '14px 16px' }}>
+                <p style={{ color: 'var(--text-1)', fontWeight: 600, fontSize: 13, lineHeight: 1.4, marginBottom: 6 }}>{lang === 'bn' ? v.titleBn : v.title}</p>
+                <div className="flex items-center justify-between">
+                  <span style={{ background: '#EFF6FF', color: '#2563EB', padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 600 }}>{v.category}</span>
+                  <span style={{ color: 'var(--text-3)', fontSize: 11 }}>{v.views}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 48 }}><SupportBar onOpenTicket={onOpenTicket} /></div>
+      </div>
+    </div>
+  );
+};
+
+const SearchView = ({ query, navigate, lang, onOpenTicket }) => {
+  const results = useMemo(() => {
+    if (!query) return [];
+    const q = query.toLowerCase();
+    const hits = [];
+    for (const [catId, articles] of Object.entries(ARTICLES)) {
+      for (const a of articles) {
+        if (a.title.toLowerCase().includes(q) || a.titleBn.includes(q)) hits.push({ ...a, catId });
+      }
+    }
+    return hits;
+  }, [query]);
+  const cat = (cId) => CATEGORIES.find(c => c.id === cId);
+  return (
+    <div className="fade-in" style={{ maxWidth: 900, margin: '0 auto', padding: '36px 24px 60px' }}>
+      <p style={{ color: 'var(--text-3)', fontSize: 13, marginBottom: 24 }}>
+        {results.length > 0 ? `${results.length} result${results.length !== 1 ? 's' : ''} for "${query}"` : `No results found for "${query}"`}
+      </p>
+      {results.length > 0 ? (
+        <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
+          {results.map((a, i) => (
+            <div key={a.id} className="article-card cursor-pointer flex items-center gap-4"
+              onClick={() => navigate({ view: 'article', articleId: a.id, catId: a.catId })}
+              style={{ padding: '16px 20px', borderBottom: i < results.length-1 ? '1px solid var(--border)' : 'none', transition: 'background 0.15s' }}>
+              <span style={{ fontSize: 22, flexShrink: 0 }}>{cat(a.catId)?.icon}</span>
+              <div style={{ flex: 1 }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span style={{ color: 'var(--text-1)', fontSize: 14, fontWeight: 600 }}>{lang === 'bn' ? a.titleBn : a.title}</span>
+                  {a.tag && <span className={`tag ${a.tag === 'new' ? 'tag-new' : 'tag-popular'}`}>{a.tag}</span>}
+                </div>
+                <span style={{ color: 'var(--text-3)', fontSize: 12 }}>{cat(a.catId)?.label}</span>
+              </div>
+              <Icon name="chevronRight" size={15} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div style={{ textAlign: 'center', padding: '60px 24px' }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>🔍</div>
+          <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 18, marginBottom: 8 }}>No results found</p>
+          <p style={{ color: 'var(--text-2)', fontSize: 14, marginBottom: 28 }}>Try different keywords, or browse our categories below.</p>
+          <button className="btn-primary px-6 py-2.5 rounded-lg font-semibold cursor-pointer" onClick={() => navigate({ view: 'home' })}>Browse categories</button>
+        </div>
+      )}
+      <div style={{ marginTop: 40 }}><SupportBar compact onOpenTicket={onOpenTicket} /></div>
+    </div>
+  );
+};
+
+// ── App ───────────────────────────────────────────────────────────────────────
+function App() {
+  const [theme, setTheme] = useState('light');
+  const [lang, setLang] = useState('en');
+  const [nav, setNav] = useState({ view: 'home' });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showTicket, setShowTicket] = useState(false);
+
+  useEffect(() => { document.documentElement.setAttribute('data-theme', theme); }, [theme]);
+
+  const navigate = useCallback((newNav) => {
+    if (newNav.view !== 'search') setSearchQuery('');
+    if (newNav.query) setSearchQuery(newNav.query);
+    setNav(newNav);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const onOpenTicket = useCallback(() => setShowTicket(true), []);
+
+  const viewProps = { navigate, lang, onOpenTicket };
+
+  const renderView = () => {
+    switch (nav.view) {
+      case 'home':       return <HomeView {...viewProps} />;
+      case 'getstarted': return <GetStartedView {...viewProps} />;
+      case 'category':   return <CategoryView catId={nav.catId} {...viewProps} />;
+      case 'article':    return <ArticleView articleId={nav.articleId} catId={nav.catId} {...viewProps} />;
+      case 'videos':     return <VideoLibraryView {...viewProps} />;
+      case 'search':     return <SearchView query={searchQuery} {...viewProps} />;
+      default:           return <HomeView {...viewProps} />;
+    }
+  };
+
+  return (
+    <>
+      <Topbar theme={theme} setTheme={setTheme} lang={lang} setLang={setLang}
+        searchQuery={searchQuery} setSearchQuery={setSearchQuery}
+        navigate={navigate} onOpenTicket={onOpenTicket} />
+      {renderView()}
+      {showTicket && <TicketModal onClose={() => setShowTicket(false)} />}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
