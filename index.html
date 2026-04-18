@@ -92,10 +92,14 @@
     .article-sidebar { position: static; }
   }
   /* Responsive topbar */
-  @media (max-width: 600px) {
-    .topbar-chat { display: none !important; }
+  .topbar-nav { display: none; }
+  @media (min-width: 1024px) { .topbar-nav { display: flex; align-items: center; } }
+  @media (max-width: 1023px) {
     .topbar-lang { display: none !important; }
+    .topbar-chat { display: none !important; }
   }
+  .topbar-btn-text { display: none; }
+  @media (min-width: 768px) { .topbar-btn-text { display: inline; } }
   /* Category card grid min size on small screens */
   @media (max-width: 480px) {
     .category-grid { grid-template-columns: repeat(2, 1fr) !important; }
@@ -856,7 +860,7 @@ const Topbar = ({ theme, setTheme, lang, setLang, searchQuery, setSearchQuery, n
         <span style={{ color: 'var(--text-3)', fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' }}>Help Center</span>
       </div>
 
-      <div className="hidden md:flex" style={{ alignItems: 'center', gap: 2, marginLeft: 8 }}>
+      <div className="topbar-nav" style={{ gap: 2, marginLeft: 8 }}>
         {[{ label: 'Get Started', view: 'getstarted' }, { label: 'Help Articles', view: 'home' }, { label: 'Video Library', view: 'videos' }].map((item, i) => (
           <React.Fragment key={item.view}>
             {i > 0 && <span style={{ width: 1, height: 14, background: 'var(--border)', display: 'inline-block', flexShrink: 0 }} />}
@@ -893,12 +897,12 @@ const Topbar = ({ theme, setTheme, lang, setLang, searchQuery, setSearchQuery, n
         <button onClick={openNuggetChat}
           className="topbar-chat btn-ghost flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all"
           style={{ fontSize: 13, height: 34 }}>
-          <Icon name="chat" size={14} /> <span className="hidden md:inline">Chat</span>
+          <Icon name="chat" size={14} /> <span className="topbar-btn-text">Chat</span>
         </button>
         <button onClick={onOpenTicket}
           className="btn-primary flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all"
           style={{ fontSize: 13, height: 34 }}>
-          <Icon name="ticket" size={14} /> <span className="hidden md:inline">Raise a Ticket</span>
+          <Icon name="ticket" size={14} /> <span className="topbar-btn-text">Raise a Ticket</span>
         </button>
       </div>
     </div>
