@@ -1139,7 +1139,16 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket }) => {
   const cat = CATEGORIES.find(c => c.id === catId);
   const allArticles = ARTICLES[catId] || [];
   const articleMeta = allArticles.find(a => a.id === articleId) || {};
-  const content = ARTICLE_CONTENT[articleId];
+  const [fsContent, setFsContent] = useState(null);
+
+  useEffect(() => {
+    setFsContent(null);
+    db.collection('articles').doc(articleId).get()
+      .then(doc => { if (doc.exists && doc.data().published !== false) setFsContent(doc.data()); })
+      .catch(() => {});
+  }, [articleId]);
+
+  const content = fsContent || ARTICLE_CONTENT[articleId];
   const relatedIds = content?.relatedArticles || [];
   const relatedArticles = relatedIds.map(id => {
     for (const [cId, arts] of Object.entries(ARTICLES)) {
