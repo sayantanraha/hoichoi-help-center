@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>hoichoi Help Center — Admin</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #F0F3FA; --surface: #FFFFFF; --surface2: #F8FAFC;
+    --border: #E4E8F0; --text-1: #0F172A; --text-2: #475569; --text-3: #94A3B8;
+    --sidebar-bg: #0C1120; --sidebar-border: #1C2A3E;
+    --accent: #d20820; --accent2: #6d0550;
+    --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10); --shadow-lg: 0 8px 40px rgba(0,0,0,0.18);
+  }
+  * { font-family: 'Inter', sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text-1); }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 9999px; }
+  .btn-primary { background: linear-gradient(135deg,#d20820,#6d0550); color: #fff; border: none; cursor: pointer; font-weight: 600; transition: opacity 0.15s; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-ghost { background: var(--surface); border: 1.5px solid var(--border); color: var(--text-1); cursor: pointer; transition: background 0.15s; }
+  .btn-ghost:hover { background: var(--surface2); }
+  .btn-danger { background: #FEE2E2; color: #DC2626; border: 1.5px solid #FECACA; cursor: pointer; transition: background 0.15s; }
+  .btn-danger:hover { background: #FECACA; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 10px 14px; color: var(--text-1); font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s; font-family: 'Inter', sans-serif;
+  }
+  .form-select { appearance: none; cursor: pointer; }
+  .form-textarea { resize: vertical; min-height: 120px; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(210,8,32,0.12);
+  }
+  .form-label { color: var(--text-2); font-size: 13px; font-weight: 600; margin-bottom: 6px; display: block; }
+  .badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .badge-green { background: #DCFCE7; color: #15803D; }
+  .badge-gray  { background: #F1F5F9; color: #64748B; }
+  .badge-blue  { background: #EFF6FF; color: #2563EB; }
+  .badge-orange{ background: #FFF7ED; color: #EA580C; }
+  .badge-red   { background: #FEE2E2; color: #DC2626; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); backdrop-filter: blur(4px); z-index: 200; display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 24px; }
+  .modal-box { background: var(--surface); border-radius: 18px; width: 100%; max-width: 760px; box-shadow: var(--shadow-lg); margin: auto; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 10px; cursor: pointer; transition: background 0.15s; color: #8896AB; font-size: 14px; font-weight: 500; }
+  .sidebar-item:hover { background: rgba(255,255,255,0.06); color: #E8EDF5; }
+  .sidebar-item.active { background: rgba(210,8,32,0.18); color: #F87171; }
+  .sidebar-item.active svg { color: #F87171; }
+  .table-row:hover { background: var(--surface2); }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fadeIn 0.2s ease; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .spin { animation: spin 0.8s linear infinite; }
+  .tag-toggle { display: inline-flex; border-radius: 8px; overflow: hidden; border: 1.5px solid var(--border); }
+  .tag-toggle-item { padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s, color 0.15s; background: var(--surface2); color: var(--text-2); }
+  .tag-toggle-item.selected { background: var(--accent); color: #fff; }
+  .tag-toggle-item:not(:last-child) { border-right: 1.5px solid var(--border); }
+  .preview-content p { margin-bottom: 12px; line-height: 1.7; }
+  .preview-content strong { font-weight: 700; }
+  .preview-content hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: var(--shadow); }
+  .progress-bar { height: 6px; background: #E4E8F0; border-radius: 999px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 999px; transition: width 0.4s; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0F172A; color: #fff; padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 500; z-index: 999; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ── Firebase ──────────────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyDbaSdfHpLbcKFLu0gP6Ftji6PXW1VJ5Jk",
+  authDomain: "hoichoi-help-center.firebaseapp.com",
+  projectId: "hoichoi-help-center",
+  storageBucket: "hoichoi-help-center.firebasestorage.app",
+  messagingSenderId: "100762044374",
+  appId: "1:100762044374:web:43757f995a95c71e530677"
+};
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db   = firebase.firestore();
+const auth = firebase.auth();
+
+// ── Category reference ────────────────────────────────────────────────────────
+const CATEGORIES = [
+  { id: 'account',   label: 'Account & Login' },
+  { id: 'billing',   label: 'Subscription & Payments' },
+  { id: 'streaming', label: 'Streaming & Playback' },
+  { id: 'downloads', label: 'Downloads & Offline' },
+  { id: 'tv',        label: 'Smart TV & Devices' },
+  { id: 'cancel',    label: 'Cancellation & Refund' },
+  { id: 'app',       label: 'App & Technical Issues' },
+  { id: 'payment',   label: 'Payment Methods' },
+];
+
+// ── Icons ─────────────────────────────────────────────────────────────────────
+const Icon = ({ name, size = 16, style = {} }) => {
+  const icons = {
+    articles:   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={style}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>,
+    feedback:   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={style}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
+    tickets:    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={style}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
+    logout:     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={style}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+    plus:       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={style}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+    edit:       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={style}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
+    trash:      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={style}><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>,
+    eye:        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={style}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
+    eyeOff:     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={style}><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>,
+    thumbUp:    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={style}><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>,
+    thumbDown:  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={style}><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>,
+    search:     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={style}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+    check:      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={style}><polyline points="20 6 9 17 4 12"/></svg>,
+    x:          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={style}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    refresh:    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={style}><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>,
+    link:       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={style}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>,
+    star:       <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" style={style}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+  };
+  return icons[name] || null;
+};
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function Toast({ msg, type = 'success', onDone }) {
+  useEffect(() => { const t = setTimeout(onDone, 3000); return () => clearTimeout(t); }, []);
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  const color = type === 'success' ? '#22C55E' : type === 'error' ? '#EF4444' : '#60A5FA';
+  return <div className="toast"><span style={{ color, fontWeight: 800, fontSize: 16 }}>{icon}</span>{msg}</div>;
+}
+
+// ── Markdown preview (simple) ─────────────────────────────────────────────────
+function renderMarkdown(text) {
+  if (!text) return '';
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^---$/gm,'<hr/>')
+    .replace(/\n/g,'<br/>');
+}
+
+// ── Login Screen ──────────────────────────────────────────────────────────────
+function LoginScreen({ onLogin }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    setError(''); setLoading(true);
+    try {
+      const cred = await auth.signInWithEmailAndPassword(email, password);
+      onLogin(cred.user);
+    } catch (err) {
+      const msgs = {
+        'auth/user-not-found': 'No account with this email.',
+        'auth/wrong-password': 'Incorrect password.',
+        'auth/invalid-email': 'Invalid email address.',
+        'auth/too-many-requests': 'Too many attempts. Try again later.',
+      };
+      setError(msgs[err.code] || 'Login failed. Check credentials.');
+    } finally { setLoading(false); }
+  }
+
+  return (
+    <div style={{ minHeight:'100vh', background:'linear-gradient(135deg,#07090F 0%,#0C1120 60%,#1a0810 100%)', display:'flex', alignItems:'center', justifyContent:'center', padding:24 }}>
+      <div className="fade-in" style={{ width:'100%', maxWidth:420 }}>
+        {/* Logo */}
+        <div style={{ textAlign:'center', marginBottom:36 }}>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:10, marginBottom:12 }}>
+            <div style={{ width:40, height:40, background:'linear-gradient(135deg,#d20820,#6d0550)', borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', fontWeight:800, fontSize:18, color:'#fff' }}>h</div>
+            <span style={{ color:'#fff', fontSize:22, fontWeight:800 }}>hoichoi</span>
+          </div>
+          <p style={{ color:'#8896AB', fontSize:13, fontWeight:500 }}>Help Center · Admin Panel</p>
+        </div>
+
+        <div style={{ background:'#0C1120', border:'1px solid #1C2A3E', borderRadius:18, padding:32, boxShadow:'0 8px 40px rgba(0,0,0,0.6)' }}>
+          <h2 style={{ color:'#E8EDF5', fontSize:20, fontWeight:700, marginBottom:6 }}>Sign in</h2>
+          <p style={{ color:'#8896AB', fontSize:13, marginBottom:24 }}>Access is restricted to authorised admins.</p>
+
+          <form onSubmit={handleLogin} style={{ display:'flex', flexDirection:'column', gap:16 }}>
+            <div>
+              <label className="form-label" style={{ color:'#8896AB' }}>Email</label>
+              <input className="form-input" type="email" placeholder="admin@hoichoi.tv" value={email} onChange={e=>setEmail(e.target.value)} required
+                style={{ background:'#111827', border:'1.5px solid #1C2A3E', color:'#E8EDF5' }} />
+            </div>
+            <div>
+              <label className="form-label" style={{ color:'#8896AB' }}>Password</label>
+              <div style={{ position:'relative' }}>
+                <input className="form-input" type={showPass?'text':'password'} placeholder="••••••••" value={password} onChange={e=>setPassword(e.target.value)} required
+                  style={{ background:'#111827', border:'1.5px solid #1C2A3E', color:'#E8EDF5', paddingRight:44 }} />
+                <button type="button" onClick={()=>setShowPass(!showPass)}
+                  style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'#8896AB', display:'flex' }}>
+                  <Icon name={showPass?'eyeOff':'eye'} size={16} />
+                </button>
+              </div>
+            </div>
+            {error && <div style={{ background:'rgba(220,38,38,0.1)', border:'1px solid rgba(220,38,38,0.3)', borderRadius:8, padding:'10px 14px', fontSize:13, color:'#F87171' }}>{error}</div>}
+            <button className="btn-primary" type="submit" disabled={loading}
+              style={{ padding:'12px 0', borderRadius:10, fontSize:15, marginTop:4, display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+              {loading ? <span className="spin" style={{ width:18,height:18,border:'2px solid rgba(255,255,255,0.3)',borderTopColor:'#fff',borderRadius:'50%',display:'inline-block' }}/> : 'Sign in'}
+            </button>
+          </form>
+        </div>
+        <p style={{ textAlign:'center', color:'#3D5068', fontSize:12, marginTop:20 }}>Forgot access? Contact the project admin.</p>
+      </div>
+    </div>
+  );
+}
+
+// ── Article Editor Modal ──────────────────────────────────────────────────────
+function ArticleEditor({ article, onSave, onClose }) {
+  const isNew = !article?.id;
+  const [form, setForm] = useState({
+    id: article?.id || '',
+    title: article?.title || '',
+    titleBn: article?.titleBn || '',
+    categoryId: article?.categoryId || 'account',
+    tag: article?.tag || 'none',
+    readTime: article?.readTime || '2 min',
+    content: article?.content || '',
+    relatedArticles: (article?.relatedArticles || []).join(', '),
+    published: article?.published !== false,
+  });
+  const [preview, setPreview] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [idError, setIdError] = useState('');
+
+  function set(key, val) { setForm(f => ({...f, [key]: val})); }
+
+  async function handleSave() {
+    if (!form.id.trim()) { setIdError('Article ID is required.'); return; }
+    if (!/^[a-z0-9_-]+$/.test(form.id.trim())) { setIdError('Only lowercase letters, numbers, - and _ allowed.'); return; }
+    if (!form.title.trim() || !form.content.trim()) return;
+    setSaving(true);
+    try {
+      const related = form.relatedArticles.split(',').map(s=>s.trim()).filter(Boolean);
+      const payload = {
+        id: form.id.trim(),
+        title: form.title.trim(),
+        titleBn: form.titleBn.trim(),
+        categoryId: form.categoryId,
+        tag: form.tag === 'none' ? null : form.tag,
+        readTime: form.readTime.trim() || '2 min',
+        content: form.content.trim(),
+        relatedArticles: related,
+        published: form.published,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        ...(isNew ? { createdAt: firebase.firestore.FieldValue.serverTimestamp() } : {}),
+      };
+      await db.collection('articles').doc(form.id.trim()).set(payload, { merge: true });
+      onSave(payload);
+    } finally { setSaving(false); }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target===e.currentTarget && onClose()}>
+      <div className="modal-box fade-in" style={{ maxWidth:800 }}>
+        {/* Header */}
+        <div style={{ padding:'20px 24px', borderBottom:'1px solid var(--border)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <div>
+            <h2 style={{ fontWeight:700, fontSize:18 }}>{isNew ? 'New Article' : 'Edit Article'}</h2>
+            {!isNew && <p style={{ color:'var(--text-3)', fontSize:12, marginTop:2 }}>ID: {article.id}</p>}
+          </div>
+          <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+            <button onClick={()=>setPreview(!preview)} className="btn-ghost"
+              style={{ padding:'7px 14px', borderRadius:8, fontSize:13, display:'flex', alignItems:'center', gap:6 }}>
+              <Icon name="eye" size={14} />{preview ? 'Edit' : 'Preview'}
+            </button>
+            <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--text-3)', display:'flex' }}><Icon name="x" size={20} /></button>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding:24, maxHeight:'72vh', overflowY:'auto', display:'flex', flexDirection:'column', gap:18 }}>
+          {preview ? (
+            <div>
+              <h1 style={{ fontSize:22, fontWeight:800, marginBottom:6 }}>{form.title || 'Untitled'}</h1>
+              {form.titleBn && <p style={{ color:'var(--text-3)', fontSize:14, marginBottom:16 }}>{form.titleBn}</p>}
+              <div className="preview-content" style={{ fontSize:15, lineHeight:1.7, color:'var(--text-1)' }}
+                dangerouslySetInnerHTML={{ __html: renderMarkdown(form.content) }} />
+            </div>
+          ) : (
+            <>
+              {/* ID (new only) */}
+              {isNew && (
+                <div>
+                  <label className="form-label">Article ID <span style={{ color:'var(--accent)' }}>*</span></label>
+                  <input className="form-input" placeholder="e.g. a6 or reset-password-guide" value={form.id}
+                    onChange={e=>{set('id',e.target.value);setIdError('');}} />
+                  {idError && <p style={{ color:'#DC2626', fontSize:12, marginTop:4 }}>{idError}</p>}
+                  <p style={{ color:'var(--text-3)', fontSize:12, marginTop:4 }}>Lowercase, no spaces. This is permanent once saved.</p>
+                </div>
+              )}
+
+              {/* Title */}
+              <div>
+                <label className="form-label">Title (English) <span style={{ color:'var(--accent)' }}>*</span></label>
+                <input className="form-input" placeholder="e.g. How to reset your password" value={form.title} onChange={e=>set('title',e.target.value)} />
+              </div>
+
+              {/* Bengali title */}
+              <div>
+                <label className="form-label">Title (Bengali) <span style={{ color:'var(--text-3)', fontWeight:400 }}>(optional)</span></label>
+                <input className="form-input" placeholder="e.g. পাসওয়ার্ড রিসেট করবেন কীভাবে" value={form.titleBn} onChange={e=>set('titleBn',e.target.value)} />
+              </div>
+
+              {/* Category + Read time */}
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+                <div>
+                  <label className="form-label">Category <span style={{ color:'var(--accent)' }}>*</span></label>
+                  <select className="form-select" value={form.categoryId} onChange={e=>set('categoryId',e.target.value)}>
+                    {CATEGORIES.map(c=><option key={c.id} value={c.id}>{c.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="form-label">Read time</label>
+                  <input className="form-input" placeholder="e.g. 3 min" value={form.readTime} onChange={e=>set('readTime',e.target.value)} />
+                </div>
+              </div>
+
+              {/* Tag */}
+              <div>
+                <label className="form-label">Tag</label>
+                <div className="tag-toggle">
+                  {['none','popular','new'].map(t=>(
+                    <div key={t} className={`tag-toggle-item ${form.tag===t?'selected':''}`} onClick={()=>set('tag',t)}>
+                      {t==='none'?'No tag':t.charAt(0).toUpperCase()+t.slice(1)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Content */}
+              <div>
+                <label className="form-label">Content <span style={{ color:'var(--accent)' }}>*</span></label>
+                <p style={{ color:'var(--text-3)', fontSize:12, marginBottom:6 }}>
+                  Use **bold**, *italic*, and --- for a divider. Newlines render as line breaks.
+                </p>
+                <textarea className="form-textarea" rows={12} placeholder="Write article content here..." value={form.content} onChange={e=>set('content',e.target.value)} />
+              </div>
+
+              {/* Related articles */}
+              <div>
+                <label className="form-label">Related article IDs <span style={{ color:'var(--text-3)', fontWeight:400 }}>(comma-separated)</span></label>
+                <input className="form-input" placeholder="e.g. a2, a3, b1" value={form.relatedArticles} onChange={e=>set('relatedArticles',e.target.value)} />
+              </div>
+
+              {/* Published toggle */}
+              <div style={{ display:'flex', alignItems:'center', gap:12, padding:'14px 16px', background:'var(--surface2)', borderRadius:10, border:'1px solid var(--border)' }}>
+                <div onClick={()=>set('published',!form.published)}
+                  style={{ width:40, height:22, borderRadius:11, background:form.published?'var(--accent)':'var(--border)', cursor:'pointer', position:'relative', transition:'background 0.2s' }}>
+                  <div style={{ width:18, height:18, borderRadius:'50%', background:'#fff', position:'absolute', top:2, left:form.published?20:2, transition:'left 0.2s', boxShadow:'0 1px 3px rgba(0,0,0,0.2)' }} />
+                </div>
+                <div>
+                  <p style={{ fontWeight:600, fontSize:14 }}>{form.published ? 'Published' : 'Draft'}</p>
+                  <p style={{ color:'var(--text-3)', fontSize:12 }}>{form.published ? 'Visible on help.hoichoi.tv' : 'Hidden from public'}</p>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding:'16px 24px', borderTop:'1px solid var(--border)', display:'flex', gap:10, justifyContent:'flex-end' }}>
+          <button className="btn-ghost" onClick={onClose} style={{ padding:'9px 20px', borderRadius:9, fontSize:14 }}>Cancel</button>
+          <button className="btn-primary" onClick={handleSave} disabled={saving || !form.title.trim() || !form.content.trim()}
+            style={{ padding:'9px 24px', borderRadius:9, fontSize:14, display:'flex', alignItems:'center', gap:8 }}>
+            {saving ? <span className="spin" style={{ width:14,height:14,border:'2px solid rgba(255,255,255,0.3)',borderTopColor:'#fff',borderRadius:'50%',display:'inline-block' }}/> : <Icon name="check" size={14} />}
+            {isNew ? 'Create article' : 'Save changes'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Delete Confirm Modal ──────────────────────────────────────────────────────
+function DeleteConfirm({ article, onConfirm, onClose }) {
+  const [deleting, setDeleting] = useState(false);
+  async function handleDelete() {
+    setDeleting(true);
+    await db.collection('articles').doc(article.id).delete();
+    onConfirm(article.id);
+  }
+  return (
+    <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal-box fade-in" style={{ maxWidth:440 }}>
+        <div style={{ padding:28, textAlign:'center' }}>
+          <div style={{ width:56, height:56, background:'#FEE2E2', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px', color:'#DC2626' }}>
+            <Icon name="trash" size={22} />
+          </div>
+          <h3 style={{ fontSize:18, fontWeight:700, marginBottom:8 }}>Delete article?</h3>
+          <p style={{ color:'var(--text-2)', fontSize:14, marginBottom:4 }}>"{article.title}"</p>
+          <p style={{ color:'var(--text-3)', fontSize:13, marginBottom:24 }}>This removes the Firestore document. Hardcoded fallback content in index.html is unaffected.</p>
+          <div style={{ display:'flex', gap:10, justifyContent:'center' }}>
+            <button className="btn-ghost" onClick={onClose} style={{ padding:'9px 24px', borderRadius:9, fontSize:14 }}>Cancel</button>
+            <button className="btn-danger" onClick={handleDelete} disabled={deleting}
+              style={{ padding:'9px 24px', borderRadius:9, fontSize:14, display:'flex', alignItems:'center', gap:8 }}>
+              {deleting ? <span className="spin" style={{ width:14,height:14,border:'2px solid rgba(220,38,38,0.3)',borderTopColor:'#DC2626',borderRadius:'50%',display:'inline-block' }}/> : null}
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Articles Tab ──────────────────────────────────────────────────────────────
+function ArticlesTab({ showToast }) {
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [filterCat, setFilterCat] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [editing, setEditing] = useState(null); // null | 'new' | article obj
+  const [deleting, setDeleting] = useState(null);
+
+  async function fetchArticles() {
+    setLoading(true);
+    try {
+      const snap = await db.collection('articles').get();
+      const docs = snap.docs.map(d => ({ ...d.data(), _exists: true }));
+      setArticles(docs);
+    } finally { setLoading(false); }
+  }
+
+  useEffect(() => { fetchArticles(); }, []);
+
+  function handleSaved(payload) {
+    setArticles(prev => {
+      const idx = prev.findIndex(a => a.id === payload.id);
+      if (idx >= 0) { const n=[...prev]; n[idx]={...n[idx],...payload,_exists:true}; return n; }
+      return [...prev, {...payload,_exists:true}];
+    });
+    setEditing(null);
+    showToast(editing === 'new' ? 'Article created!' : 'Article saved!');
+  }
+
+  function handleDeleted(id) {
+    setArticles(prev => prev.filter(a => a.id !== id));
+    setDeleting(null);
+    showToast('Article deleted.', 'info');
+  }
+
+  async function togglePublished(article) {
+    const newVal = !article.published;
+    await db.collection('articles').doc(article.id).update({ published: newVal, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    setArticles(prev => prev.map(a => a.id===article.id ? {...a,published:newVal} : a));
+    showToast(newVal ? 'Article published.' : 'Article set to draft.');
+  }
+
+  const filtered = articles.filter(a => {
+    const q = search.toLowerCase();
+    const matchSearch = !q || a.title?.toLowerCase().includes(q) || a.id?.toLowerCase().includes(q);
+    const matchCat = filterCat === 'all' || a.categoryId === filterCat;
+    const matchStatus = filterStatus==='all' || (filterStatus==='published'&&a.published) || (filterStatus==='draft'&&!a.published);
+    return matchSearch && matchCat && matchStatus;
+  });
+
+  const catLabel = id => CATEGORIES.find(c=>c.id===id)?.label || id;
+
+  return (
+    <div>
+      {/* Header */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20, flexWrap:'wrap', gap:12 }}>
+        <div>
+          <h2 style={{ fontSize:20, fontWeight:700 }}>Articles</h2>
+          <p style={{ color:'var(--text-3)', fontSize:13, marginTop:2 }}>{articles.length} article{articles.length!==1?'s':''} in Firestore</p>
+        </div>
+        <div style={{ display:'flex', gap:8 }}>
+          <button onClick={fetchArticles} className="btn-ghost" style={{ padding:'8px 14px', borderRadius:9, fontSize:13, display:'flex', alignItems:'center', gap:6 }}>
+            <Icon name="refresh" size={14} />Refresh
+          </button>
+          <button onClick={()=>setEditing('new')} className="btn-primary" style={{ padding:'8px 18px', borderRadius:9, fontSize:14, display:'flex', alignItems:'center', gap:6 }}>
+            <Icon name="plus" size={14} />New article
+          </button>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div style={{ display:'flex', gap:10, marginBottom:18, flexWrap:'wrap' }}>
+        <div style={{ position:'relative', flex:1, minWidth:180 }}>
+          <span style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-3)', display:'flex' }}><Icon name="search" size={14} /></span>
+          <input className="form-input" placeholder="Search articles…" value={search} onChange={e=>setSearch(e.target.value)} style={{ paddingLeft:36 }} />
+        </div>
+        <select className="form-select" value={filterCat} onChange={e=>setFilterCat(e.target.value)} style={{ width:'auto', minWidth:160 }}>
+          <option value="all">All categories</option>
+          {CATEGORIES.map(c=><option key={c.id} value={c.id}>{c.label}</option>)}
+        </select>
+        <select className="form-select" value={filterStatus} onChange={e=>setFilterStatus(e.target.value)} style={{ width:'auto', minWidth:130 }}>
+          <option value="all">All status</option>
+          <option value="published">Published</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+
+      {/* Table */}
+      <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:14, overflow:'hidden', boxShadow:'var(--shadow)' }}>
+        {loading ? (
+          <div style={{ padding:48, textAlign:'center', color:'var(--text-3)' }}>
+            <div className="spin" style={{ width:32,height:32,border:'3px solid var(--border)',borderTopColor:'var(--accent)',borderRadius:'50%',display:'inline-block',marginBottom:12 }} />
+            <p>Loading articles…</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ padding:48, textAlign:'center', color:'var(--text-3)' }}>
+            <p style={{ fontSize:32, marginBottom:12 }}>📄</p>
+            <p style={{ fontWeight:600, marginBottom:4 }}>No articles found</p>
+            <p style={{ fontSize:13 }}>{articles.length === 0 ? 'Create your first article.' : 'Try adjusting your filters.'}</p>
+          </div>
+        ) : (
+          <table style={{ width:'100%', borderCollapse:'collapse' }}>
+            <thead>
+              <tr style={{ background:'var(--surface2)', borderBottom:'1px solid var(--border)' }}>
+                <th style={{ padding:'10px 16px', textAlign:'left', fontSize:11, fontWeight:700, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:'0.05em' }}>Article</th>
+                <th style={{ padding:'10px 16px', textAlign:'left', fontSize:11, fontWeight:700, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:'0.05em', whiteSpace:'nowrap' }}>Category</th>
+                <th style={{ padding:'10px 16px', textAlign:'left', fontSize:11, fontWeight:700, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:'0.05em' }}>Status</th>
+                <th style={{ padding:'10px 16px', textAlign:'right', fontSize:11, fontWeight:700, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:'0.05em' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((a, i) => (
+                <tr key={a.id} className="table-row" style={{ borderBottom: i<filtered.length-1?'1px solid var(--border)':'none' }}>
+                  <td style={{ padding:'14px 16px' }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                      <div>
+                        <p style={{ fontWeight:600, fontSize:14, marginBottom:2 }}>{a.title || '—'}</p>
+                        <div style={{ display:'flex', gap:6, alignItems:'center' }}>
+                          <span style={{ color:'var(--text-3)', fontSize:12 }}>ID: {a.id}</span>
+                          {a.tag && <span className={`badge ${a.tag==='popular'?'badge-orange':'badge-blue'}`}>{a.tag}</span>}
+                          {a.readTime && <span style={{ color:'var(--text-3)', fontSize:11 }}>· {a.readTime}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ padding:'14px 16px' }}>
+                    <span style={{ color:'var(--text-2)', fontSize:13 }}>{catLabel(a.categoryId)}</span>
+                  </td>
+                  <td style={{ padding:'14px 16px' }}>
+                    <button onClick={()=>togglePublished(a)}
+                      style={{ padding:'3px 12px', borderRadius:999, fontSize:12, fontWeight:700, cursor:'pointer', border:'none',
+                        background:a.published?'#DCFCE7':'#F1F5F9', color:a.published?'#15803D':'#64748B' }}>
+                      {a.published ? '● Published' : '○ Draft'}
+                    </button>
+                  </td>
+                  <td style={{ padding:'14px 16px', textAlign:'right' }}>
+                    <div style={{ display:'flex', gap:6, justifyContent:'flex-end' }}>
+                      <button onClick={()=>setEditing(a)} className="btn-ghost"
+                        style={{ padding:'6px 12px', borderRadius:8, fontSize:12, display:'flex', alignItems:'center', gap:5 }}>
+                        <Icon name="edit" size={13} />Edit
+                      </button>
+                      <button onClick={()=>setDeleting(a)} className="btn-danger"
+                        style={{ padding:'6px 12px', borderRadius:8, fontSize:12, display:'flex', alignItems:'center', gap:5 }}>
+                        <Icon name="trash" size={13} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Modals */}
+      {editing && <ArticleEditor article={editing==='new'?null:editing} onSave={handleSaved} onClose={()=>setEditing(null)} />}
+      {deleting && <DeleteConfirm article={deleting} onConfirm={handleDeleted} onClose={()=>setDeleting(null)} />}
+    </div>
+  );
+}
+
+// ── Feedback Tab ──────────────────────────────────────────────────────────────
+function FeedbackTab() {
+  const [scores, setScores] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [loadingS, setLoadingS] = useState(true);
+  const [loadingC, setLoadingC] = useState(true);
+
+  useEffect(() => {
+    // Article feedback scores
+    db.collection('articleFeedback').get().then(snap => {
+      const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        .sort((a,b) => (b.likes||0)+(b.dislikes||0) - ((a.likes||0)+(a.dislikes||0)));
+      setScores(docs);
+      setLoadingS(false);
+    });
+
+    // Text feedback comments
+    db.collection('articleFeedbackText').orderBy('createdAt','desc').limit(100).get().then(snap => {
+      setComments(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setLoadingC(false);
+    }).catch(() => {
+      db.collection('articleFeedbackText').get().then(snap => {
+        setComments(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        setLoadingC(false);
+      });
+    });
+  }, []);
+
+  const totalLikes    = scores.reduce((s,a)=>s+(a.likes||0), 0);
+  const totalDislikes = scores.reduce((s,a)=>s+(a.dislikes||0), 0);
+  const satisfaction  = totalLikes+totalDislikes > 0 ? Math.round(totalLikes/(totalLikes+totalDislikes)*100) : null;
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:24 }}>
+      {/* Summary stats */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:16 }}>
+        {[
+          { label:'Total helpful', value: totalLikes, icon:'thumbUp', color:'#22C55E' },
+          { label:'Not helpful', value: totalDislikes, icon:'thumbDown', color:'#EF4444' },
+          { label:'Satisfaction rate', value: satisfaction !== null ? satisfaction+'%' : '—', icon:'star', color:'#F59E0B' },
+          { label:'Text feedback', value: comments.length, icon:'feedback', color:'#6366F1' },
+        ].map(s=>(
+          <div key={s.label} className="stat-card">
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+              <div>
+                <p style={{ color:'var(--text-3)', fontSize:12, fontWeight:600, marginBottom:6 }}>{s.label}</p>
+                <p style={{ fontSize:26, fontWeight:800 }}>{loadingS ? '…' : s.value}</p>
+              </div>
+              <div style={{ color:s.color, opacity:0.8 }}><Icon name={s.icon} size={20} /></div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Per-article feedback */}
+      <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:14, overflow:'hidden', boxShadow:'var(--shadow)' }}>
+        <div style={{ padding:'14px 20px', borderBottom:'1px solid var(--border)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <h3 style={{ fontWeight:700, fontSize:16 }}>Article feedback scores</h3>
+          <span style={{ color:'var(--text-3)', fontSize:12 }}>{scores.length} articles tracked</span>
+        </div>
+        {loadingS ? (
+          <div style={{ padding:32, textAlign:'center', color:'var(--text-3)' }}>Loading…</div>
+        ) : scores.length === 0 ? (
+          <div style={{ padding:32, textAlign:'center', color:'var(--text-3)' }}>
+            <p style={{ fontSize:24, marginBottom:8 }}>👍</p>
+            <p>No feedback recorded yet. Feedback appears after users rate articles.</p>
+          </div>
+        ) : (
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse' }}>
+              <thead>
+                <tr style={{ background:'var(--surface2)', borderBottom:'1px solid var(--border)' }}>
+                  <th style={{ padding:'10px 16px', textAlign:'left', fontSize:11, fontWeight:700, color:'var(--text-3)', textTransform:'uppercase' }}>Article ID</th>
+                  <th style={{ padding:'10px 16px', textAlign:'center', fontSize:11, fontWeight:700, color:'var(--text-3)', textTransform:'uppercase' }}>Helpful</th>
+                  <th style={{ padding:'10px 16px', textAlign:'center', fontSize:11, fontWeight:700, color:'var(--text-3)', textTransform:'uppercase' }}>Not helpful</th>
+                  <th style={{ padding:'10px 16px', textAlign:'left', fontSize:11, fontWeight:700, color:'var(--text-3)', textTransform:'uppercase' }}>Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scores.map((a, i) => {
+                  const total = (a.likes||0) + (a.dislikes||0);
+                  const pct = total > 0 ? Math.round((a.likes||0)/total*100) : 0;
+                  return (
+                    <tr key={a.id} className="table-row" style={{ borderBottom: i<scores.length-1?'1px solid var(--border)':'none' }}>
+                      <td style={{ padding:'12px 16px', fontWeight:600, fontSize:14 }}>{a.id}</td>
+                      <td style={{ padding:'12px 16px', textAlign:'center' }}>
+                        <span style={{ color:'#22C55E', fontWeight:700 }}>{a.likes||0}</span>
+                      </td>
+                      <td style={{ padding:'12px 16px', textAlign:'center' }}>
+                        <span style={{ color:'#EF4444', fontWeight:700 }}>{a.dislikes||0}</span>
+                      </td>
+                      <td style={{ padding:'12px 16px', width:200 }}>
+                        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                          <div className="progress-bar" style={{ flex:1 }}>
+                            <div className="progress-fill" style={{ width:pct+'%', background:pct>=70?'#22C55E':pct>=40?'#F59E0B':'#EF4444' }} />
+                          </div>
+                          <span style={{ fontSize:12, fontWeight:700, color:'var(--text-2)', minWidth:36 }}>{pct}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Text feedback */}
+      <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:14, overflow:'hidden', boxShadow:'var(--shadow)' }}>
+        <div style={{ padding:'14px 20px', borderBottom:'1px solid var(--border)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <h3 style={{ fontWeight:700, fontSize:16 }}>Text feedback</h3>
+          <span style={{ color:'var(--text-3)', fontSize:12 }}>{comments.length} responses</span>
+        </div>
+        {loadingC ? (
+          <div style={{ padding:32, textAlign:'center', color:'var(--text-3)' }}>Loading…</div>
+        ) : comments.length === 0 ? (
+          <div style={{ padding:32, textAlign:'center', color:'var(--text-3)' }}>
+            <p style={{ fontSize:24, marginBottom:8 }}>💬</p>
+            <p>No text feedback yet.</p>
+          </div>
+        ) : (
+          <div style={{ maxHeight:480, overflowY:'auto' }}>
+            {comments.map((c, i) => {
+              const ts = c.createdAt?.toDate?.()?.toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' }) || '—';
+              return (
+                <div key={c.id} style={{ padding:'14px 20px', borderBottom: i<comments.length-1?'1px solid var(--border)':'none' }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12 }}>
+                    <div style={{ flex:1 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
+                        <span className="badge badge-blue" style={{ fontSize:11 }}>ID: {c.articleId}</span>
+                        <span className={`badge ${c.helpful?'badge-green':'badge-red'}`} style={{ fontSize:11 }}>
+                          {c.helpful ? '👍 Helpful' : '👎 Not helpful'}
+                        </span>
+                      </div>
+                      {c.text && <p style={{ fontSize:14, color:'var(--text-1)', lineHeight:1.6 }}>{c.text}</p>}
+                      {!c.text && <p style={{ fontSize:13, color:'var(--text-3)', fontStyle:'italic' }}>No text — rating only</p>}
+                    </div>
+                    <span style={{ color:'var(--text-3)', fontSize:11, whiteSpace:'nowrap' }}>{ts}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Tickets Tab (placeholder) ─────────────────────────────────────────────────
+function TicketsTab() {
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:24 }}>
+      <div>
+        <h2 style={{ fontSize:20, fontWeight:700 }}>Ticket Analytics</h2>
+        <p style={{ color:'var(--text-3)', fontSize:13, marginTop:2 }}>Support tickets submitted via the help center.</p>
+      </div>
+      <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:14, padding:40, textAlign:'center', boxShadow:'var(--shadow)' }}>
+        <div style={{ fontSize:40, marginBottom:16 }}>📊</div>
+        <h3 style={{ fontSize:18, fontWeight:700, marginBottom:8 }}>Enable ticket logging to see analytics</h3>
+        <p style={{ color:'var(--text-2)', fontSize:14, lineHeight:1.7, maxWidth:480, margin:'0 auto 24px' }}>
+          Currently, tickets are emailed via Brevo but not stored in Firestore.
+          Add one line to <code style={{ background:'var(--surface2)', padding:'1px 6px', borderRadius:4, fontSize:13 }}>api/send-ticket.js</code> to log each ticket to Firestore,
+          and this tab will show volume by category, submission trends, and top issues.
+        </p>
+        <div style={{ background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:12, padding:20, textAlign:'left', maxWidth:560, margin:'0 auto' }}>
+          <p style={{ fontSize:12, fontWeight:700, color:'var(--text-3)', marginBottom:10, textTransform:'uppercase', letterSpacing:'0.05em' }}>Add to send-ticket.js after a successful Brevo send:</p>
+          <pre style={{ fontSize:13, color:'var(--text-1)', overflowX:'auto', lineHeight:1.6 }}>{`await db.collection('ticketSubmissions').add({
+  name, email, phone,
+  category, subcategory, device,
+  createdAt: admin.firestore.FieldValue.serverTimestamp(),
+});`}</pre>
+        </div>
+        <p style={{ color:'var(--text-3)', fontSize:12, marginTop:20 }}>
+          Requires adding Firebase Admin SDK to the serverless function.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── Main App ──────────────────────────────────────────────────────────────────
+function App() {
+  const [user, setUser]     = useState(undefined); // undefined = loading
+  const [tab, setTab]       = useState('articles');
+  const [toast, setToast]   = useState(null);
+
+  useEffect(() => {
+    const unsub = auth.onAuthStateChanged(u => setUser(u || null));
+    return unsub;
+  }, []);
+
+  function showToast(msg, type='success') {
+    setToast({ msg, type, key: Date.now() });
+  }
+
+  function handleLogout() {
+    auth.signOut();
+  }
+
+  // Loading
+  if (user === undefined) {
+    return (
+      <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#07090F' }}>
+        <div className="spin" style={{ width:36,height:36,border:'3px solid #1C2A3E',borderTopColor:'#d20820',borderRadius:'50%' }} />
+      </div>
+    );
+  }
+
+  if (!user) return <LoginScreen onLogin={u => setUser(u)} />;
+
+  const tabs = [
+    { id:'articles', label:'Articles', icon:'articles' },
+    { id:'feedback', label:'Feedback', icon:'feedback' },
+    { id:'tickets',  label:'Tickets',  icon:'tickets'  },
+  ];
+
+  return (
+    <div style={{ display:'flex', minHeight:'100vh' }}>
+      {/* Sidebar */}
+      <div style={{ width:220, background:'var(--sidebar-bg)', borderRight:'1px solid var(--sidebar-border)', display:'flex', flexDirection:'column', position:'fixed', top:0, bottom:0, left:0, zIndex:50 }}>
+        {/* Logo */}
+        <div style={{ padding:'20px 20px 16px', borderBottom:'1px solid var(--sidebar-border)' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+            <div style={{ width:32, height:32, background:'linear-gradient(135deg,#d20820,#6d0550)', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', fontWeight:800, fontSize:14, color:'#fff', flexShrink:0 }}>h</div>
+            <div>
+              <p style={{ color:'#E8EDF5', fontSize:14, fontWeight:700, lineHeight:1.2 }}>hoichoi</p>
+              <p style={{ color:'#3D5068', fontSize:10, fontWeight:600 }}>Help Center Admin</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Nav */}
+        <nav style={{ flex:1, padding:'12px 12px' }}>
+          {tabs.map(t=>(
+            <div key={t.id} className={`sidebar-item ${tab===t.id?'active':''}`} onClick={()=>setTab(t.id)}>
+              <Icon name={t.icon} size={16} />
+              <span>{t.label}</span>
+            </div>
+          ))}
+        </nav>
+
+        {/* User */}
+        <div style={{ padding:12, borderTop:'1px solid var(--sidebar-border)' }}>
+          <div style={{ padding:'10px 12px', background:'rgba(255,255,255,0.04)', borderRadius:10, marginBottom:8 }}>
+            <p style={{ color:'#E8EDF5', fontSize:12, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{user.email}</p>
+            <p style={{ color:'#3D5068', fontSize:11 }}>Admin</p>
+          </div>
+          <div className="sidebar-item" onClick={handleLogout}>
+            <Icon name="logout" size={16} /><span>Sign out</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main */}
+      <div style={{ flex:1, marginLeft:220, padding:32, maxWidth:'100%' }}>
+        <div className="fade-in" key={tab}>
+          {tab === 'articles' && <ArticlesTab showToast={showToast} />}
+          {tab === 'feedback' && <FeedbackTab />}
+          {tab === 'tickets'  && <TicketsTab />}
+        </div>
+      </div>
+
+      {/* Toast */}
+      {toast && <Toast key={toast.key} msg={toast.msg} type={toast.type} onDone={()=>setToast(null)} />}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
