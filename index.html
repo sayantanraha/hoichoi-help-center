@@ -924,27 +924,34 @@ const renderContent = (text) => {
 };
 
 // ── Views ─────────────────────────────────────────────────────────────────────
-const HomeView = ({ navigate, lang, onOpenTicket }) => {
+const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, categories }) => {
   const [query, setQuery] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const searchRef = useRef(null);
+
+  const categoryCounts = useMemo(() => {
+    const counts = {};
+    for (const a of allArticles) {
+      const cid = a.categoryId || a.category;
+      if (cid) counts[cid] = (counts[cid] || 0) + 1;
+    }
+    return counts;
+  }, [allArticles]);
 
   const liveResults = useMemo(() => {
     if (!query || query.trim().length < 2) return [];
     const q = query.toLowerCase();
     const hits = [];
-    for (const [catId, articles] of Object.entries(ARTICLES)) {
-      for (const a of articles) {
-        if (a.title.toLowerCase().includes(q) || a.titleBn.includes(q))
-          hits.push({ ...a, catId, type: 'article' });
-      }
+    for (const a of allArticles) {
+      if (a.title.toLowerCase().includes(q) || (a.titleBn && a.titleBn.includes(q)))
+        hits.push({ ...a, catId: a.categoryId || a.category, type: 'article' });
     }
     for (const v of VIDEOS) {
       if (v.title.toLowerCase().includes(q) || v.titleBn.includes(q))
         hits.push({ ...v, type: 'video' });
     }
     return hits.slice(0, 8);
-  }, [query]);
+  }, [query, allArticles]);
 
   useEffect(() => {
     setDropdownOpen(liveResults.length > 0);
@@ -990,7 +997,7 @@ const HomeView = ({ navigate, lang, onOpenTicket }) => {
                     }}>
                     <Icon name={r.type === 'video' ? 'play' : 'search'} size={13} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
                     <span style={{ fontSize: 14, color: '#0F172A', flex: 1 }}>{lang === 'bn' ? r.titleBn : r.title}</span>
-                    <span style={{ fontSize: 11, color: '#94A3B8', flexShrink: 0 }}>{r.type === 'video' ? 'Video' : CATEGORIES.find(c => c.id === r.catId)?.label}</span>
+                    <span style={{ fontSize: 11, color: '#94A3B8', flexShrink: 0 }}>{r.type === 'video' ? 'Video' : categories.find(c => c.id === r.catId)?.label}</span>
                   </div>
                 ))}
                 {query.trim().length >= 2 && (
@@ -1018,13 +1025,13 @@ const HomeView = ({ navigate, lang, onOpenTicket }) => {
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px 60px' }}>
         <h2 style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 20, marginBottom: 20 }}>Browse by category</h2>
         <div className="category-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 14 }}>
-          {CATEGORIES.map(cat => (
+          {categories.map(cat => (
             <div key={cat.id} className="category-card cursor-pointer transition-all"
               onClick={() => navigate({ view: 'category', catId: cat.id })}
               style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: 20, boxShadow: 'var(--shadow)', transition: 'transform 0.18s, box-shadow 0.18s' }}>
               <div style={{ width: 48, height: 48, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', background: cat.color + '18', marginBottom: 12, color: cat.color }}><Icon name={cat.icon} size={26} /></div>
               <p style={{ color: 'var(--text-1)', fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{lang === 'bn' ? cat.labelBn : cat.label}</p>
-              <p style={{ color: 'var(--text-3)', fontSize: 12 }}>{cat.count} articles</p>
+              <p style={{ color: 'var(--text-3)', fontSize: 12 }}>{categoryCounts[cat.id] ?? cat.count} articles</p>
             </div>
           ))}
         </div>
@@ -1032,12 +1039,12 @@ const HomeView = ({ navigate, lang, onOpenTicket }) => {
         <div style={{ marginTop: 48 }}>
           <h2 style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 20, marginBottom: 20 }}>Popular articles</h2>
           <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
-            {POPULAR_ARTICLES.map((a, i) => {
-              const cat = CATEGORIES.find(c => c.id === a.catId);
+            {popularArticles.map((a, i) => {
+              const cat = categories.find(c => c.id === a.catId);
               return (
                 <div key={a.id} className="article-card cursor-pointer flex items-center gap-4"
                   onClick={() => navigate({ view: 'article', articleId: a.id, catId: a.catId })}
-                  style={{ padding: '16px 20px', borderBottom: i < POPULAR_ARTICLES.length - 1 ? '1px solid var(--border)' : 'none', transition: 'background 0.15s' }}>
+                  style={{ padding: '16px 20px', borderBottom: i < popularArticles.length - 1 ? '1px solid var(--border)' : 'none', transition: 'background 0.15s' }}>
                   <span style={{ color: 'var(--text-1)', fontSize: 14, fontWeight: 500, flex: 1 }}>{a.title}</span>
                   <div className="flex items-center gap-2">
                     <span style={{ color: 'var(--text-3)', fontSize: 12 }}>{cat?.label}</span>
@@ -1094,9 +1101,9 @@ const GetStartedView = ({ navigate, lang, onOpenTicket }) => {
   );
 };
 
-const CategoryView = ({ catId, navigate, lang, onOpenTicket }) => {
-  const cat = CATEGORIES.find(c => c.id === catId);
-  const articles = ARTICLES[catId] || [];
+const CategoryView = ({ catId, navigate, lang, onOpenTicket, allArticles, categories }) => {
+  const cat = categories.find(c => c.id === catId);
+  const articles = allArticles.filter(a => (a.categoryId || a.category) === catId);
   return (
     <div className="fade-in" style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 24px 60px' }}>
       <div className="flex items-center gap-2 mb-6" style={{ fontSize: 13, color: 'var(--text-3)' }}>
@@ -1135,9 +1142,9 @@ const CategoryView = ({ catId, navigate, lang, onOpenTicket }) => {
   );
 };
 
-const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket }) => {
-  const cat = CATEGORIES.find(c => c.id === catId);
-  const allArticles = ARTICLES[catId] || [];
+const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticles, categories }) => {
+  const cat = categories.find(c => c.id === catId);
+  const catArticles = allArticles.filter(a => (a.categoryId || a.category) === catId);
   const articleMeta = allArticles.find(a => a.id === articleId) || {};
   const [fsContent, setFsContent] = useState(null);
 
@@ -1149,15 +1156,17 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket }) => {
   }, [articleId]);
 
   const content = fsContent || ARTICLE_CONTENT[articleId];
-  const relatedIds = content?.relatedArticles || [];
+  const relatedIds = content?.relatedArticles || articleMeta.relatedArticles || [];
   const relatedArticles = relatedIds.map(id => {
+    const found = allArticles.find(a => a.id === id);
+    if (found) return { ...found, catId: found.categoryId || found.category };
     for (const [cId, arts] of Object.entries(ARTICLES)) {
-      const found = arts.find(a => a.id === id);
-      if (found) return { ...found, catId: cId };
+      const fb = arts.find(a => a.id === id);
+      if (fb) return { ...fb, catId: cId };
     }
     return null;
   }).filter(Boolean);
-  const title = lang === 'bn' ? (articleMeta.titleBn || content?.title) : (content?.title || articleMeta.title);
+  const title = lang === 'bn' ? (articleMeta.titleBn || content?.titleBn || content?.title) : (content?.title || articleMeta.title);
 
   return (
     <div className="fade-in article-grid">
@@ -1194,7 +1203,7 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket }) => {
           <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: 20, boxShadow: 'var(--shadow)' }}>
             <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 14, marginBottom: 14 }}>Related articles</p>
             {relatedArticles.map((a, i) => {
-              const rc = CATEGORIES.find(c => c.id === a.catId);
+              const rc = categories.find(c => c.id === a.catId);
               return (
                 <div key={a.id} className="cursor-pointer flex items-center gap-3 py-2"
                   onClick={() => navigate({ view: 'article', articleId: a.id, catId: a.catId })}
@@ -1214,10 +1223,10 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket }) => {
             <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 14 }}>In this category</p>
             <span style={{ color: 'var(--accent)', fontSize: 12, cursor: 'pointer' }} onClick={() => navigate({ view: 'category', catId })}>See all</span>
           </div>
-          {allArticles.slice(0,5).map((a, i) => (
+          {catArticles.slice(0,5).map((a, i) => (
             <div key={a.id} className="cursor-pointer flex items-center gap-2 py-2"
               onClick={() => navigate({ view: 'article', articleId: a.id, catId })}
-              style={{ borderBottom: i < Math.min(4, allArticles.length-1) ? '1px solid var(--border)' : 'none' }}>
+              style={{ borderBottom: i < Math.min(4, catArticles.length-1) ? '1px solid var(--border)' : 'none' }}>
               {a.id === articleId && <div style={{ width: 3, height: 16, background: 'var(--accent)', borderRadius: 3, flexShrink: 0 }} />}
               <span style={{ fontSize: 13, lineHeight: 1.4, color: a.id === articleId ? 'var(--accent)' : 'var(--text-2)', fontWeight: a.id === articleId ? 600 : 400 }}>{a.title}</span>
             </div>
@@ -1294,19 +1303,15 @@ const VideoLibraryView = ({ navigate, lang, onOpenTicket }) => {
   );
 };
 
-const SearchView = ({ query, navigate, lang, onOpenTicket }) => {
+const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categories }) => {
   const results = useMemo(() => {
     if (!query) return [];
     const q = query.toLowerCase();
-    const hits = [];
-    for (const [catId, articles] of Object.entries(ARTICLES)) {
-      for (const a of articles) {
-        if (a.title.toLowerCase().includes(q) || a.titleBn.includes(q)) hits.push({ ...a, catId });
-      }
-    }
-    return hits;
-  }, [query]);
-  const cat = (cId) => CATEGORIES.find(c => c.id === cId);
+    return allArticles
+      .filter(a => a.title.toLowerCase().includes(q) || (a.titleBn && a.titleBn.includes(q)))
+      .map(a => ({ ...a, catId: a.categoryId || a.category }));
+  }, [query, allArticles]);
+  const cat = (cId) => categories.find(c => c.id === cId);
   return (
     <div className="fade-in" style={{ maxWidth: 900, margin: '0 auto', padding: '36px 24px 60px' }}>
       <p style={{ color: 'var(--text-3)', fontSize: 13, marginBottom: 24 }}>
@@ -1370,6 +1375,26 @@ function App() {
   const [lang, setLang] = useState('en');
   const [nav, setNav] = useState(() => hashToNav(window.location.hash));
   const [showTicket, setShowTicket] = useState(false);
+  const [allArticles, setAllArticles] = useState([]);
+  const [popularArticles, setPopularArticles] = useState(POPULAR_ARTICLES);
+  const [categories, setCategories] = useState(CATEGORIES);
+
+  useEffect(() => {
+    db.collection('articles').where('published', '==', true).get()
+      .then(snap => setAllArticles(snap.docs.map(d => ({ id: d.id, ...d.data() }))))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    db.collection('siteConfig').doc('main').get()
+      .then(doc => {
+        if (!doc.exists) return;
+        const data = doc.data();
+        if (data.popularArticles) setPopularArticles(data.popularArticles);
+        if (data.categories && data.categories.length > 0) setCategories(data.categories);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => { document.documentElement.setAttribute('data-theme', theme); }, [theme]);
 
@@ -1388,7 +1413,7 @@ function App() {
   }, []);
 
   const onOpenTicket = useCallback(() => setShowTicket(true), []);
-  const viewProps = { navigate, lang, onOpenTicket };
+  const viewProps = { navigate, lang, onOpenTicket, allArticles, popularArticles, categories };
 
   const renderView = () => {
     switch (nav.view) {
