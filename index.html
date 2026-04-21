@@ -1210,7 +1210,6 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
                   style={{ borderBottom: i < relatedArticles.length-1 ? '1px solid var(--border)' : 'none' }}
                   onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
                   onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
-                  <span style={{ fontSize: 16 }}>{rc?.icon}</span>
                   <span style={{ fontSize: 13, color: 'var(--text-2)', flex: 1, lineHeight: 1.4 }}>{a.title}</span>
                   <Icon name="chevronRight" size={13} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
                 </div>
