@@ -22,7 +22,7 @@ module.exports = async function handler(req, res) {
       {
         method: 'POST',
         headers: {
-          'Authorization': BASIC_AUTH,
+          'Authorization': 'Basic ' + BASIC_AUTH,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
