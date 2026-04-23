@@ -1438,9 +1438,7 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
               </div>
             : <div>{renderContent(lang === 'bn' && translatedContent ? translatedContent : content?.content)}</div>
           }
-          {articleMeta.likes !== undefined && (
-            <ArticleFeedback articleId={articleId} initialLikes={articleMeta.likes} initialDislikes={articleMeta.dislikes} lang={lang} />
-          )}
+          <ArticleFeedback articleId={articleId} initialLikes={articleMeta.likes || 0} initialDislikes={articleMeta.dislikes || 0} lang={lang} />
         </div>
       </div>
 
