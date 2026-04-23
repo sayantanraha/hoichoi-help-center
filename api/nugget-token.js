@@ -35,12 +35,13 @@ module.exports = async function handler(req, res) {
     );
 
     const data = await response.json();
-    if (!response.ok || !data.accessToken) {
+    const token = data.accessToken?.token || data.accessToken;
+    if (!response.ok || !token || typeof token !== 'string') {
       console.error('Nugget token error:', response.status, JSON.stringify(data));
       return res.status(502).json({ nuggetStatus: response.status, nuggetError: data });
     }
 
-    return res.status(200).json({ accessToken: data.accessToken });
+    return res.status(200).json({ accessToken: token });
   } catch (err) {
     console.error('nugget-token error:', err);
     return res.status(500).json({ error: 'Internal server error' });
