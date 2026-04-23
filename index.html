@@ -623,7 +623,6 @@ const SupportBar = ({ compact = false, onOpenTicket, lang = 'en' }) => {
       <p style={{ color: 'var(--text-1)', fontWeight: 600, fontSize: compact ? 14 : 15 }}>
         {compact ? S.stillNeedHelp : S.cantFind}
       </p>
-      <p style={{ color: 'var(--text-2)', fontSize: 13, marginTop: 2 }}>{S.supportHours}</p>
     </div>
     <div className="flex items-center gap-3">
       <button onClick={openNuggetChat}
@@ -1478,7 +1477,6 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
         {/* Inline support CTA in sidebar */}
         <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: 20, boxShadow: 'var(--shadow)' }}>
           <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 14, marginBottom: 6 }}>{S.needMoreHelp}</p>
-          <p style={{ color: 'var(--text-2)', fontSize: 12, marginBottom: 14, lineHeight: 1.5 }}>{S.supportHoursShort}</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <button onClick={openNuggetChat} className="btn-ghost flex items-center justify-center gap-2 rounded-lg w-full" style={{ padding: '8px 12px', fontSize: 13 }}>
               <Icon name="chat" size={14} /> {S.chatWithUs}
