@@ -34,15 +34,10 @@ module.exports = async function handler(req, res) {
       }
     );
 
-    if (!response.ok) {
-      const err = await response.text();
-      console.error('Nugget token error:', response.status, err);
-      return res.status(502).json({ error: 'Token request failed' });
-    }
-
     const data = await response.json();
-    if (!data.accessToken) {
-      return res.status(502).json({ error: 'No token in response' });
+    if (!response.ok || !data.accessToken) {
+      console.error('Nugget token error:', response.status, JSON.stringify(data));
+      return res.status(502).json({ nuggetStatus: response.status, nuggetError: data });
     }
 
     return res.status(200).json({ accessToken: data.accessToken });
