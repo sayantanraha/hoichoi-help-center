@@ -111,6 +111,58 @@
 </style>
 </head>
 <body>
+
+<!-- ── Nugget Chat SDK ──────────────────────────────────────────────────────── -->
+<script>
+(function(w,d,s,a){
+  w[a]=w[a]||{q:[],
+    init:function(c){w[a].q.push({type:"init",config:c});if(w[a].loaded)w[a]._processQueue();},
+    toggle:function(){w[a].q.push({type:"toggle"});if(w[a].loaded)w[a]._processQueue();},
+    open:function(){w[a].q.push({type:"open"});if(w[a].loaded)w[a]._processQueue();},
+    close:function(){w[a].q.push({type:"close"});if(w[a].loaded)w[a]._processQueue();},
+    showWidget:function(){w[a].q.push({type:"showWidget"});if(w[a].loaded)w[a]._processQueue();},
+    hideWidget:function(){w[a].q.push({type:"hideWidget"});if(w[a].loaded)w[a]._processQueue();},
+    destroy:function(){w[a].q.push({type:"destroy"});if(w[a].loaded)w[a]._processQueue();},
+    reloadIframe:function(){w[a].q.push({type:"reloadIframe"});if(w[a].loaded)w[a]._processQueue();},
+    updateToken:function(t,c){w[a].q.push({type:"updateToken",callback:c});},
+    _processQueue:function(){console.log("NuggetChat: real implementation not loaded yet");}
+  };
+  var n=d.createElement(s),c=d.getElementsByTagName(s)[0];
+  n.async=1;
+  n.src='https://hoichoi.nugget.com/user/chat-embed.js';
+  n.onload=function(){w[a].loaded=true;w[a]._processQueue();};
+  c.parentNode.insertBefore(n,c);
+})(window,document,'script','NuggetChat');
+</script>
+
+<script>
+async function fetchNuggetToken() {
+  var uid = sessionStorage.getItem('hc_nugget_uid');
+  if (!uid) {
+    uid = Date.now().toString(36) + Math.random().toString(36).slice(2);
+    sessionStorage.setItem('hc_nugget_uid', uid);
+  }
+  var cached = sessionStorage.getItem('hc_nugget_token');
+  if (cached) return cached;
+  var res = await fetch('/api/nugget-token?uid=' + encodeURIComponent(uid));
+  var data = await res.json();
+  if (data.accessToken) {
+    sessionStorage.setItem('hc_nugget_token', data.accessToken);
+    return data.accessToken;
+  }
+  throw new Error('Nugget token unavailable');
+}
+
+NuggetChat.init({
+  accessTokenHandler: fetchNuggetToken,
+  position: 'bottom-right',
+  initiallyVisible: true,
+  initiallyExpanded: false,
+  viewType: 'issue',
+});
+</script>
+<!-- ─────────────────────────────────────────────────────────────────────────── -->
+
 <div id="root"></div>
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
