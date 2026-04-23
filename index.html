@@ -237,6 +237,155 @@ const VIDEOS = [
   { id: 'v8', title: 'Adding profiles for family members',       titleBn: 'পরিবারের জন্য প্রোফাইল যোগ করুন',  duration: '1:30', thumb: '👨‍👩‍👧', category: 'Profile',     views: '5.2K'  },
 ];
 
+// ── Translations ─────────────────────────────────────────────────────────────
+const STRINGS = {
+  en: {
+    helpCenter: 'Help Center', getStarted: 'Get Started', helpArticles: 'Help Articles',
+    videoLibrary: 'Video Library', raiseTicketBtn: 'Raise a Ticket',
+    cantFind: "Couldn't find what you were looking for?", stillNeedHelp: 'Still need help?',
+    supportHours: 'Our support team is available Mon–Sat, 9 AM–9 PM IST / BST',
+    supportHoursShort: 'Our support team is ready to help Mon–Sat, 9 AM–9 PM',
+    chatWithUs: 'Chat with us', raiseTicket: 'Raise a ticket',
+    heroTitle: 'How can we help?',
+    heroSubtitle: 'Search help articles or browse categories below',
+    searchPlaceholder: 'e.g. reset password, bKash payment, Smart TV...',
+    searchBtn: 'Search',
+    quickSearches: ['Reset password', 'bKash payment', 'Cancel subscription', 'Smart TV setup'],
+    browseByCategory: 'Browse by category', popularArticles: 'Popular articles',
+    articlesLabel: 'articles', videoLabel: 'Video',
+    seeAllResultsFor: 'See all results for',
+    gettingStartedBadge: 'Getting Started',
+    gettingStartedTitle: "New to hoichoi? Here's everything you need.",
+    gettingStartedSubtitle: 'From signing up to streaming your first show — set up in minutes.',
+    learnMore: 'Learn more',
+    knowledgeBase: 'Knowledge Base', articleBreadcrumb: 'Article',
+    articlesCount: 'articles', viewsLabel: 'views',
+    relatedArticles: 'Related articles', inThisCategory: 'In this category', seeAll: 'See all',
+    needMoreHelp: 'Need more help?',
+    wasHelpful: 'Was this article helpful?', yesHelped: 'Yes, it helped', notReally: 'Not really',
+    thanksFeedback: 'Thanks for the feedback!',
+    whatMissing: 'What was missing or unclear? (optional)',
+    feedbackPlaceholder: 'Tell us what we could improve...',
+    submitFeedback: 'Submit', skipFeedback: 'Skip',
+    feedbackThanks: 'Thank you — your feedback helps us improve our articles.',
+    translating: 'বাংলায় অনুবাদ হচ্ছে…',
+    videosBadge: 'How-to Videos', videosTitle: 'Visual step-by-step guides',
+    videosSubtitle: 'Short, clear videos showing exactly how to use hoichoi',
+    filterAll: 'All',
+    noResultsHeading: 'No results found',
+    tryDifferent: 'Try different keywords, or browse our categories below.',
+    browseCategories: 'Browse categories',
+    searchResultsText: (n, q) => `${n} result${n !== 1 ? 's' : ''} for "${q}"`,
+    noResultsText: (q) => `No results found for "${q}"`,
+    ticketTitle: 'Raise a support ticket',
+    ticketSubtitle: "We'll respond to your registered email within 24 hours",
+    fullName: 'Full Name', namePlaceholder: 'Your full name',
+    emailAddress: 'Email Address', emailPlaceholder: 'you@example.com',
+    mobileNumber: 'Registered Mobile Number', phonePlaceholder: 'Phone number',
+    issueCategory: 'Issue Category', categoryPlaceholder: 'Select a category',
+    issueType: 'Issue Type', issueTypePlaceholder: 'Select issue type',
+    deviceLabel: 'Device', devicePlaceholder: 'Select your device',
+    describeIssue: 'Describe your issue',
+    descriptionPlaceholder: 'Please describe what happened, what you expected, and any error messages you saw...',
+    attachmentLabel: 'Attachment', optionalLabel: '(optional)',
+    attachmentRequiredMsg: 'A screenshot of the error or payment confirmation is required for this issue type. This helps us resolve your ticket faster.',
+    uploadPrompt: 'Click or drag a file here', uploadHint: 'JPG, PNG, PDF — max 5MB',
+    submitTicket: 'Submit ticket', orEmail: 'Or email us directly at',
+    charsLabel: 'chars', ticketSuccess: 'Ticket submitted!', doneBtn: 'Done',
+    ticketSuccessMsg: (email) => `We've received your query and will respond to ${email} within 24 hours.`,
+    errName: 'Full name is required.', errEmail: 'Email is required.',
+    errEmailInvalid: 'Enter a valid email address.',
+    errPhone: 'Phone number is required.',
+    errPhoneInvalid: 'Enter a valid phone number (digits only).',
+    errCategory: 'Please select a category.', errSubcategory: 'Please select an issue type.',
+    errDevice: 'Please select your device.', errDescription: 'Please describe your issue.',
+    errDescriptionMin: 'Please provide at least 20 characters.',
+    errAttachment: 'A screenshot or attachment is required for this issue type.',
+    errFileType: 'Only JPG, PNG, WEBP, GIF or PDF allowed.',
+    errFileSize: 'File must be under 5MB.',
+    errSubmit: 'Something went wrong. Please try again or email support@hoichoi.tv directly.',
+  },
+  bn: {
+    helpCenter: 'হেল্প সেন্টার', getStarted: 'শুরু করুন', helpArticles: 'হেল্প আর্টিকেল',
+    videoLibrary: 'ভিডিও লাইব্রেরি', raiseTicketBtn: 'টিকেট করুন',
+    cantFind: 'যা খুঁজছিলেন তা কি পাননি?', stillNeedHelp: 'আরও সাহায্য দরকার?',
+    supportHours: 'আমাদের সাপোর্ট টিম সোম–শনি, সকাল ৯টা–রাত ৯টা উপলব্ধ',
+    supportHoursShort: 'আমাদের সাপোর্ট টিম সোম–শনি সকাল ৯টা–রাত ৯টা সাহায্যের জন্য প্রস্তুত',
+    chatWithUs: 'চ্যাট করুন', raiseTicket: 'টিকেট করুন',
+    heroTitle: 'আমরা কীভাবে সাহায্য করতে পারি?',
+    heroSubtitle: 'হেল্প আর্টিকেল সার্চ করুন বা নিচের ক্যাটাগরি ব্রাউজ করুন',
+    searchPlaceholder: 'যেমন: পাসওয়ার্ড রিসেট, বিকাশ পেমেন্ট, স্মার্ট টিভি...',
+    searchBtn: 'সার্চ',
+    quickSearches: ['পাসওয়ার্ড রিসেট', 'বিকাশ পেমেন্ট', 'সাবস্ক্রিপশন ক্যান্সেল', 'স্মার্ট টিভি সেটআপ'],
+    browseByCategory: 'ক্যাটাগরি অনুযায়ী ব্রাউজ করুন', popularArticles: 'জনপ্রিয় আর্টিকেল',
+    articlesLabel: 'আর্টিকেল', videoLabel: 'ভিডিও',
+    seeAllResultsFor: 'সব রেজাল্ট দেখুন',
+    gettingStartedBadge: 'শুরু করা যাক',
+    gettingStartedTitle: 'hoichoi-এ নতুন? সব কিছু এখানে আছে।',
+    gettingStartedSubtitle: 'সাইন আপ থেকে প্রথম শো স্ট্রিমিং — মাত্র কয়েক মিনিটে সেটআপ করুন।',
+    learnMore: 'আরও জানুন',
+    knowledgeBase: 'নলেজ বেস', articleBreadcrumb: 'আর্টিকেল',
+    articlesCount: 'আর্টিকেল', viewsLabel: 'ভিউ',
+    relatedArticles: 'সম্পর্কিত আর্টিকেল', inThisCategory: 'এই ক্যাটাগরিতে', seeAll: 'সব দেখুন',
+    needMoreHelp: 'আরও সাহায্য দরকার?',
+    wasHelpful: 'এই আর্টিকেলটি কি সাহায্যকারী ছিল?',
+    yesHelped: 'হ্যাঁ, সাহায্য হয়েছে', notReally: 'তেমন সাহায্য হয়নি',
+    thanksFeedback: 'ধন্যবাদ!',
+    whatMissing: 'কী বাদ পড়েছে বা অস্পষ্ট ছিল? (ঐচ্ছিক)',
+    feedbackPlaceholder: 'আমরা কীভাবে উন্নত করতে পারি তা জানান...',
+    submitFeedback: 'সাবমিট করুন', skipFeedback: 'এড়িয়ে যান',
+    feedbackThanks: 'ধন্যবাদ — আপনার ফিডব্যাক আমাদের আর্টিকেল উন্নত করতে সাহায্য করে।',
+    translating: 'বাংলায় অনুবাদ হচ্ছে…',
+    videosBadge: 'হাউ-টু ভিডিও', videosTitle: 'ভিজ্যুয়াল স্টেপ-বাই-স্টেপ গাইড',
+    videosSubtitle: 'hoichoi কীভাবে ব্যবহার করবেন তা দেখানো সংক্ষিপ্ত ও স্পষ্ট ভিডিও',
+    filterAll: 'সব',
+    noResultsHeading: 'কোনো রেজাল্ট পাওয়া যায়নি',
+    tryDifferent: 'ভিন্ন কীওয়ার্ড চেষ্টা করুন, অথবা নিচের ক্যাটাগরি ব্রাউজ করুন।',
+    browseCategories: 'ক্যাটাগরি ব্রাউজ করুন',
+    searchResultsText: (n, q) => `"${q}" এর জন্য ${n}টি রেজাল্ট`,
+    noResultsText: (q) => `"${q}" এর জন্য কোনো রেজাল্ট পাওয়া যায়নি`,
+    ticketTitle: 'সাপোর্ট টিকেট করুন',
+    ticketSubtitle: 'আমরা ২৪ ঘণ্টার মধ্যে আপনার রেজিস্টার্ড ইমেইলে সাড়া দেব',
+    fullName: 'পূর্ণ নাম', namePlaceholder: 'আপনার পূর্ণ নাম',
+    emailAddress: 'ইমেইল অ্যাড্রেস', emailPlaceholder: 'you@example.com',
+    mobileNumber: 'রেজিস্টার্ড মোবাইল নম্বর', phonePlaceholder: 'ফোন নম্বর',
+    issueCategory: 'ইস্যু ক্যাটাগরি', categoryPlaceholder: 'ক্যাটাগরি বেছে নিন',
+    issueType: 'ইস্যুর ধরন', issueTypePlaceholder: 'ইস্যুর ধরন বেছে নিন',
+    deviceLabel: 'ডিভাইস', devicePlaceholder: 'আপনার ডিভাইস বেছে নিন',
+    describeIssue: 'সমস্যা বর্ণনা করুন',
+    descriptionPlaceholder: 'কী হয়েছে, কী প্রত্যাশা করেছিলেন এবং কোনো এরর মেসেজ দেখলে জানান...',
+    attachmentLabel: 'অ্যাটাচমেন্ট', optionalLabel: '(ঐচ্ছিক)',
+    attachmentRequiredMsg: 'এই ইস্যুর জন্য একটি স্ক্রিনশট বা অ্যাটাচমেন্ট প্রয়োজন। এটি আমাদের দ্রুত সমস্যা সমাধান করতে সাহায্য করে।',
+    uploadPrompt: 'ক্লিক করুন বা ফাইল এখানে ড্র্যাগ করুন', uploadHint: 'JPG, PNG, PDF — সর্বোচ্চ ৫MB',
+    submitTicket: 'টিকেট সাবমিট করুন', orEmail: 'অথবা সরাসরি ইমেইল করুন',
+    charsLabel: 'অক্ষর', ticketSuccess: 'টিকেট সাবমিট হয়েছে!', doneBtn: 'সম্পন্ন',
+    ticketSuccessMsg: (email) => `আমরা আপনার প্রশ্ন পেয়েছি এবং ২৪ ঘণ্টার মধ্যে ${email}-এ সাড়া দেব।`,
+    errName: 'পূর্ণ নাম প্রয়োজন।', errEmail: 'ইমেইল প্রয়োজন।',
+    errEmailInvalid: 'একটি বৈধ ইমেইল অ্যাড্রেস দিন।',
+    errPhone: 'ফোন নম্বর প্রয়োজন।',
+    errPhoneInvalid: 'একটি বৈধ ফোন নম্বর দিন (শুধু সংখ্যা)।',
+    errCategory: 'একটি ক্যাটাগরি বেছে নিন।', errSubcategory: 'একটি ইস্যুর ধরন বেছে নিন।',
+    errDevice: 'আপনার ডিভাইস বেছে নিন।', errDescription: 'আপনার সমস্যা বর্ণনা করুন।',
+    errDescriptionMin: 'অনুগ্রহ করে কমপক্ষে ২০টি অক্ষর দিন।',
+    errAttachment: 'এই ইস্যুর ধরনের জন্য একটি স্ক্রিনশট বা অ্যাটাচমেন্ট প্রয়োজন।',
+    errFileType: 'শুধুমাত্র JPG, PNG, WEBP, GIF বা PDF অনুমোদিত।',
+    errFileSize: 'ফাইলের আকার ৫MB-এর মধ্যে হতে হবে।',
+    errSubmit: 'কিছু একটা ভুল হয়েছে। আবার চেষ্টা করুন বা সরাসরি support@hoichoi.tv-তে ইমেইল করুন।',
+  },
+};
+
+const FORM_CATEGORIES_LABELS_BN = {
+  account: 'অ্যাকাউন্ট ও লগইন',
+  billing: 'সাবস্ক্রিপশন ও পেমেন্ট',
+  offers: 'অফার ও প্রমোশন',
+  streaming: 'স্ট্রিমিং ও প্লেব্যাক',
+  content: 'কন্টেন্ট',
+  downloads: 'ডাউনলোড',
+  app: 'অ্যাপ ও টেকনিক্যাল সমস্যা',
+  bundle: 'Jio, Airtel ও অন্যান্য বান্ডেলে hoichoi',
+  general: 'সাধারণ ও ফিডব্যাক',
+};
+
 // ── Ticket Form Data ──────────────────────────────────────────────────────────
 const FORM_CATEGORIES = [
   {
@@ -408,34 +557,36 @@ const Icon = ({ name, size = 16, style = {}, className = '' }) => {
 };
 
 // ── Support CTA Bar ───────────────────────────────────────────────────────────
-const SupportBar = ({ compact = false, onOpenTicket }) => (
+const SupportBar = ({ compact = false, onOpenTicket, lang = 'en' }) => {
+  const S = STRINGS[lang];
+  return (
   <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: compact ? '14px 18px' : '20px 24px' }}
     className="flex items-center justify-between gap-4 flex-wrap">
     <div>
       <p style={{ color: 'var(--text-1)', fontWeight: 600, fontSize: compact ? 14 : 15 }}>
-        {compact ? 'Still need help?' : "Couldn't find what you were looking for?"}
+        {compact ? S.stillNeedHelp : S.cantFind}
       </p>
-      <p style={{ color: 'var(--text-2)', fontSize: 13, marginTop: 2 }}>
-        Our support team is available Mon–Sat, 9 AM–9 PM IST / BST
-      </p>
+      <p style={{ color: 'var(--text-2)', fontSize: 13, marginTop: 2 }}>{S.supportHours}</p>
     </div>
     <div className="flex items-center gap-3">
       <button onClick={openNuggetChat}
         className="btn-ghost flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all"
         style={{ fontSize: 13 }}>
-        <Icon name="chat" size={15} /> Chat with us
+        <Icon name="chat" size={15} /> {S.chatWithUs}
       </button>
       <button onClick={onOpenTicket}
         className="btn-primary flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all"
         style={{ fontSize: 13 }}>
-        <Icon name="ticket" size={15} /> Raise a ticket
+        <Icon name="ticket" size={15} /> {S.raiseTicket}
       </button>
     </div>
   </div>
-);
+  );
+};
 
 // ── Article Feedback (Firebase-wired) ─────────────────────────────────────────
-const ArticleFeedback = ({ articleId, initialLikes, initialDislikes }) => {
+const ArticleFeedback = ({ articleId, initialLikes, initialDislikes, lang = 'en' }) => {
+  const S = STRINGS[lang];
   const [vote, setVote] = useState(() => localStorage.getItem(`hc_vote_${articleId}`));
   const [likes, setLikes] = useState(initialLikes);
   const [dislikes, setDislikes] = useState(initialDislikes);
@@ -501,44 +652,44 @@ const ArticleFeedback = ({ articleId, initialLikes, initialDislikes }) => {
   if (submitted) return (
     <div style={{ borderTop: '1.5px solid var(--border)', paddingTop: 24, marginTop: 32 }}>
       <p style={{ color: '#16A34A', fontSize: 13, fontWeight: 500 }}>
-        <Icon name="checkCircle" size={14} style={{ marginRight: 6 }} /> Thank you — your feedback helps us improve our articles.
+        <Icon name="checkCircle" size={14} style={{ marginRight: 6 }} /> {S.feedbackThanks}
       </p>
     </div>
   );
 
   return (
     <div style={{ borderTop: '1.5px solid var(--border)', paddingTop: 24, marginTop: 32 }}>
-      <p style={{ color: 'var(--text-2)', fontSize: 14, fontWeight: 500, marginBottom: 12 }}>Was this article helpful?</p>
+      <p style={{ color: 'var(--text-2)', fontSize: 14, fontWeight: 500, marginBottom: 12 }}>{S.wasHelpful}</p>
       <div className="flex items-center gap-3 flex-wrap">
         <button onClick={() => handleVote('like')}
           className={`like-btn flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium cursor-pointer transition-all ${vote === 'like' ? 'like-active' : ''}`}
           style={{ background: 'var(--surface2)', color: 'var(--text-2)', borderColor: 'var(--border)' }}>
-          <Icon name="thumbUp" size={15} /> Yes, it helped
+          <Icon name="thumbUp" size={15} /> {S.yesHelped}
           <span style={{ color: 'var(--text-3)', marginLeft: 2 }}>({likes})</span>
         </button>
         <button onClick={() => handleVote('dislike')}
           className={`dislike-btn flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium cursor-pointer transition-all ${vote === 'dislike' ? 'dislike-active' : ''}`}
           style={{ background: 'var(--surface2)', color: 'var(--text-2)', borderColor: 'var(--border)' }}>
-          <Icon name="thumbDown" size={15} /> Not really
+          <Icon name="thumbDown" size={15} /> {S.notReally}
           <span style={{ color: 'var(--text-3)', marginLeft: 2 }}>({dislikes})</span>
         </button>
       </div>
       {vote === 'like' && !showFeedback && (
         <p style={{ color: '#16A34A', fontSize: 13, marginTop: 10, fontWeight: 500 }}>
-          <Icon name="check" size={13} style={{ marginRight: 4 }} /> Thanks for the feedback!
+          <Icon name="check" size={13} style={{ marginRight: 4 }} /> {S.thanksFeedback}
         </p>
       )}
       {showFeedback && (
         <div className="fade-in" style={{ marginTop: 14 }}>
-          <p style={{ color: 'var(--text-2)', fontSize: 13, marginBottom: 8 }}>What was missing or unclear? (optional)</p>
+          <p style={{ color: 'var(--text-2)', fontSize: 13, marginBottom: 8 }}>{S.whatMissing}</p>
           <textarea value={feedback} onChange={e => setFeedback(e.target.value)}
-            placeholder="Tell us what we could improve..."
+            placeholder={S.feedbackPlaceholder}
             rows={3} className="form-textarea" style={{ maxWidth: 480 }} />
           <div className="flex gap-2 mt-2">
-            <button onClick={submitFeedback} className="btn-primary px-4 py-2 rounded-lg text-sm font-medium">Submit</button>
+            <button onClick={submitFeedback} className="btn-primary px-4 py-2 rounded-lg text-sm font-medium">{S.submitFeedback}</button>
             <button onClick={() => { setSubmitted(true); setShowFeedback(false); }}
               style={{ color: 'var(--text-3)', background: 'transparent', border: 'none', fontSize: 13, cursor: 'pointer' }}>
-              Skip
+              {S.skipFeedback}
             </button>
           </div>
         </div>
@@ -548,7 +699,8 @@ const ArticleFeedback = ({ articleId, initialLikes, initialDislikes }) => {
 };
 
 // ── Ticket Modal ──────────────────────────────────────────────────────────────
-const TicketModal = ({ onClose }) => {
+const TicketModal = ({ onClose, lang = 'en' }) => {
+  const S = STRINGS[lang];
   const [form, setForm] = useState({
     name: '', email: '', countryCode: '+91', phone: '',
     category: '', subcategory: '', device: '', description: '',
@@ -584,25 +736,25 @@ const TicketModal = ({ onClose }) => {
   const handleFile = (f) => {
     if (!f) return;
     const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
-    if (!allowed.includes(f.type)) { setErrors(e => ({ ...e, file: 'Only JPG, PNG, WEBP, GIF or PDF allowed.' })); return; }
-    if (f.size > 5 * 1024 * 1024)  { setErrors(e => ({ ...e, file: 'File must be under 5MB.' })); return; }
+    if (!allowed.includes(f.type)) { setErrors(e => ({ ...e, file: S.errFileType })); return; }
+    if (f.size > 5 * 1024 * 1024)  { setErrors(e => ({ ...e, file: S.errFileSize })); return; }
     setFile(f);
     setErrors(e => ({ ...e, file: '' }));
   };
 
   const validate = () => {
     const e = {};
-    if (!form.name.trim())        e.name = 'Full name is required.';
-    if (!form.email.trim())       e.email = 'Email is required.';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Enter a valid email address.';
-    if (!form.phone.trim())       e.phone = 'Phone number is required.';
-    else if (!/^\d{6,15}$/.test(form.phone.replace(/\s/g,''))) e.phone = 'Enter a valid phone number (digits only).';
-    if (!form.category)           e.category = 'Please select a category.';
-    if (!form.subcategory)        e.subcategory = 'Please select an issue type.';
-    if (needsDevice && !form.device) e.device = 'Please select your device.';
-    if (!form.description.trim()) e.description = 'Please describe your issue.';
-    else if (form.description.trim().length < 20) e.description = 'Please provide at least 20 characters.';
-    if (needsAttachment && !file) e.file = 'A screenshot or attachment is required for this issue type.';
+    if (!form.name.trim())        e.name = S.errName;
+    if (!form.email.trim())       e.email = S.errEmail;
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = S.errEmailInvalid;
+    if (!form.phone.trim())       e.phone = S.errPhone;
+    else if (!/^\d{6,15}$/.test(form.phone.replace(/\s/g,''))) e.phone = S.errPhoneInvalid;
+    if (!form.category)           e.category = S.errCategory;
+    if (!form.subcategory)        e.subcategory = S.errSubcategory;
+    if (needsDevice && !form.device) e.device = S.errDevice;
+    if (!form.description.trim()) e.description = S.errDescription;
+    else if (form.description.trim().length < 20) e.description = S.errDescriptionMin;
+    if (needsAttachment && !file) e.file = S.errAttachment;
     return e;
   };
 
@@ -641,7 +793,7 @@ const TicketModal = ({ onClose }) => {
       if (!res.ok) throw new Error('Server error');
       setSubmitted(true);
     } catch (err) {
-      setErrors({ submit: 'Something went wrong. Please try again or email support@hoichoi.tv directly.' });
+      setErrors({ submit: S.errSubmit });
     }
     setSubmitting(false);
   };
@@ -652,8 +804,8 @@ const TicketModal = ({ onClose }) => {
         {/* Header */}
         <div style={{ padding: '20px 24px 16px', borderBottom: '1.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 17 }}>Raise a support ticket</p>
-            <p style={{ color: 'var(--text-3)', fontSize: 12, marginTop: 2 }}>We'll respond to your registered email within 24 hours</p>
+            <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 17 }}>{S.ticketTitle}</p>
+            <p style={{ color: 'var(--text-3)', fontSize: 12, marginTop: 2 }}>{S.ticketSubtitle}</p>
           </div>
           <button onClick={onClose} style={{ background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-2)' }}>
             <Icon name="x" size={16} />
@@ -665,12 +817,12 @@ const TicketModal = ({ onClose }) => {
             <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(22,163,74,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', color: '#16A34A' }}>
               <Icon name="checkCircle" size={32} />
             </div>
-            <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 18, marginBottom: 8 }}>Ticket submitted!</p>
+            <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 18, marginBottom: 8 }}>{S.ticketSuccess}</p>
             <p style={{ color: 'var(--text-2)', fontSize: 14, lineHeight: 1.6, maxWidth: 380, margin: '0 auto 24px' }}>
-              We've received your query and will respond to <strong>{form.email}</strong> within 24 hours.
+              {S.ticketSuccessMsg(form.email)}
             </p>
             <button onClick={onClose} className="btn-primary px-6 py-2.5 rounded-xl font-semibold" style={{ fontSize: 14 }}>
-              Done
+              {S.doneBtn}
             </button>
           </div>
         ) : (
@@ -678,21 +830,21 @@ const TicketModal = ({ onClose }) => {
 
             {/* Name */}
             <div>
-              <label className="form-label">Full Name <span className="req">*</span></label>
-              <input value={form.name} onChange={e => set('name', e.target.value)} className="form-input" placeholder="Your full name" />
+              <label className="form-label">{S.fullName} <span className="req">*</span></label>
+              <input value={form.name} onChange={e => set('name', e.target.value)} className="form-input" placeholder={S.namePlaceholder} />
               {errors.name && <p className="field-error">{errors.name}</p>}
             </div>
 
             {/* Email */}
             <div>
-              <label className="form-label">Email Address <span className="req">*</span></label>
-              <input type="email" value={form.email} onChange={e => set('email', e.target.value)} className="form-input" placeholder="you@example.com" />
+              <label className="form-label">{S.emailAddress} <span className="req">*</span></label>
+              <input type="email" value={form.email} onChange={e => set('email', e.target.value)} className="form-input" placeholder={S.emailPlaceholder} />
               {errors.email && <p className="field-error">{errors.email}</p>}
             </div>
 
             {/* Phone */}
             <div>
-              <label className="form-label">Registered Mobile Number <span className="req">*</span></label>
+              <label className="form-label">{S.mobileNumber} <span className="req">*</span></label>
               <div className="flex gap-2">
                 <div style={{ position: 'relative', flexShrink: 0 }}>
                   <select value={form.countryCode} onChange={e => set('countryCode', e.target.value)}
@@ -704,18 +856,18 @@ const TicketModal = ({ onClose }) => {
                   </div>
                 </div>
                 <input value={form.phone} onChange={e => set('phone', e.target.value.replace(/\D/g,''))}
-                  className="form-input" placeholder="Phone number" style={{ flex: 1 }} maxLength={15} />
+                  className="form-input" placeholder={S.phonePlaceholder} style={{ flex: 1 }} maxLength={15} />
               </div>
               {errors.phone && <p className="field-error">{errors.phone}</p>}
             </div>
 
             {/* Category */}
             <div>
-              <label className="form-label">Issue Category <span className="req">*</span></label>
+              <label className="form-label">{S.issueCategory} <span className="req">*</span></label>
               <div style={{ position: 'relative' }}>
                 <select value={form.category} onChange={e => handleCategoryChange(e.target.value)} className="form-select" style={{ paddingRight: 28 }}>
-                  <option value="">Select a category</option>
-                  {FORM_CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                  <option value="">{S.categoryPlaceholder}</option>
+                  {FORM_CATEGORIES.map(c => <option key={c.id} value={c.id}>{lang === 'bn' ? FORM_CATEGORIES_LABELS_BN[c.id] : c.label}</option>)}
                 </select>
                 <div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-3)' }}>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
@@ -727,10 +879,10 @@ const TicketModal = ({ onClose }) => {
             {/* Subcategory */}
             {form.category && (
               <div className="fade-in">
-                <label className="form-label">Issue Type <span className="req">*</span></label>
+                <label className="form-label">{S.issueType} <span className="req">*</span></label>
                 <div style={{ position: 'relative' }}>
                   <select value={form.subcategory} onChange={e => { set('subcategory', e.target.value); setFile(null); }} className="form-select" style={{ paddingRight: 28 }}>
-                    <option value="">Select issue type</option>
+                    <option value="">{S.issueTypePlaceholder}</option>
                     {(selectedCat?.subs || []).map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                   <div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-3)' }}>
@@ -744,10 +896,10 @@ const TicketModal = ({ onClose }) => {
             {/* Device — conditional */}
             {needsDevice && (
               <div className="fade-in">
-                <label className="form-label">Device <span className="req">*</span></label>
+                <label className="form-label">{S.deviceLabel} <span className="req">*</span></label>
                 <div style={{ position: 'relative' }}>
                   <select value={form.device} onChange={e => set('device', e.target.value)} className="form-select" style={{ paddingRight: 28 }}>
-                    <option value="">Select your device</option>
+                    <option value="">{S.devicePlaceholder}</option>
                     {DEVICES.map(d => <option key={d} value={d}>{d}</option>)}
                   </select>
                   <div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-3)' }}>
@@ -760,27 +912,27 @@ const TicketModal = ({ onClose }) => {
 
             {/* Description */}
             <div>
-              <label className="form-label">Describe your issue <span className="req">*</span></label>
+              <label className="form-label">{S.describeIssue} <span className="req">*</span></label>
               <textarea value={form.description} onChange={e => set('description', e.target.value)}
-                className="form-textarea" placeholder="Please describe what happened, what you expected, and any error messages you saw..." rows={4} />
+                className="form-textarea" placeholder={S.descriptionPlaceholder} rows={4} />
               <div className="flex justify-between mt-1">
                 {errors.description
                   ? <p className="field-error">{errors.description}</p>
                   : <span />}
-                <span style={{ color: 'var(--text-3)', fontSize: 11 }}>{form.description.length} chars</span>
+                <span style={{ color: 'var(--text-3)', fontSize: 11 }}>{form.description.length} {S.charsLabel}</span>
               </div>
             </div>
 
             {/* Attachment */}
             <div>
               <label className="form-label">
-                Attachment {needsAttachment ? <span className="req">*</span> : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>(optional)</span>}
+                {S.attachmentLabel} {needsAttachment ? <span className="req">*</span> : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>{S.optionalLabel}</span>}
               </label>
               {needsAttachment && (
                 <div className="flex items-start gap-2 mb-2 p-3 rounded-lg" style={{ background: 'rgba(210,8,32,0.06)', border: '1px solid rgba(210,8,32,0.2)' }}>
                   <Icon name="alertCircle" size={14} style={{ color: 'var(--accent)', marginTop: 1, flexShrink: 0 }} />
                   <p style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 500 }}>
-                    A screenshot of the error or payment confirmation is required for this issue type. This helps us resolve your ticket faster.
+                    {S.attachmentRequiredMsg}
                   </p>
                 </div>
               )}
@@ -810,8 +962,8 @@ const TicketModal = ({ onClose }) => {
                 ) : (
                   <div>
                     <Icon name="upload" size={22} style={{ color: 'var(--text-3)', marginBottom: 8 }} />
-                    <p style={{ color: 'var(--text-2)', fontSize: 13, fontWeight: 500 }}>Click or drag a file here</p>
-                    <p style={{ color: 'var(--text-3)', fontSize: 12, marginTop: 3 }}>JPG, PNG, PDF — max 5MB</p>
+                    <p style={{ color: 'var(--text-2)', fontSize: 13, fontWeight: 500 }}>{S.uploadPrompt}</p>
+                    <p style={{ color: 'var(--text-3)', fontSize: 12, marginTop: 3 }}>{S.uploadHint}</p>
                   </div>
                 )}
               </div>
@@ -830,11 +982,11 @@ const TicketModal = ({ onClose }) => {
             <button onClick={handleSubmit} disabled={submitting}
               className="btn-primary flex items-center justify-center gap-2 rounded-xl font-semibold"
               style={{ padding: '12px 24px', fontSize: 15, opacity: submitting ? 0.7 : 1, marginTop: 4 }}>
-              {submitting ? <><Icon name="loader" size={16} /> Submitting…</> : <><Icon name="ticket" size={16} /> Submit ticket</>}
+              {submitting ? <><Icon name="loader" size={16} /> {lang === 'bn' ? 'সাবমিট হচ্ছে…' : 'Submitting…'}</> : <><Icon name="ticket" size={16} /> {S.submitTicket}</>}
             </button>
 
             <p style={{ color: 'var(--text-3)', fontSize: 12, textAlign: 'center' }}>
-              Or email us directly at <a href="mailto:support@hoichoi.tv" style={{ color: 'var(--accent)', textDecoration: 'none' }}>support@hoichoi.tv</a>
+              {S.orEmail} <a href="mailto:support@hoichoi.tv" style={{ color: 'var(--accent)', textDecoration: 'none' }}>support@hoichoi.tv</a>
             </p>
           </div>
         )}
@@ -858,11 +1010,11 @@ const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket }) => (
           <text x="0" y="24" fontFamily="Inter,-apple-system,BlinkMacSystemFont,sans-serif" fontWeight="900" fontSize="26" letterSpacing="-1" fill="url(#wm-grad)">hoichoi</text>
         </svg>
         <div style={{ width: 1, height: 20, background: 'var(--border)', flexShrink: 0 }} />
-        <span style={{ color: 'var(--text-2)', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}>Help Center</span>
+        <span style={{ color: 'var(--text-2)', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}>{STRINGS[lang].helpCenter}</span>
       </div>
 
       <div className="topbar-nav" style={{ gap: 2, marginLeft: 8 }}>
-        {[{ label: 'Get Started', view: 'getstarted' }, { label: 'Help Articles', view: 'home' }, { label: 'Video Library', view: 'videos' }].map((item, i) => (
+        {[{ label: STRINGS[lang].getStarted, view: 'getstarted' }, { label: STRINGS[lang].helpArticles, view: 'home' }, { label: STRINGS[lang].videoLibrary, view: 'videos' }].map((item, i) => (
           <React.Fragment key={item.view}>
             {i > 0 && <span style={{ width: 1, height: 14, background: 'var(--border)', display: 'inline-block', flexShrink: 0 }} />}
             <button onClick={() => navigate({ view: item.view })}
@@ -888,7 +1040,7 @@ const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket }) => (
         <button onClick={onOpenTicket}
           className="btn-primary"
           style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, height: 36, padding: '0 16px', borderRadius: 8, fontWeight: 600, flexShrink: 0 }}>
-          <Icon name="ticket" size={14} /> <span className="topbar-btn-text">Raise a Ticket</span>
+          <Icon name="ticket" size={14} /> <span className="topbar-btn-text">{STRINGS[lang].raiseTicketBtn}</span>
         </button>
       </div>
     </div>
@@ -925,6 +1077,7 @@ const renderContent = (text) => {
 
 // ── Views ─────────────────────────────────────────────────────────────────────
 const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, categories }) => {
+  const S = STRINGS[lang];
   const [query, setQuery] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const searchRef = useRef(null);
@@ -968,8 +1121,8 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
     <div className="fade-in">
       <div className="hero-gradient" style={{ padding: '48px 24px 56px' }}>
         <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
-          <h1 style={{ color: '#fff', fontSize: 34, fontWeight: 800, letterSpacing: '-0.5px', marginBottom: 10 }}>How can we help?</h1>
-          <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 15, marginBottom: 28 }}>Search help articles or browse categories below</p>
+          <h1 style={{ color: '#fff', fontSize: 34, fontWeight: 800, letterSpacing: '-0.5px', marginBottom: 10 }}>{S.heroTitle}</h1>
+          <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 15, marginBottom: 28 }}>{S.heroSubtitle}</p>
           <div ref={searchRef} style={{ position: 'relative', maxWidth: 520, margin: '0 auto' }}>
             <div style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(0,0,0,0.4)', zIndex: 1 }}>
               <Icon name="search" size={18} />
@@ -978,11 +1131,11 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
               onChange={e => { setQuery(e.target.value); }}
               onKeyDown={e => { if (e.key === 'Enter' && query.trim()) { setDropdownOpen(false); navigate({ view: 'search', query }); } }}
               onFocus={() => liveResults.length > 0 && setDropdownOpen(true)}
-              placeholder="e.g. reset password, bKash payment, Smart TV..."
+              placeholder={S.searchPlaceholder}
               style={{ width: '100%', height: 52, paddingLeft: 48, paddingRight: 100, borderRadius: dropdownOpen ? '14px 14px 0 0' : 14, border: 'none', fontSize: 15, color: '#0F172A', background: '#fff', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', outline: 'none', position: 'relative' }} />
             <button onClick={() => { if (query.trim()) { setDropdownOpen(false); navigate({ view: 'search', query }); } }}
               style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'linear-gradient(135deg,#d20820,#6d0550)', color: '#fff', border: 'none', borderRadius: 10, height: 36, paddingInline: 16, fontWeight: 600, fontSize: 13, cursor: 'pointer', zIndex: 1 }}>
-              Search
+              {S.searchBtn}
             </button>
             {dropdownOpen && (
               <div className="search-dropdown" style={{ borderTop: '1px solid #E4E8F0', borderRadius: '0 0 14px 14px', textAlign: 'left' }}>
@@ -997,7 +1150,7 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
                     }}>
                     <Icon name={r.type === 'video' ? 'play' : 'search'} size={13} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
                     <span style={{ fontSize: 14, color: '#0F172A', flex: 1 }}>{lang === 'bn' ? r.titleBn : r.title}</span>
-                    <span style={{ fontSize: 11, color: '#94A3B8', flexShrink: 0 }}>{r.type === 'video' ? 'Video' : categories.find(c => c.id === r.catId)?.label}</span>
+                    <span style={{ fontSize: 11, color: '#94A3B8', flexShrink: 0 }}>{r.type === 'video' ? S.videoLabel : categories.find(c => c.id === r.catId)?.label}</span>
                   </div>
                 ))}
                 {query.trim().length >= 2 && (
@@ -1005,15 +1158,15 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
                     className="search-dropdown-item" style={{ padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
                     onMouseDown={() => { setDropdownOpen(false); navigate({ view: 'search', query }); }}>
                     <Icon name="search" size={13} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-                    <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 500 }}>See all results for "{query}"</span>
+                    <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 500 }}>{S.seeAllResultsFor} "{query}"</span>
                   </div>
                 )}
               </div>
             )}
           </div>
           <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 16, flexWrap: 'wrap' }}>
-            {['Reset password', 'bKash payment', 'Cancel subscription', 'Smart TV setup'].map(s => (
-              <button key={s} onClick={() => navigate({ view: 'search', query: s })}
+            {S.quickSearches.map((s, idx) => (
+              <button key={idx} onClick={() => navigate({ view: 'search', query: STRINGS.en.quickSearches[idx] })}
                 style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 999, color: '#fff', fontSize: 12, fontWeight: 500, padding: '5px 14px', cursor: 'pointer' }}>
                 {s}
               </button>
@@ -1023,7 +1176,7 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
       </div>
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px 60px' }}>
-        <h2 style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 20, marginBottom: 20 }}>Browse by category</h2>
+        <h2 style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 20, marginBottom: 20 }}>{S.browseByCategory}</h2>
         <div className="category-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 14 }}>
           {categories.map(cat => (
             <div key={cat.id} className="category-card cursor-pointer transition-all"
@@ -1031,13 +1184,13 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
               style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: 20, boxShadow: 'var(--shadow)', transition: 'transform 0.18s, box-shadow 0.18s' }}>
               <div style={{ width: 48, height: 48, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', background: cat.color + '18', marginBottom: 12, color: cat.color }}><Icon name={cat.icon} size={26} /></div>
               <p style={{ color: 'var(--text-1)', fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{lang === 'bn' ? cat.labelBn : cat.label}</p>
-              <p style={{ color: 'var(--text-3)', fontSize: 12 }}>{categoryCounts[cat.id] ?? cat.count} articles</p>
+              <p style={{ color: 'var(--text-3)', fontSize: 12 }}>{categoryCounts[cat.id] ?? cat.count} {S.articlesLabel}</p>
             </div>
           ))}
         </div>
 
         <div style={{ marginTop: 48 }}>
-          <h2 style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 20, marginBottom: 20 }}>Popular articles</h2>
+          <h2 style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 20, marginBottom: 20 }}>{S.popularArticles}</h2>
           <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
             {popularArticles.map((a, i) => {
               const cat = categories.find(c => c.id === a.catId);
@@ -1045,9 +1198,9 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
                 <div key={a.id} className="article-card cursor-pointer flex items-center gap-4"
                   onClick={() => navigate({ view: 'article', articleId: a.id, catId: a.catId })}
                   style={{ padding: '16px 20px', borderBottom: i < popularArticles.length - 1 ? '1px solid var(--border)' : 'none', transition: 'background 0.15s' }}>
-                  <span style={{ color: 'var(--text-1)', fontSize: 14, fontWeight: 500, flex: 1 }}>{a.title}</span>
+                  <span style={{ color: 'var(--text-1)', fontSize: 14, fontWeight: 500, flex: 1 }}>{lang === 'bn' ? (a.titleBn || a.title) : a.title}</span>
                   <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-3)', fontSize: 12 }}>{cat?.label}</span>
+                    <span style={{ color: 'var(--text-3)', fontSize: 12 }}>{lang === 'bn' ? (cat?.labelBn || cat?.label) : cat?.label}</span>
                     <Icon name="chevronRight" size={15} style={{ color: 'var(--text-3)' }} />
                   </div>
                 </div>
@@ -1055,27 +1208,28 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
             })}
           </div>
         </div>
-        <div style={{ marginTop: 48 }}><SupportBar onOpenTicket={onOpenTicket} /></div>
+        <div style={{ marginTop: 48 }}><SupportBar onOpenTicket={onOpenTicket} lang={lang} /></div>
       </div>
     </div>
   );
 };
 
 const GetStartedView = ({ navigate, lang, onOpenTicket }) => {
+  const S = STRINGS[lang];
   const steps = [
-    { step: 1, icon: 'mail',          title: 'Create your account',       titleBn: 'অ্যাকাউন্ট তৈরি করুন',          desc: 'Sign up with your email or phone at hoichoi.tv or on the app', articleId: 'a2', catId: 'account' },
-    { step: 2, icon: 'creditCard',   title: 'Pick a plan & pay',          titleBn: 'প্ল্যান বেছে নিন',              desc: 'Choose Monthly or Annual. Pay via bKash, card, Google Play, or iTunes', articleId: 'b2', catId: 'billing' },
-    { step: 3, icon: 'monitor',      title: 'Set up your device',         titleBn: 'ডিভাইস সেটআপ করুন',            desc: 'Install on your phone, Smart TV, or Fire Stick and log in', articleId: 't1', catId: 'tv' },
-    { step: 4, icon: 'users',        title: 'Add profiles',               titleBn: 'প্রোফাইল যোগ করুন',            desc: 'Create up to 5 profiles for different family members', articleId: 'p1', catId: 'app' },
-    { step: 5, icon: 'downloadArrow',title: 'Download for offline',       titleBn: 'অফলাইনের জন্য ডাউনলোড করুন',  desc: 'Save your favourite content to watch without internet', articleId: 'd1', catId: 'downloads' },
+    { step: 1, icon: 'mail',          title: 'Create your account',       titleBn: 'অ্যাকাউন্ট তৈরি করুন',          desc: 'Sign up with your email or phone at hoichoi.tv or on the app', descBn: 'hoichoi.tv-তে বা অ্যাপে আপনার ইমেইল বা ফোন দিয়ে সাইন আপ করুন', articleId: 'a2', catId: 'account' },
+    { step: 2, icon: 'creditCard',   title: 'Pick a plan & pay',          titleBn: 'প্ল্যান বেছে নিন',              desc: 'Choose Monthly or Annual. Pay via bKash, card, Google Play, or iTunes', descBn: 'মান্থলি বা অ্যানুয়াল প্ল্যান বেছে নিন। বিকাশ, কার্ড, Google Play বা iTunes-এ পেমেন্ট করুন', articleId: 'b2', catId: 'billing' },
+    { step: 3, icon: 'monitor',      title: 'Set up your device',         titleBn: 'ডিভাইস সেটআপ করুন',            desc: 'Install on your phone, Smart TV, or Fire Stick and log in', descBn: 'আপনার ফোন, স্মার্ট টিভি বা Fire Stick-এ ইন্সটল করুন এবং লগইন করুন', articleId: 't1', catId: 'tv' },
+    { step: 4, icon: 'users',        title: 'Add profiles',               titleBn: 'প্রোফাইল যোগ করুন',            desc: 'Create up to 5 profiles for different family members', descBn: 'পরিবারের বিভিন্ন সদস্যের জন্য সর্বোচ্চ ৫টি প্রোফাইল তৈরি করুন', articleId: 'p1', catId: 'app' },
+    { step: 5, icon: 'downloadArrow',title: 'Download for offline',       titleBn: 'অফলাইনের জন্য ডাউনলোড করুন',  desc: 'Save your favourite content to watch without internet', descBn: 'ইন্টারনেট ছাড়া দেখার জন্য আপনার পছন্দের কন্টেন্ট সেভ করুন', articleId: 'd1', catId: 'downloads' },
   ];
   return (
     <div className="fade-in">
       <div style={{ background: 'var(--surface)', borderBottom: '1.5px solid var(--border)', padding: '40px 24px' }}>
         <div style={{ maxWidth: 760, margin: '0 auto' }}>
-          <p style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 8 }}>Getting Started</p>
-          <h1 style={{ color: 'var(--text-1)', fontSize: 28, fontWeight: 800, letterSpacing: '-0.4px', marginBottom: 8 }}>New to hoichoi? Here's everything you need.</h1>
-          <p style={{ color: 'var(--text-2)', fontSize: 15, lineHeight: 1.6 }}>From signing up to streaming your first show — set up in minutes.</p>
+          <p style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 8 }}>{S.gettingStartedBadge}</p>
+          <h1 style={{ color: 'var(--text-1)', fontSize: 28, fontWeight: 800, letterSpacing: '-0.4px', marginBottom: 8 }}>{S.gettingStartedTitle}</h1>
+          <p style={{ color: 'var(--text-2)', fontSize: 15, lineHeight: 1.6 }}>{S.gettingStartedSubtitle}</p>
         </div>
       </div>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 24px 60px' }}>
@@ -1086,28 +1240,29 @@ const GetStartedView = ({ navigate, lang, onOpenTicket }) => {
               <div style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, background: 'var(--surface2)', border: '1.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-2)' }}><Icon name={s.icon} size={20} /></div>
               <div style={{ flex: 1 }}>
                 <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 15 }}>{lang === 'bn' ? s.titleBn : s.title}</p>
-                <p style={{ color: 'var(--text-2)', fontSize: 13, marginTop: 3 }}>{s.desc}</p>
+                <p style={{ color: 'var(--text-2)', fontSize: 13, marginTop: 3 }}>{lang === 'bn' ? s.descBn : s.desc}</p>
               </div>
               <button onClick={() => navigate({ view: 'article', articleId: s.articleId, catId: s.catId })}
                 style={{ background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 600, color: 'var(--text-1)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                Learn more
+                {S.learnMore}
               </button>
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 44 }}><SupportBar onOpenTicket={onOpenTicket} /></div>
+        <div style={{ marginTop: 44 }}><SupportBar onOpenTicket={onOpenTicket} lang={lang} /></div>
       </div>
     </div>
   );
 };
 
 const CategoryView = ({ catId, navigate, lang, onOpenTicket, allArticles, categories }) => {
+  const S = STRINGS[lang];
   const cat = categories.find(c => c.id === catId);
   const articles = allArticles.filter(a => (a.categoryId || a.category) === catId);
   return (
     <div className="fade-in" style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 24px 60px' }}>
       <div className="flex items-center gap-2 mb-6" style={{ fontSize: 13, color: 'var(--text-3)' }}>
-        <span className="cursor-pointer" style={{ color: 'var(--accent)' }} onClick={() => navigate({ view: 'home' })}>Knowledge Base</span>
+        <span className="cursor-pointer" style={{ color: 'var(--accent)' }} onClick={() => navigate({ view: 'home' })}>{S.knowledgeBase}</span>
         <span>/</span>
         <span style={{ color: 'var(--text-2)' }}>{lang === 'bn' ? cat?.labelBn : cat?.label}</span>
       </div>
@@ -1115,7 +1270,7 @@ const CategoryView = ({ catId, navigate, lang, onOpenTicket, allArticles, catego
         <div style={{ width: 52, height: 52, borderRadius: 14, background: cat?.color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', color: cat?.color }}><Icon name={cat?.icon} size={28} /></div>
         <div>
           <h1 style={{ color: 'var(--text-1)', fontWeight: 800, fontSize: 24, marginBottom: 2 }}>{lang === 'bn' ? cat?.labelBn : cat?.label}</h1>
-          <p style={{ color: 'var(--text-3)', fontSize: 13 }}>{articles.length} articles</p>
+          <p style={{ color: 'var(--text-3)', fontSize: 13 }}>{articles.length} {S.articlesCount}</p>
         </div>
       </div>
       <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
@@ -1143,6 +1298,7 @@ const CategoryView = ({ catId, navigate, lang, onOpenTicket, allArticles, catego
 };
 
 const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticles, categories }) => {
+  const S = STRINGS[lang];
   const cat = categories.find(c => c.id === catId);
   const catArticles = allArticles.filter(a => (a.categoryId || a.category) === catId);
   const articleMeta = allArticles.find(a => a.id === articleId) || {};
@@ -1199,15 +1355,15 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
     <div className="fade-in article-grid">
       <div>
         <div className="flex items-center gap-2 mb-6" style={{ fontSize: 13, color: 'var(--text-3)' }}>
-          <span className="cursor-pointer" style={{ color: 'var(--accent)' }} onClick={() => navigate({ view: 'home' })}>Knowledge Base</span>
+          <span className="cursor-pointer" style={{ color: 'var(--accent)' }} onClick={() => navigate({ view: 'home' })}>{S.knowledgeBase}</span>
           <span>/</span>
-          <span className="cursor-pointer" style={{ color: 'var(--accent)' }} onClick={() => navigate({ view: 'category', catId })}>{cat?.label}</span>
+          <span className="cursor-pointer" style={{ color: 'var(--accent)' }} onClick={() => navigate({ view: 'category', catId })}>{lang === 'bn' ? (cat?.labelBn || cat?.label) : cat?.label}</span>
           <span>/</span>
-          <span style={{ color: 'var(--text-2)' }}>Article</span>
+          <span style={{ color: 'var(--text-2)' }}>{S.articleBreadcrumb}</span>
         </div>
         <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 16, padding: 32, boxShadow: 'var(--shadow)' }}>
           <div className="flex items-center gap-2 mb-4 flex-wrap">
-            <span style={{ background: cat?.color + '18', color: cat?.color, padding: '3px 10px', borderRadius: 999, fontSize: 12, fontWeight: 600 }}>{cat?.label}</span>
+            <span style={{ background: cat?.color + '18', color: cat?.color, padding: '3px 10px', borderRadius: 999, fontSize: 12, fontWeight: 600 }}>{lang === 'bn' ? (cat?.labelBn || cat?.label) : cat?.label}</span>
             {articleMeta.tag && <span className={`tag ${articleMeta.tag === 'new' ? 'tag-new' : 'tag-popular'}`}>{articleMeta.tag}</span>}
             <span style={{ color: 'var(--text-3)', fontSize: 12, marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
               <Icon name="clock" size={12} /> {articleMeta.readTime}
@@ -1215,18 +1371,18 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
           </div>
           <h1 style={{ color: 'var(--text-1)', fontWeight: 800, fontSize: 22, letterSpacing: '-0.3px', marginBottom: 12 }}>{title}</h1>
           <div className="flex gap-4 mb-6 pb-5 flex-wrap" style={{ borderBottom: '1px solid var(--border)' }}>
-            {articleMeta.views && <span className="flex items-center gap-1.5" style={{ color: 'var(--text-3)', fontSize: 12 }}><Icon name="eye" size={13} />{(articleMeta.views/1000).toFixed(1)}K views</span>}
+            {articleMeta.views && <span className="flex items-center gap-1.5" style={{ color: 'var(--text-3)', fontSize: 12 }}><Icon name="eye" size={13} />{(articleMeta.views/1000).toFixed(1)}K {S.viewsLabel}</span>}
             {articleMeta.likes && <span className="flex items-center gap-1.5" style={{ color: 'var(--text-3)', fontSize: 12 }}><Icon name="thumbUp" size={13} />{articleMeta.likes}</span>}
           </div>
           {translating
             ? <div style={{ color: 'var(--text-3)', fontSize: 14, padding: '20px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span className="spin" style={{ width: 16, height: 16, border: '2px solid var(--border)', borderTopColor: 'var(--accent)', borderRadius: '50%', display: 'inline-block', flexShrink: 0 }} />
-                বাংলায় অনুবাদ হচ্ছে…
+                {S.translating}
               </div>
             : <div>{renderContent(lang === 'bn' && translatedContent ? translatedContent : content?.content)}</div>
           }
           {articleMeta.likes !== undefined && (
-            <ArticleFeedback articleId={articleId} initialLikes={articleMeta.likes} initialDislikes={articleMeta.dislikes} />
+            <ArticleFeedback articleId={articleId} initialLikes={articleMeta.likes} initialDislikes={articleMeta.dislikes} lang={lang} />
           )}
         </div>
       </div>
@@ -1234,7 +1390,7 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
       <div className="article-sidebar">
         {relatedArticles.length > 0 && (
           <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: 20, boxShadow: 'var(--shadow)' }}>
-            <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 14, marginBottom: 14 }}>Related articles</p>
+            <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 14, marginBottom: 14 }}>{S.relatedArticles}</p>
             {relatedArticles.map((a, i) => {
               const rc = categories.find(c => c.id === a.catId);
               return (
@@ -1243,7 +1399,7 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
                   style={{ borderBottom: i < relatedArticles.length-1 ? '1px solid var(--border)' : 'none' }}
                   onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
                   onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
-                  <span style={{ fontSize: 13, color: 'var(--text-2)', flex: 1, lineHeight: 1.4 }}>{a.title}</span>
+                  <span style={{ fontSize: 13, color: 'var(--text-2)', flex: 1, lineHeight: 1.4 }}>{lang === 'bn' ? (a.titleBn || a.title) : a.title}</span>
                   <Icon name="chevronRight" size={13} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
                 </div>
               );
@@ -1252,28 +1408,28 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
         )}
         <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: 20, boxShadow: 'var(--shadow)' }}>
           <div className="flex items-center justify-between mb-4">
-            <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 14 }}>In this category</p>
-            <span style={{ color: 'var(--accent)', fontSize: 12, cursor: 'pointer' }} onClick={() => navigate({ view: 'category', catId })}>See all</span>
+            <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 14 }}>{S.inThisCategory}</p>
+            <span style={{ color: 'var(--accent)', fontSize: 12, cursor: 'pointer' }} onClick={() => navigate({ view: 'category', catId })}>{S.seeAll}</span>
           </div>
           {catArticles.slice(0,5).map((a, i) => (
             <div key={a.id} className="cursor-pointer flex items-center gap-2 py-2"
               onClick={() => navigate({ view: 'article', articleId: a.id, catId })}
               style={{ borderBottom: i < Math.min(4, catArticles.length-1) ? '1px solid var(--border)' : 'none' }}>
               {a.id === articleId && <div style={{ width: 3, height: 16, background: 'var(--accent)', borderRadius: 3, flexShrink: 0 }} />}
-              <span style={{ fontSize: 13, lineHeight: 1.4, color: a.id === articleId ? 'var(--accent)' : 'var(--text-2)', fontWeight: a.id === articleId ? 600 : 400 }}>{a.title}</span>
+              <span style={{ fontSize: 13, lineHeight: 1.4, color: a.id === articleId ? 'var(--accent)' : 'var(--text-2)', fontWeight: a.id === articleId ? 600 : 400 }}>{lang === 'bn' ? (a.titleBn || a.title) : a.title}</span>
             </div>
           ))}
         </div>
         {/* Inline support CTA in sidebar */}
         <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: 20, boxShadow: 'var(--shadow)' }}>
-          <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 14, marginBottom: 6 }}>Need more help?</p>
-          <p style={{ color: 'var(--text-2)', fontSize: 12, marginBottom: 14, lineHeight: 1.5 }}>Our support team is ready to help Mon–Sat, 9 AM–9 PM</p>
+          <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 14, marginBottom: 6 }}>{S.needMoreHelp}</p>
+          <p style={{ color: 'var(--text-2)', fontSize: 12, marginBottom: 14, lineHeight: 1.5 }}>{S.supportHoursShort}</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <button onClick={openNuggetChat} className="btn-ghost flex items-center justify-center gap-2 rounded-lg w-full" style={{ padding: '8px 12px', fontSize: 13 }}>
-              <Icon name="chat" size={14} /> Chat with us
+              <Icon name="chat" size={14} /> {S.chatWithUs}
             </button>
             <button onClick={onOpenTicket} className="btn-primary flex items-center justify-center gap-2 rounded-lg w-full" style={{ padding: '8px 12px', fontSize: 13 }}>
-              <Icon name="ticket" size={14} /> Raise a ticket
+              <Icon name="ticket" size={14} /> {S.raiseTicket}
             </button>
           </div>
         </div>
@@ -1283,6 +1439,7 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
 };
 
 const VideoLibraryView = ({ navigate, lang, onOpenTicket }) => {
+  const S = STRINGS[lang];
   const [activeFilter, setActiveFilter] = useState('All');
   const filters = ['All', 'Smart TV', 'Payment', 'Subscription', 'Downloads', 'Playback', 'Profile'];
   const filtered = activeFilter === 'All' ? VIDEOS : VIDEOS.filter(v => v.category === activeFilter);
@@ -1290,9 +1447,9 @@ const VideoLibraryView = ({ navigate, lang, onOpenTicket }) => {
     <div className="fade-in">
       <div style={{ background: 'var(--surface)', borderBottom: '1.5px solid var(--border)', padding: '36px 24px 28px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <p style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 8 }}>How-to Videos</p>
-          <h1 style={{ color: 'var(--text-1)', fontWeight: 800, fontSize: 26, letterSpacing: '-0.4px', marginBottom: 6 }}>Visual step-by-step guides</h1>
-          <p style={{ color: 'var(--text-2)', fontSize: 14 }}>Short, clear videos showing exactly how to use hoichoi</p>
+          <p style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 8 }}>{S.videosBadge}</p>
+          <h1 style={{ color: 'var(--text-1)', fontWeight: 800, fontSize: 26, letterSpacing: '-0.4px', marginBottom: 6 }}>{S.videosTitle}</h1>
+          <p style={{ color: 'var(--text-2)', fontSize: 14 }}>{S.videosSubtitle}</p>
         </div>
       </div>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px 60px' }}>
@@ -1300,7 +1457,7 @@ const VideoLibraryView = ({ navigate, lang, onOpenTicket }) => {
           {filters.map(f => (
             <button key={f} onClick={() => setActiveFilter(f)}
               style={{ padding: '7px 16px', borderRadius: 999, fontSize: 13, fontWeight: 500, cursor: 'pointer', border: '1.5px solid', background: activeFilter === f ? 'linear-gradient(135deg,#d20820,#6d0550)' : 'var(--surface)', color: activeFilter === f ? '#fff' : 'var(--text-2)', borderColor: activeFilter === f ? 'transparent' : 'var(--border)' }}>
-              {f}
+              {f === 'All' ? S.filterAll : f}
             </button>
           ))}
         </div>
@@ -1329,13 +1486,14 @@ const VideoLibraryView = ({ navigate, lang, onOpenTicket }) => {
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 48 }}><SupportBar onOpenTicket={onOpenTicket} /></div>
+        <div style={{ marginTop: 48 }}><SupportBar onOpenTicket={onOpenTicket} lang={lang} /></div>
       </div>
     </div>
   );
 };
 
 const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categories }) => {
+  const S = STRINGS[lang];
   const results = useMemo(() => {
     if (!query) return [];
     const q = query.toLowerCase();
@@ -1347,7 +1505,7 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
   return (
     <div className="fade-in" style={{ maxWidth: 900, margin: '0 auto', padding: '36px 24px 60px' }}>
       <p style={{ color: 'var(--text-3)', fontSize: 13, marginBottom: 24 }}>
-        {results.length > 0 ? `${results.length} result${results.length !== 1 ? 's' : ''} for "${query}"` : `No results found for "${query}"`}
+        {results.length > 0 ? S.searchResultsText(results.length, query) : S.noResultsText(query)}
       </p>
       {results.length > 0 ? (
         <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
@@ -1369,12 +1527,12 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
       ) : (
         <div style={{ textAlign: 'center', padding: '60px 24px' }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>🔍</div>
-          <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 18, marginBottom: 8 }}>No results found</p>
-          <p style={{ color: 'var(--text-2)', fontSize: 14, marginBottom: 28 }}>Try different keywords, or browse our categories below.</p>
-          <button className="btn-primary px-6 py-2.5 rounded-lg font-semibold cursor-pointer" onClick={() => navigate({ view: 'home' })}>Browse categories</button>
+          <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 18, marginBottom: 8 }}>{S.noResultsHeading}</p>
+          <p style={{ color: 'var(--text-2)', fontSize: 14, marginBottom: 28 }}>{S.tryDifferent}</p>
+          <button className="btn-primary px-6 py-2.5 rounded-lg font-semibold cursor-pointer" onClick={() => navigate({ view: 'home' })}>{S.browseCategories}</button>
         </div>
       )}
-      <div style={{ marginTop: 40 }}><SupportBar compact onOpenTicket={onOpenTicket} /></div>
+      <div style={{ marginTop: 40 }}><SupportBar compact onOpenTicket={onOpenTicket} lang={lang} /></div>
     </div>
   );
 };
@@ -1464,7 +1622,7 @@ function App() {
       <Topbar theme={theme} setTheme={setTheme} lang={lang} setLang={setLang}
         navigate={navigate} onOpenTicket={onOpenTicket} />
       {renderView()}
-      {showTicket && <TicketModal onClose={() => setShowTicket(false)} />}
+      {showTicket && <TicketModal onClose={() => setShowTicket(false)} lang={lang} />}
     </>
   );
 }
