@@ -1147,13 +1147,40 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
   const catArticles = allArticles.filter(a => (a.categoryId || a.category) === catId);
   const articleMeta = allArticles.find(a => a.id === articleId) || {};
   const [fsContent, setFsContent] = useState(null);
+  const [translatedContent, setTranslatedContent] = useState(null);
+  const [translating, setTranslating] = useState(false);
 
   useEffect(() => {
     setFsContent(null);
+    setTranslatedContent(null);
     db.collection('articles').doc(articleId).get()
       .then(doc => { if (doc.exists && doc.data().published !== false) setFsContent(doc.data()); })
       .catch(() => {});
   }, [articleId]);
+
+  useEffect(() => {
+    if (lang !== 'bn') { setTranslatedContent(null); return; }
+    const rawContent = (fsContent || ARTICLE_CONTENT[articleId])?.content;
+    if (!rawContent) return;
+    const cacheKey = `hc_trans_${articleId}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) { setTranslatedContent(cached); return; }
+    setTranslating(true);
+    fetch('/api/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: rawContent, target: 'bn' }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.translated) {
+          localStorage.setItem(cacheKey, data.translated);
+          setTranslatedContent(data.translated);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setTranslating(false));
+  }, [lang, articleId, fsContent]);
 
   const content = fsContent || ARTICLE_CONTENT[articleId];
   const relatedIds = content?.relatedArticles || articleMeta.relatedArticles || [];
@@ -1191,7 +1218,13 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
             {articleMeta.views && <span className="flex items-center gap-1.5" style={{ color: 'var(--text-3)', fontSize: 12 }}><Icon name="eye" size={13} />{(articleMeta.views/1000).toFixed(1)}K views</span>}
             {articleMeta.likes && <span className="flex items-center gap-1.5" style={{ color: 'var(--text-3)', fontSize: 12 }}><Icon name="thumbUp" size={13} />{articleMeta.likes}</span>}
           </div>
-          <div>{renderContent(content?.content)}</div>
+          {translating
+            ? <div style={{ color: 'var(--text-3)', fontSize: 14, padding: '20px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span className="spin" style={{ width: 16, height: 16, border: '2px solid var(--border)', borderTopColor: 'var(--accent)', borderRadius: '50%', display: 'inline-block', flexShrink: 0 }} />
+                বাংলায় অনুবাদ হচ্ছে…
+              </div>
+            : <div>{renderContent(lang === 'bn' && translatedContent ? translatedContent : content?.content)}</div>
+          }
           {articleMeta.likes !== undefined && (
             <ArticleFeedback articleId={articleId} initialLikes={articleMeta.likes} initialDislikes={articleMeta.dislikes} />
           )}
