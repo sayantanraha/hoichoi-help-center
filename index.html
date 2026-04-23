@@ -156,7 +156,8 @@ async function fetchNuggetToken() {
 NuggetChat.init({
   accessTokenHandler: fetchNuggetToken,
   position: 'bottom-right',
-  initiallyVisible: false,
+  initiallyVisible: true,
+  bubbleStyles: { visibility: 'hidden', pointerEvents: 'none' },
   initiallyExpanded: false,
   viewType: 'issue',
   bubbleIcon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56"><defs><radialGradient id="hg" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#d20820"/><stop offset="100%" stop-color="#6d0550"/></radialGradient></defs><circle cx="28" cy="28" r="28" fill="url(#hg)"/><text x="28" y="40" font-family="Inter,Arial,sans-serif" font-size="32" font-weight="700" fill="white" text-anchor="middle">h</text></svg>',
