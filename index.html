@@ -57,12 +57,23 @@
   .video-card:hover .play-overlay { opacity: 1; }
   .play-overlay { opacity: 0; transition: opacity 0.2s; }
   .search-input:focus, .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(210,8,32,0.12); }
-  /* Nugget chat bubble — override SDK's 24px icon cap */
-  [style*="z-index: 10000"][style*="border-radius: 50%"] svg {
+  /* Nugget chat bubble — hoichoi logo fills full circle */
+  #chat-bubble-nugget-chat-widget svg:not([fill]) {
     max-width: none !important;
     max-height: none !important;
     width: 100% !important;
     height: 100% !important;
+  }
+  /* Chevron state — grey circle with black arrow */
+  #chat-bubble-nugget-chat-widget:has(svg[fill="#000000"]) {
+    background: #E2E8F0 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+  }
+  #chat-bubble-nugget-chat-widget svg[fill="#000000"] {
+    max-width: 32px !important;
+    max-height: 32px !important;
+    width: 32px !important;
+    height: 32px !important;
   }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   .fade-in { animation: fadeIn 0.25s ease; }
