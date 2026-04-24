@@ -1252,7 +1252,7 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
     const hits = [];
     for (const a of allArticles) {
       if (a.title.toLowerCase().includes(q) || (a.titleBn && a.titleBn.includes(q)))
-        hits.push({ ...a, catId: a.categoryId || a.category, type: 'article' });
+        hits.push({ ...a, catId: (a.categories && a.categories[0]) || a.categoryId || a.category, type: 'article' });
     }
     for (const v of VIDEOS) {
       if (v.title.toLowerCase().includes(q) || v.titleBn.includes(q))
@@ -1413,7 +1413,7 @@ const GetStartedView = ({ navigate, lang, onOpenTicket }) => {
 const CategoryView = ({ catId, navigate, lang, onOpenTicket, allArticles, categories }) => {
   const S = STRINGS[lang];
   const cat = categories.find(c => c.id === catId);
-  const articles = allArticles.filter(a => (a.categoryId || a.category) === catId);
+  const articles = allArticles.filter(a => (a.categories || [a.categoryId || a.category]).includes(catId));
   return (
     <div className="fade-in" style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 24px 60px' }}>
       <div className="flex items-center gap-2 mb-6" style={{ fontSize: 13, color: 'var(--text-3)' }}>
@@ -1455,7 +1455,7 @@ const CategoryView = ({ catId, navigate, lang, onOpenTicket, allArticles, catego
 const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticles, categories }) => {
   const S = STRINGS[lang];
   const cat = categories.find(c => c.id === catId);
-  const catArticles = allArticles.filter(a => (a.categoryId || a.category) === catId);
+  const catArticles = allArticles.filter(a => (a.categories || [a.categoryId || a.category]).includes(catId));
   const articleMeta = allArticles.find(a => a.id === articleId) || {};
   const [fsContent, setFsContent] = useState(null);
   const [translatedContent, setTranslatedContent] = useState(null);
@@ -1497,7 +1497,7 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
   const relatedIds = content?.relatedArticles || articleMeta.relatedArticles || [];
   const relatedArticles = relatedIds.map(id => {
     const found = allArticles.find(a => a.id === id);
-    if (found) return { ...found, catId: found.categoryId || found.category };
+    if (found) return { ...found, catId: (found.categories && found.categories[0]) || found.categoryId || found.category };
     for (const [cId, arts] of Object.entries(ARTICLES)) {
       const fb = arts.find(a => a.id === id);
       if (fb) return { ...fb, catId: cId };
@@ -1653,7 +1653,7 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
     const q = query.toLowerCase();
     return allArticles
       .filter(a => a.title.toLowerCase().includes(q) || (a.titleBn && a.titleBn.includes(q)))
-      .map(a => ({ ...a, catId: a.categoryId || a.category }));
+      .map(a => ({ ...a, catId: (a.categories && a.categories[0]) || a.categoryId || a.category }));
   }, [query, allArticles]);
   const cat = (cId) => categories.find(c => c.id === cId);
   return (
