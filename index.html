@@ -110,34 +110,44 @@
     .article-sidebar { position: static; }
   }
   /* ── Topbar redesign ─────────────────────────────────────────────────────── */
-  .topbar-inner { max-width: 1280px; margin: 0 auto; padding: 0 48px; height: 76px; display: flex; align-items: center; }
-  @media (max-width: 767px) { .topbar-inner { padding: 0 20px; height: 64px; } }
-  /* Brand title */
-  .topbar-brand-title { color: #243042; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; white-space: nowrap; line-height: 1; }
-  [data-theme="dark"] .topbar-brand-title { color: #E2E8F5; }
+  .topbar-inner { max-width: 1280px; margin: 0 auto; padding: 0 48px; height: 76px; display: flex; align-items: center; overflow: hidden; }
+  @media (max-width: 1023px) { .topbar-inner { padding: 0 24px; height: 64px; } }
+  @media (max-width: 479px)  { .topbar-inner { padding: 0 16px; } }
+  /* hoichoi logo — CSS gradient text, no SVG whitespace */
+  .topbar-logo { font-family: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif; font-weight: 900; font-size: 24px; letter-spacing: -0.8px; line-height: 1; white-space: nowrap; background: linear-gradient(135deg, #d20820 0%, #6d0550 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; flex-shrink: 0; }
+  @media (max-width: 479px) { .topbar-logo { font-size: 20px; } }
+  /* Divider between logo and title */
+  .topbar-divider { width: 1px; height: 18px; background: #D1D5DB; flex-shrink: 0; }
+  /* Brand title — visibly navy, not black */
+  .topbar-brand-title { color: #1E3A5F; font-size: 20px; font-weight: 600; letter-spacing: -0.4px; white-space: nowrap; line-height: 1; flex-shrink: 0; }
+  [data-theme="dark"] .topbar-brand-title { color: #C8D8EE; }
+  @media (max-width: 479px) { .topbar-brand-title { font-size: 16px; } }
   /* Desktop nav */
-  .topbar-nav { display: none; align-items: center; gap: 0; margin-left: 36px; }
+  .topbar-nav { display: none; align-items: center; gap: 0; margin-left: 32px; }
   @media (min-width: 1024px) { .topbar-nav { display: flex; } }
-  .topbar-nav-link { color: #475569 !important; background: transparent !important; border: none; font-size: 15px; font-weight: 500; padding: 8px 14px; border-radius: 8px; cursor: pointer; white-space: nowrap; letter-spacing: -0.1px; transition: color 0.15s, background 0.15s; }
-  .topbar-nav-link:hover { color: #1E293B !important; background: rgba(0,0,0,0.05) !important; }
+  .topbar-nav-link { color: #475569 !important; background: transparent !important; border: none; font-size: 14px; font-weight: 500; padding: 7px 13px; border-radius: 7px; cursor: pointer; white-space: nowrap; letter-spacing: -0.1px; transition: color 0.15s, background 0.15s; }
+  .topbar-nav-link:hover { color: #0F172A !important; background: rgba(0,0,0,0.05) !important; }
   [data-theme="dark"] .topbar-nav-link { color: #8896AB !important; }
   [data-theme="dark"] .topbar-nav-link:hover { color: #E2E8F5 !important; background: rgba(255,255,255,0.06) !important; }
   /* Right controls */
   .topbar-chat { display: none !important; }
   .topbar-lang-text { display: none; }
-  @media (min-width: 768px) { .topbar-lang-text { display: inline; } }
+  @media (min-width: 1024px) { .topbar-lang-text { display: inline; } }
   .topbar-btn-text { display: none; }
-  @media (min-width: 640px) { .topbar-btn-text { display: inline; } }
-  /* Language button — hide on mobile */
+  @media (min-width: 768px) { .topbar-btn-text { display: inline; } }
+  /* Ticket button — hide entirely on small phones, icon-only on tablets */
+  .topbar-ticket { display: flex !important; }
+  @media (max-width: 479px) { .topbar-ticket { display: none !important; } }
+  /* Language button — desktop only */
   @media (max-width: 1023px) { .topbar-lang { display: none !important; } }
-  /* Hamburger — mobile only */
-  .topbar-hamburger { display: none !important; width: 36px; height: 36px; align-items: center; justify-content: center; }
+  /* Hamburger — tablet + mobile only */
+  .topbar-hamburger { display: none !important; width: 36px; height: 36px; align-items: center; justify-content: center; flex-shrink: 0; }
   @media (max-width: 1023px) { .topbar-hamburger { display: flex !important; } }
   /* Mobile dropdown menu */
   .topbar-mobile-menu { border-top: 1px solid var(--border); background: var(--topbar-bg); padding: 6px 0 14px; }
-  .topbar-mobile-menu button { display: block; width: 100%; text-align: left; padding: 13px 24px; background: transparent; border: none; color: var(--text-1); font-size: 15px; font-weight: 500; cursor: pointer; letter-spacing: -0.2px; transition: background 0.12s; }
+  .topbar-mobile-menu button { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 13px 24px; background: transparent; border: none; color: var(--text-1); font-size: 15px; font-weight: 500; cursor: pointer; letter-spacing: -0.2px; transition: background 0.12s; }
   .topbar-mobile-menu button:hover { background: var(--hover); }
-  /* Sticky sidebar offset matches new navbar height */
+  /* Sticky sidebar offset */
   .article-sidebar { position: sticky; top: 84px; }
   /* Live search dropdown */
   .search-dropdown { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); z-index: 200; overflow: hidden; max-height: 360px; overflow-y: auto; }
@@ -1112,20 +1122,11 @@ const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket }) => {
       <div className="topbar-inner">
 
         {/* LEFT: Brand — logo + divider + title as one tight unit */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer', flexShrink: 0, userSelect: 'none' }}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer', userSelect: 'none' }}
           onClick={() => goTo('home')}>
-          <svg width="118" height="26" viewBox="0 0 118 26" style={{ display: 'block', flexShrink: 0 }}>
-            <defs>
-              <linearGradient id="wm-grad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#d20820"/>
-                <stop offset="100%" stopColor="#6d0550"/>
-              </linearGradient>
-            </defs>
-            <text x="0" y="22" fontFamily="Inter,-apple-system,BlinkMacSystemFont,sans-serif"
-              fontWeight="900" fontSize="24" letterSpacing="-0.8" fill="url(#wm-grad)">hoichoi</text>
-          </svg>
-          {/* Subtle divider — barely visible, just enough to separate */}
-          <div style={{ width: 1, height: 20, background: 'var(--border)', opacity: 0.8, flexShrink: 0 }} />
+          {/* CSS gradient text — no SVG, no invisible whitespace */}
+          <span className="topbar-logo">hoichoi</span>
+          <div className="topbar-divider" />
           <span className="topbar-brand-title">{S.helpCenter}</span>
         </div>
 
@@ -1156,8 +1157,8 @@ const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket }) => {
 
           {/* Raise a Ticket */}
           <button onClick={onOpenTicket}
-            className="btn-primary"
-            style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, height: 36, padding: '0 18px', borderRadius: 8, fontWeight: 600, flexShrink: 0 }}>
+            className="btn-primary topbar-ticket"
+            style={{ alignItems: 'center', gap: 6, fontSize: 13, height: 36, padding: '0 16px', borderRadius: 8, fontWeight: 600, flexShrink: 0 }}>
             <Icon name="ticket" size={14} />
             <span className="topbar-btn-text">{S.raiseTicketBtn}</span>
           </button>
