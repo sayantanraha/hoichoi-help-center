@@ -44,7 +44,7 @@
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 9999px; }
-  .topbar { background: var(--topbar-bg); border-bottom: 1.5px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+  .topbar { background: var(--topbar-bg); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 0 var(--border), 0 4px 24px rgba(0,0,0,0.04); }
   .hero-gradient { background: linear-gradient(135deg, #d20820 0%, #6d0550 100%); }
   .category-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
   .article-card:hover { background: var(--hover); }
@@ -109,13 +109,36 @@
     .article-grid { grid-template-columns: 1fr; }
     .article-sidebar { position: static; }
   }
-  /* Responsive topbar */
-  .topbar-nav { display: none; }
-  @media (min-width: 1024px) { .topbar-nav { display: flex; align-items: center; } }
+  /* ── Topbar redesign ─────────────────────────────────────────────────────── */
+  .topbar-inner { max-width: 1280px; margin: 0 auto; padding: 0 48px; height: 76px; display: flex; align-items: center; }
+  @media (max-width: 767px) { .topbar-inner { padding: 0 20px; height: 64px; } }
+  /* Brand title */
+  .topbar-brand-title { color: #243042; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; white-space: nowrap; line-height: 1; }
+  [data-theme="dark"] .topbar-brand-title { color: #E2E8F5; }
+  /* Desktop nav */
+  .topbar-nav { display: none; align-items: center; gap: 0; margin-left: 36px; }
+  @media (min-width: 1024px) { .topbar-nav { display: flex; } }
+  .topbar-nav-link { color: #475569 !important; background: transparent !important; border: none; font-size: 15px; font-weight: 500; padding: 8px 14px; border-radius: 8px; cursor: pointer; white-space: nowrap; letter-spacing: -0.1px; transition: color 0.15s, background 0.15s; }
+  .topbar-nav-link:hover { color: #1E293B !important; background: rgba(0,0,0,0.05) !important; }
+  [data-theme="dark"] .topbar-nav-link { color: #8896AB !important; }
+  [data-theme="dark"] .topbar-nav-link:hover { color: #E2E8F5 !important; background: rgba(255,255,255,0.06) !important; }
+  /* Right controls */
   .topbar-chat { display: none !important; }
-  @media (max-width: 1023px) { .topbar-lang { display: none !important; } }
+  .topbar-lang-text { display: none; }
+  @media (min-width: 768px) { .topbar-lang-text { display: inline; } }
   .topbar-btn-text { display: none; }
-  @media (min-width: 768px) { .topbar-btn-text { display: inline; } }
+  @media (min-width: 640px) { .topbar-btn-text { display: inline; } }
+  /* Language button — hide on mobile */
+  @media (max-width: 1023px) { .topbar-lang { display: none !important; } }
+  /* Hamburger — mobile only */
+  .topbar-hamburger { display: none !important; width: 36px; height: 36px; align-items: center; justify-content: center; }
+  @media (max-width: 1023px) { .topbar-hamburger { display: flex !important; } }
+  /* Mobile dropdown menu */
+  .topbar-mobile-menu { border-top: 1px solid var(--border); background: var(--topbar-bg); padding: 6px 0 14px; }
+  .topbar-mobile-menu button { display: block; width: 100%; text-align: left; padding: 13px 24px; background: transparent; border: none; color: var(--text-1); font-size: 15px; font-weight: 500; cursor: pointer; letter-spacing: -0.2px; transition: background 0.12s; }
+  .topbar-mobile-menu button:hover { background: var(--hover); }
+  /* Sticky sidebar offset matches new navbar height */
+  .article-sidebar { position: sticky; top: 84px; }
   /* Live search dropdown */
   .search-dropdown { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); z-index: 200; overflow: hidden; max-height: 360px; overflow-y: auto; }
   .search-dropdown-item:hover { background: var(--hover); }
@@ -1073,56 +1096,107 @@ const TicketModal = ({ onClose, lang = 'en' }) => {
 };
 
 // ── Topbar ────────────────────────────────────────────────────────────────────
-const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket }) => (
-  <div className="topbar">
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', minHeight: 64, height: 64, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'nowrap', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', flexShrink: 0 }} onClick={() => navigate({ view: 'home' })}>
-        <svg width="124" height="30" viewBox="0 0 124 30" style={{ display: 'block' }}>
-          <defs>
-            <linearGradient id="wm-grad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#d20820"/>
-              <stop offset="100%" stopColor="#6d0550"/>
-            </linearGradient>
-          </defs>
-          <text x="0" y="24" fontFamily="Inter,-apple-system,BlinkMacSystemFont,sans-serif" fontWeight="900" fontSize="26" letterSpacing="-1" fill="url(#wm-grad)">hoichoi</text>
-        </svg>
-        <div style={{ width: 1, height: 24, background: 'var(--border)', flexShrink: 0 }} />
-        <span style={{ color: 'var(--text-1)', fontSize: 20, fontWeight: 700, whiteSpace: 'nowrap', letterSpacing: '-0.3px' }}>{STRINGS[lang].helpCenter}</span>
-      </div>
+const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket }) => {
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const S = STRINGS[lang];
+  const navItems = [
+    { label: S.getStarted, view: 'getstarted' },
+    { label: S.helpArticles, view: 'home' },
+    { label: S.videoLibrary, view: 'videos' },
+  ];
+  const goTo = (view) => { navigate({ view }); setMobileOpen(false); };
 
-      <div className="topbar-nav" style={{ gap: 2, marginLeft: 8 }}>
-        {[{ label: STRINGS[lang].getStarted, view: 'getstarted' }, { label: STRINGS[lang].helpArticles, view: 'home' }, { label: STRINGS[lang].videoLibrary, view: 'videos' }].map((item, i) => (
-          <React.Fragment key={item.view}>
-            {i > 0 && <span style={{ width: 1, height: 14, background: 'var(--border)', display: 'inline-block', flexShrink: 0 }} />}
-            <button onClick={() => navigate({ view: item.view })}
-              style={{ color: 'var(--text-2)', background: 'transparent', border: 'none', fontSize: 13, fontWeight: 500, padding: '6px 14px', borderRadius: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}
-              onMouseEnter={e => e.currentTarget.style.background = 'var(--hover)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+  return (
+    <div className="topbar">
+      {/* ── Main bar ── */}
+      <div className="topbar-inner">
+
+        {/* LEFT: Brand — logo + divider + title as one tight unit */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer', flexShrink: 0, userSelect: 'none' }}
+          onClick={() => goTo('home')}>
+          <svg width="118" height="26" viewBox="0 0 118 26" style={{ display: 'block', flexShrink: 0 }}>
+            <defs>
+              <linearGradient id="wm-grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#d20820"/>
+                <stop offset="100%" stopColor="#6d0550"/>
+              </linearGradient>
+            </defs>
+            <text x="0" y="22" fontFamily="Inter,-apple-system,BlinkMacSystemFont,sans-serif"
+              fontWeight="900" fontSize="24" letterSpacing="-0.8" fill="url(#wm-grad)">hoichoi</text>
+          </svg>
+          {/* Subtle divider — barely visible, just enough to separate */}
+          <div style={{ width: 1, height: 20, background: 'var(--border)', opacity: 0.8, flexShrink: 0 }} />
+          <span className="topbar-brand-title">{S.helpCenter}</span>
+        </div>
+
+        {/* CENTER: Nav links — desktop only, pushed right of brand */}
+        <nav className="topbar-nav" aria-label="Main navigation">
+          {navItems.map(item => (
+            <button key={item.view} className="topbar-nav-link" onClick={() => goTo(item.view)}>
               {item.label}
             </button>
-          </React.Fragment>
-        ))}
+          ))}
+        </nav>
+
+        {/* RIGHT: Controls — auto-pushed to far right */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto', flexShrink: 0 }}>
+          {/* Language toggle */}
+          <button onClick={() => setLang(l => l === 'en' ? 'bn' : 'en')}
+            className="topbar-lang btn-ghost"
+            style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, height: 36, padding: '0 12px', borderRadius: 8, fontWeight: 500 }}>
+            <Icon name="globe" size={14} />
+            <span className="topbar-lang-text">{lang === 'en' ? 'বাংলা' : 'English'}</span>
+          </button>
+
+          {/* Theme toggle */}
+          <button onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}
+            style={{ background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-2)', flexShrink: 0, transition: 'background 0.15s' }}>
+            <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={15} />
+          </button>
+
+          {/* Raise a Ticket */}
+          <button onClick={onOpenTicket}
+            className="btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, height: 36, padding: '0 18px', borderRadius: 8, fontWeight: 600, flexShrink: 0 }}>
+            <Icon name="ticket" size={14} />
+            <span className="topbar-btn-text">{S.raiseTicketBtn}</span>
+          </button>
+
+          {/* Hamburger — mobile / tablet only */}
+          <button className="topbar-hamburger btn-ghost"
+            onClick={() => setMobileOpen(o => !o)}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            style={{ borderRadius: 8, cursor: 'pointer', color: 'var(--text-2)' }}>
+            {mobileOpen
+              ? <Icon name="x" size={18} />
+              : <svg width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                  <line x1="0" y1="1" x2="18" y2="1"/>
+                  <line x1="0" y1="7" x2="18" y2="7"/>
+                  <line x1="0" y1="13" x2="18" y2="13"/>
+                </svg>}
+          </button>
+        </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto', flexShrink: 0 }}>
-        <button onClick={() => setLang(l => l === 'en' ? 'bn' : 'en')}
-          className="topbar-lang btn-ghost"
-          style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, height: 36, padding: '0 12px', borderRadius: 8 }}>
-          <Icon name="globe" size={13} /> {lang === 'en' ? 'বাংলা' : 'English'}
-        </button>
-        <button onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}
-          style={{ background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-2)', flexShrink: 0 }}>
-          <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={15} />
-        </button>
-        <button onClick={onOpenTicket}
-          className="btn-primary"
-          style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, height: 36, padding: '0 16px', borderRadius: 8, fontWeight: 600, flexShrink: 0 }}>
-          <Icon name="ticket" size={14} /> <span className="topbar-btn-text">{STRINGS[lang].raiseTicketBtn}</span>
-        </button>
-      </div>
+      {/* ── Mobile dropdown menu ── */}
+      {mobileOpen && (
+        <div className="topbar-mobile-menu fade-in">
+          {navItems.map(item => (
+            <button key={item.view} onClick={() => goTo(item.view)}>
+              {item.label}
+            </button>
+          ))}
+          <div style={{ height: 1, background: 'var(--border)', margin: '8px 24px' }} />
+          <button onClick={() => { setLang(l => l === 'en' ? 'bn' : 'en'); }}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-2)', fontSize: 14 }}>
+            <Icon name="globe" size={14} />
+            {lang === 'en' ? 'বাংলায় দেখুন' : 'View in English'}
+          </button>
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 // ── Content renderer ──────────────────────────────────────────────────────────
 const renderContent = (text) => {
