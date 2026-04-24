@@ -149,6 +149,24 @@
   .topbar-mobile-menu button:hover { background: var(--hover); }
   /* Sticky sidebar offset */
   .article-sidebar { position: sticky; top: 64px; }
+  /* Active nav link */
+  .topbar-nav-link-active { color: #0F172A !important; background: rgba(0,0,0,0.06) !important; font-weight: 500; }
+  [data-theme="dark"] .topbar-nav-link-active { color: #E2E8F5 !important; background: rgba(255,255,255,0.08) !important; }
+  /* Get Started step card — responsive */
+  .getstarted-step { display: flex; align-items: center; gap: 16px; background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 20px 22px; box-shadow: var(--shadow); }
+  @media (max-width: 640px) {
+    .getstarted-step { flex-wrap: wrap; padding: 16px; gap: 10px; }
+    .getstarted-step-content { flex: 1 1 100% !important; }
+    .getstarted-btn { flex: 1 1 100% !important; justify-content: center !important; text-align: center; }
+  }
+  /* Support bar — responsive */
+  .support-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; }
+  .support-bar-btns { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  @media (max-width: 640px) {
+    .support-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+    .support-bar-btns { flex-direction: column; gap: 8px; }
+    .support-bar-btns button { width: 100% !important; justify-content: center !important; }
+  }
   /* Live search dropdown */
   .search-dropdown { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); z-index: 200; overflow: hidden; max-height: 360px; overflow-y: auto; }
   .search-dropdown-item:hover { background: var(--hover); }
@@ -671,22 +689,21 @@ const Icon = ({ name, size = 16, style = {}, className = '' }) => {
 const SupportBar = ({ compact = false, onOpenTicket, lang = 'en' }) => {
   const S = STRINGS[lang];
   return (
-  <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: compact ? '14px 18px' : '20px 24px' }}
-    className="flex items-center justify-between gap-4 flex-wrap">
+  <div className="support-bar" style={{ padding: compact ? '14px 18px' : '20px 24px' }}>
     <div>
       <p style={{ color: 'var(--text-1)', fontWeight: 600, fontSize: compact ? 14 : 15 }}>
         {compact ? S.stillNeedHelp : S.cantFind}
       </p>
     </div>
-    <div className="flex items-center gap-3">
+    <div className="support-bar-btns">
       <button onClick={openNuggetChat}
-        className="btn-ghost flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all"
-        style={{ fontSize: 13 }}>
+        className="btn-ghost flex items-center gap-2 rounded-lg"
+        style={{ fontSize: 13, padding: '8px 16px' }}>
         <Icon name="chat" size={15} /> {S.chatWithUs}
       </button>
       <button onClick={onOpenTicket}
-        className="btn-primary flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all"
-        style={{ fontSize: 13 }}>
+        className="btn-primary flex items-center gap-2 rounded-lg"
+        style={{ fontSize: 13, padding: '8px 16px' }}>
         <Icon name="ticket" size={15} /> {S.raiseTicket}
       </button>
     </div>
@@ -1106,7 +1123,7 @@ const TicketModal = ({ onClose, lang = 'en' }) => {
 };
 
 // ── Topbar ────────────────────────────────────────────────────────────────────
-const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket }) => {
+const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket, currentView }) => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const S = STRINGS[lang];
   const navItems = [
@@ -1115,6 +1132,10 @@ const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket }) => {
     { label: S.videoLibrary, view: 'videos' },
   ];
   const goTo = (view) => { navigate({ view }); setMobileOpen(false); };
+  // 'home' nav item is active for home, category, article and search views
+  const isActive = (view) => view === 'home'
+    ? ['home', 'category', 'article', 'search'].includes(currentView)
+    : currentView === view;
 
   return (
     <div className="topbar">
@@ -1133,7 +1154,9 @@ const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket }) => {
         {/* CENTER: Nav links — desktop only, pushed right of brand */}
         <nav className="topbar-nav" aria-label="Main navigation">
           {navItems.map(item => (
-            <button key={item.view} className="topbar-nav-link" onClick={() => goTo(item.view)}>
+            <button key={item.view}
+              className={`topbar-nav-link${isActive(item.view) ? ' topbar-nav-link-active' : ''}`}
+              onClick={() => goTo(item.view)}>
               {item.label}
             </button>
           ))}
@@ -1391,15 +1414,15 @@ const GetStartedView = ({ navigate, lang, onOpenTicket }) => {
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 24px 60px' }}>
         <div style={{ display: 'grid', gap: 14 }}>
           {steps.map(s => (
-            <div key={s.step} style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: '22px 24px', boxShadow: 'var(--shadow)', display: 'flex', alignItems: 'center', gap: 20 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, flexShrink: 0, background: 'linear-gradient(135deg,#d20820,#6d0550)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 16 }}>{s.step}</div>
-              <div style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, background: 'var(--surface2)', border: '1.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-2)' }}><Icon name={s.icon} size={20} /></div>
-              <div style={{ flex: 1 }}>
+            <div key={s.step} className="getstarted-step">
+              <div style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0, background: 'linear-gradient(135deg,#d20820,#6d0550)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 15 }}>{s.step}</div>
+              <div style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0, background: 'var(--surface2)', border: '1.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-2)' }}><Icon name={s.icon} size={18} /></div>
+              <div className="getstarted-step-content" style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 15 }}>{lang === 'bn' ? s.titleBn : s.title}</p>
-                <p style={{ color: 'var(--text-2)', fontSize: 13, marginTop: 3 }}>{lang === 'bn' ? s.descBn : s.desc}</p>
+                <p style={{ color: 'var(--text-2)', fontSize: 13, marginTop: 3, lineHeight: 1.5 }}>{lang === 'bn' ? s.descBn : s.desc}</p>
               </div>
-              <button onClick={() => navigate({ view: 'article', articleId: s.articleId, catId: s.catId })}
-                style={{ background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 600, color: 'var(--text-1)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+              <button className="getstarted-btn" onClick={() => navigate({ view: 'article', articleId: s.articleId, catId: s.catId })}
+                style={{ background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 600, color: 'var(--text-1)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
                 {S.learnMore}
               </button>
             </div>
@@ -1779,7 +1802,7 @@ function App() {
   return (
     <>
       <Topbar theme={theme} setTheme={setTheme} lang={lang} setLang={setLang}
-        navigate={navigate} onOpenTicket={onOpenTicket} />
+        navigate={navigate} onOpenTicket={onOpenTicket} currentView={nav.view} />
       {renderView()}
       {showTicket && <TicketModal onClose={() => setShowTicket(false)} lang={lang} />}
     </>
