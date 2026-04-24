@@ -390,7 +390,9 @@ const STRINGS = {
     needMoreHelp: 'Need more help?',
     wasHelpful: 'Was this article helpful?', yesHelped: 'Yes, it helped', notReally: 'Not really',
     thanksFeedback: 'Thanks for the feedback!',
-    whatMissing: 'What was missing or unclear? (optional)',
+    feedbackReasonLabel: 'What went wrong?',
+    feedbackReasonPlaceholder: 'Select a reason',
+    whatMissing: 'Anything else to add? (optional)',
     feedbackPlaceholder: 'Tell us what we could improve...',
     submitFeedback: 'Submit', skipFeedback: 'Skip',
     feedbackThanks: 'Thank you — your feedback helps us improve our articles.',
@@ -457,7 +459,9 @@ const STRINGS = {
     wasHelpful: 'এই আর্টিকেলটি কি সাহায্যকারী ছিল?',
     yesHelped: 'হ্যাঁ, সাহায্য হয়েছে', notReally: 'তেমন সাহায্য হয়নি',
     thanksFeedback: 'ধন্যবাদ!',
-    whatMissing: 'কী বাদ পড়েছে বা অস্পষ্ট ছিল? (ঐচ্ছিক)',
+    feedbackReasonLabel: 'কোথায় সমস্যা হয়েছে?',
+    feedbackReasonPlaceholder: 'একটি কারণ বেছে নিন',
+    whatMissing: 'আর কিছু যোগ করতে চান? (ঐচ্ছিক)',
     feedbackPlaceholder: 'আমরা কীভাবে উন্নত করতে পারি তা জানান...',
     submitFeedback: 'সাবমিট করুন', skipFeedback: 'এড়িয়ে যান',
     feedbackThanks: 'ধন্যবাদ — আপনার ফিডব্যাক আমাদের আর্টিকেল উন্নত করতে সাহায্য করে।',
@@ -711,6 +715,14 @@ const SupportBar = ({ compact = false, onOpenTicket, lang = 'en' }) => {
   );
 };
 
+// ── Feedback Reasons ──────────────────────────────────────────────────────────
+const FEEDBACK_REASONS = [
+  { value: 'inaccurate',  labelEn: 'Inaccurate information',  labelBn: 'তথ্য সঠিক নয়' },
+  { value: 'confusing',   labelEn: 'Hard to understand',      labelBn: 'বুঝতে অসুবিধা হয়েছে' },
+  { value: 'incomplete',  labelEn: 'Missing information',     labelBn: 'তথ্য অসম্পূর্ণ' },
+  { value: 'other',       labelEn: 'Other',                   labelBn: 'অন্যান্য' },
+];
+
 // ── Article Feedback (Firebase-wired) ─────────────────────────────────────────
 const ArticleFeedback = ({ articleId, initialLikes, initialDislikes, lang = 'en' }) => {
   const S = STRINGS[lang];
@@ -718,6 +730,7 @@ const ArticleFeedback = ({ articleId, initialLikes, initialDislikes, lang = 'en'
   const [likes, setLikes] = useState(initialLikes);
   const [dislikes, setDislikes] = useState(initialDislikes);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [reason, setReason] = useState('');
   const [feedback, setFeedback] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -769,7 +782,7 @@ const ArticleFeedback = ({ articleId, initialLikes, initialDislikes, lang = 'en'
   const submitFeedback = async () => {
     try {
       await db.collection('articleFeedbackText').add({
-        articleId, feedback, vote, createdAt: Date.now(),
+        articleId, reason, feedback, vote, createdAt: Date.now(),
       });
     } catch (e) {}
     setSubmitted(true);
@@ -807,13 +820,36 @@ const ArticleFeedback = ({ articleId, initialLikes, initialDislikes, lang = 'en'
         </p>
       )}
       {showFeedback && (
-        <div className="fade-in" style={{ marginTop: 14 }}>
+        <div className="fade-in" style={{ marginTop: 14, maxWidth: 480 }}>
+          <p style={{ color: 'var(--text-2)', fontSize: 13, fontWeight: 500, marginBottom: 8 }}>{S.feedbackReasonLabel}</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
+            {FEEDBACK_REASONS.map(r => {
+              const label = lang === 'bn' ? r.labelBn : r.labelEn;
+              const selected = reason === r.value;
+              return (
+                <button key={r.value} type="button" onClick={() => setReason(r.value)}
+                  style={{
+                    padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 500, cursor: 'pointer',
+                    border: selected ? '1.5px solid var(--accent)' : '1.5px solid var(--border)',
+                    background: selected ? 'rgba(210,8,32,0.08)' : 'var(--surface2)',
+                    color: selected ? 'var(--accent)' : 'var(--text-2)',
+                    transition: 'all 0.15s',
+                  }}>
+                  {label}
+                </button>
+              );
+            })}
+          </div>
           <p style={{ color: 'var(--text-2)', fontSize: 13, marginBottom: 8 }}>{S.whatMissing}</p>
           <textarea value={feedback} onChange={e => setFeedback(e.target.value)}
             placeholder={S.feedbackPlaceholder}
             rows={3} className="form-textarea" style={{ maxWidth: 480 }} />
           <div className="flex gap-2 mt-2">
-            <button onClick={submitFeedback} className="btn-primary px-4 py-2 rounded-lg text-sm font-medium">{S.submitFeedback}</button>
+            <button onClick={submitFeedback} disabled={!reason}
+              className="btn-primary px-4 py-2 rounded-lg text-sm font-medium"
+              style={{ opacity: reason ? 1 : 0.45, cursor: reason ? 'pointer' : 'not-allowed' }}>
+              {S.submitFeedback}
+            </button>
             <button onClick={() => { setSubmitted(true); setShowFeedback(false); }}
               style={{ color: 'var(--text-3)', background: 'transparent', border: 'none', fontSize: 13, cursor: 'pointer' }}>
               {S.skipFeedback}
@@ -1273,16 +1309,20 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
   const liveResults = useMemo(() => {
     if (!query || query.trim().length < 2) return [];
     const q = query.toLowerCase();
-    const hits = [];
+    const titleHits = [], bodyHits = [];
     for (const a of allArticles) {
-      if (a.title.toLowerCase().includes(q) || (a.titleBn && a.titleBn.includes(q)))
-        hits.push({ ...a, catId: (a.categories && a.categories[0]) || a.categoryId || a.category, type: 'article' });
+      const inTitle = a.title.toLowerCase().includes(q) || (a.titleBn && a.titleBn.includes(q));
+      const inBody  = !inTitle && a.content && a.content.toLowerCase().includes(q);
+      const item = { ...a, catId: (a.categories && a.categories[0]) || a.categoryId || a.category, type: 'article' };
+      if (inTitle) titleHits.push(item);
+      else if (inBody) bodyHits.push(item);
     }
+    const videoHits = [];
     for (const v of VIDEOS) {
       if (v.title.toLowerCase().includes(q) || v.titleBn.includes(q))
-        hits.push({ ...v, type: 'video' });
+        videoHits.push({ ...v, type: 'video' });
     }
-    return hits.slice(0, 8);
+    return [...titleHits, ...bodyHits, ...videoHits].slice(0, 8);
   }, [query, allArticles]);
 
   useEffect(() => {
@@ -1675,9 +1715,15 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
   const results = useMemo(() => {
     if (!query) return [];
     const q = query.toLowerCase();
-    return allArticles
-      .filter(a => a.title.toLowerCase().includes(q) || (a.titleBn && a.titleBn.includes(q)))
-      .map(a => ({ ...a, catId: (a.categories && a.categories[0]) || a.categoryId || a.category }));
+    const titleHits = [], bodyHits = [];
+    for (const a of allArticles) {
+      const inTitle = a.title.toLowerCase().includes(q) || (a.titleBn && a.titleBn.includes(q));
+      const inBody  = !inTitle && a.content && a.content.toLowerCase().includes(q);
+      const item = { ...a, catId: (a.categories && a.categories[0]) || a.categoryId || a.category };
+      if (inTitle) titleHits.push(item);
+      else if (inBody) bodyHits.push(item);
+    }
+    return [...titleHits, ...bodyHits];
   }, [query, allArticles]);
   const cat = (cId) => categories.find(c => c.id === cId);
   return (
