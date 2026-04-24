@@ -1150,7 +1150,7 @@ const renderContent = (text) => {
 };
 
 // ── Views ─────────────────────────────────────────────────────────────────────
-const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, categories }) => {
+const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, categories, siteQuickSearches }) => {
   const S = STRINGS[lang];
   const [query, setQuery] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -1239,10 +1239,10 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
             )}
           </div>
           <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 16, flexWrap: 'wrap' }}>
-            {S.quickSearches.map((s, idx) => (
-              <button key={idx} onClick={() => navigate({ view: 'search', query: STRINGS.en.quickSearches[idx] })}
+            {(siteQuickSearches || S.quickSearches.map((en, i) => ({ en, bn: STRINGS.bn.quickSearches[i] }))).map((q, idx) => (
+              <button key={idx} onClick={() => navigate({ view: 'search', query: q.en })}
                 style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 999, color: '#fff', fontSize: 12, fontWeight: 500, padding: '5px 14px', cursor: 'pointer' }}>
-                {s}
+                {lang === 'bn' ? (q.bn || q.en) : q.en}
               </button>
             ))}
           </div>
@@ -1509,11 +1509,12 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
   );
 };
 
-const VideoLibraryView = ({ navigate, lang, onOpenTicket }) => {
+const VideoLibraryView = ({ navigate, lang, onOpenTicket, siteVideos }) => {
   const S = STRINGS[lang];
   const [activeFilter, setActiveFilter] = useState('All');
-  const filters = ['All', 'Smart TV', 'Payment', 'Subscription', 'Downloads', 'Playback', 'Profile'];
-  const filtered = activeFilter === 'All' ? VIDEOS : VIDEOS.filter(v => v.category === activeFilter);
+  const videos = siteVideos || VIDEOS;
+  const filters = ['All', ...Array.from(new Set(videos.map(v => v.category)))];
+  const filtered = activeFilter === 'All' ? videos : videos.filter(v => v.category === activeFilter);
   return (
     <div className="fade-in">
       <div style={{ background: 'var(--surface)', borderBottom: '1.5px solid var(--border)', padding: '36px 24px 28px' }}>
@@ -1537,7 +1538,8 @@ const VideoLibraryView = ({ navigate, lang, onOpenTicket }) => {
             <div key={v.id} className="video-card cursor-pointer"
               style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, overflow: 'hidden', boxShadow: 'var(--shadow)', transition: 'transform 0.18s, box-shadow 0.18s' }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = 'var(--shadow)'; }}>
+              onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = 'var(--shadow)'; }}
+              onClick={() => v.youtubeUrl && window.open(v.youtubeUrl, '_blank')}>
               <div style={{ height: 140, background: 'linear-gradient(135deg,#1a0a10,#1a0520)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', fontSize: 48 }}>
                 {v.thumb}
                 <div className="play-overlay" style={{ position: 'absolute', inset: 0, background: 'rgba(210,8,32,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -1639,6 +1641,8 @@ function App() {
   const [allArticles, setAllArticles] = useState([]);
   const [popularArticles, setPopularArticles] = useState(POPULAR_ARTICLES);
   const [categories, setCategories] = useState(CATEGORIES);
+  const [siteQuickSearches, setSiteQuickSearches] = useState(null);
+  const [siteVideos, setSiteVideos] = useState(null);
 
   useEffect(() => {
     db.collection('articles').where('published', '==', true).get()
@@ -1653,6 +1657,8 @@ function App() {
         const data = doc.data();
         if (data.popularArticles) setPopularArticles(data.popularArticles);
         if (data.categories && data.categories.length > 0) setCategories(data.categories);
+        if (data.quickSearches && data.quickSearches.length > 0) setSiteQuickSearches(data.quickSearches);
+        if (data.videos && data.videos.length > 0) setSiteVideos(data.videos);
       })
       .catch(() => {});
   }, []);
@@ -1674,7 +1680,7 @@ function App() {
   }, []);
 
   const onOpenTicket = useCallback(() => setShowTicket(true), []);
-  const viewProps = { navigate, lang, onOpenTicket, allArticles, popularArticles, categories };
+  const viewProps = { navigate, lang, onOpenTicket, allArticles, popularArticles, categories, siteQuickSearches, siteVideos };
 
   const renderView = () => {
     switch (nav.view) {
