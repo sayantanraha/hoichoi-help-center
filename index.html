@@ -1143,6 +1143,10 @@ const renderContent = (text) => {
         <p style={{ color: 'var(--text-1)', fontSize: 14, lineHeight: 1.65, margin: 0 }}
           dangerouslySetInnerHTML={{ __html: line.slice(2).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') }} />
       </div>;
+    const imgMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+    if (imgMatch)
+      return <img key={i} src={imgMatch[2]} alt={imgMatch[1]}
+        style={{ maxWidth: '100%', borderRadius: 10, margin: '12px 0', display: 'block', border: '1px solid var(--border)' }} />;
     if (!line.trim()) return <div key={i} style={{ height: 6 }} />;
     return <p key={i} style={{ color: 'var(--text-1)', fontSize: 14, lineHeight: 1.75, marginBottom: 8 }}
       dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') }} />;
