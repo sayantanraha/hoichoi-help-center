@@ -110,8 +110,8 @@
     .article-sidebar { position: static; }
   }
   /* ── Topbar redesign ─────────────────────────────────────────────────────── */
-  .topbar-inner { max-width: 1280px; margin: 0 auto; padding: 0 48px; height: 76px; display: flex; align-items: center; overflow: hidden; }
-  @media (max-width: 1023px) { .topbar-inner { padding: 0 24px; height: 64px; } }
+  .topbar-inner { max-width: 1280px; margin: 0 auto; padding: 0 48px; height: 64px; display: flex; align-items: center; overflow: hidden; }
+  @media (max-width: 1023px) { .topbar-inner { padding: 0 24px; height: 56px; } }
   @media (max-width: 479px)  { .topbar-inner { padding: 0 16px; } }
   /* hoichoi logo — CSS gradient text, no SVG whitespace */
   .topbar-logo { font-family: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif; font-weight: 900; font-size: 24px; letter-spacing: -0.8px; line-height: 1; white-space: nowrap; background: linear-gradient(135deg, #d20820 0%, #6d0550 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; flex-shrink: 0; }
@@ -119,8 +119,8 @@
   /* Divider between logo and title */
   .topbar-divider { width: 1px; height: 18px; background: #D1D5DB; flex-shrink: 0; }
   /* Brand title — visibly navy, not black */
-  .topbar-brand-title { color: #1E3A5F; font-size: 20px; font-weight: 600; letter-spacing: -0.4px; white-space: nowrap; line-height: 1; flex-shrink: 0; }
-  [data-theme="dark"] .topbar-brand-title { color: #C8D8EE; }
+  .topbar-brand-title { color: #7A93AD; font-size: 20px; font-weight: 600; letter-spacing: -0.4px; white-space: nowrap; line-height: 1; flex-shrink: 0; }
+  [data-theme="dark"] .topbar-brand-title { color: #7A93AD; }
   @media (max-width: 479px) { .topbar-brand-title { font-size: 16px; } }
   /* Desktop nav */
   .topbar-nav { display: none; align-items: center; gap: 0; margin-left: 32px; }
@@ -148,7 +148,7 @@
   .topbar-mobile-menu button { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 13px 24px; background: transparent; border: none; color: var(--text-1); font-size: 15px; font-weight: 500; cursor: pointer; letter-spacing: -0.2px; transition: background 0.12s; }
   .topbar-mobile-menu button:hover { background: var(--hover); }
   /* Sticky sidebar offset */
-  .article-sidebar { position: sticky; top: 84px; }
+  .article-sidebar { position: sticky; top: 72px; }
   /* Live search dropdown */
   .search-dropdown { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); z-index: 200; overflow: hidden; max-height: 360px; overflow-y: auto; }
   .search-dropdown-item:hover { background: var(--hover); }
