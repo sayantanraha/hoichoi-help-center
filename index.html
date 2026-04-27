@@ -177,6 +177,15 @@
   }
   /* Dark mode video category tag */
   [data-theme="dark"] .tag-category { background: rgba(37,99,235,0.15) !important; color: #60A5FA !important; }
+  /* Callout blocks */
+  .callout { display:flex; gap:10px; align-items:flex-start; border-radius:10px; padding:12px 16px; margin:12px 0; border-width:1.5px; border-style:solid; }
+  .callout p { margin:0; font-size:14px; line-height:1.65; font-weight:500; }
+  .callout-info    { background:#EFF6FF; border-color:#BFDBFE; color:#1D4ED8; }
+  .callout-warning { background:#FFFBEB; border-color:#FDE68A; color:#B45309; }
+  .callout-tip     { background:#F0FDF4; border-color:#BBF7D0; color:#15803D; }
+  [data-theme="dark"] .callout-info    { background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.3); color:#93C5FD; }
+  [data-theme="dark"] .callout-warning { background:rgba(245,158,11,0.12); border-color:rgba(245,158,11,0.3); color:#FCD34D; }
+  [data-theme="dark"] .callout-tip     { background:rgba(16,185,129,0.12); border-color:rgba(16,185,129,0.3); color:#6EE7B7; }
 </style>
 </head>
 <body>
@@ -1280,6 +1289,18 @@ const renderContent = (text) => {
         <p style={{ color: 'var(--text-1)', fontSize: 14, lineHeight: 1.65, margin: 0 }}
           dangerouslySetInnerHTML={{ __html: line.slice(2).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') }} />
       </div>;
+    const calloutMatch = line.match(/^\[!(info|warning|tip)\]\s*(.+)$/i);
+    if (calloutMatch) {
+      const type = calloutMatch[1].toLowerCase();
+      const text = calloutMatch[2];
+      const icons = { info: 'ℹ️', warning: '⚠️', tip: '💡' };
+      return (
+        <div key={i} className={`callout callout-${type}`}>
+          <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>{icons[type]}</span>
+          <p dangerouslySetInnerHTML={{ __html: text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+        </div>
+      );
+    }
     const imgMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
     if (imgMatch)
       return <img key={i} src={imgMatch[2]} alt={imgMatch[1]}
