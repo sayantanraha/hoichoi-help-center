@@ -1731,6 +1731,21 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
     }
     return [...titleHits, ...bodyHits];
   }, [query, allArticles]);
+
+  // Log search query to Firestore for analytics (debounced 1s)
+  useEffect(() => {
+    if (!query || query.trim().length < 2) return;
+    const t = setTimeout(() => {
+      db.collection('searchLogs').add({
+        query: query.trim().toLowerCase(),
+        hasResults: results.length > 0,
+        timestamp: Date.now(),
+        lang,
+      }).catch(() => {});
+    }, 1000);
+    return () => clearTimeout(t);
+  }, [query]);
+
   const cat = (cId) => categories.find(c => c.id === cId);
   return (
     <div className="fade-in" style={{ maxWidth: 900, margin: '0 auto', padding: '36px 24px 60px' }}>
