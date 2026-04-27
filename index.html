@@ -374,7 +374,7 @@ const STRINGS = {
     chatWithUs: 'Chat with us', raiseTicket: 'Raise a ticket',
     heroTitle: 'How can we help?',
     heroSubtitle: 'Search help articles or browse categories below',
-    searchPlaceholder: 'e.g. reset password, bKash payment, Smart TV...',
+    searchPlaceholder: 'e.g. Renew subscription, Activate TV, Parental control...',
     searchBtn: 'Search',
     quickSearches: ['Reset password', 'bKash payment', 'Cancel subscription', 'Smart TV setup'],
     browseByCategory: 'Browse by category', popularArticles: 'Popular articles',
@@ -442,7 +442,7 @@ const STRINGS = {
     chatWithUs: 'চ্যাট করুন', raiseTicket: 'টিকেট করুন',
     heroTitle: 'আমরা কীভাবে সাহায্য করতে পারি?',
     heroSubtitle: 'হেল্প আর্টিকেল সার্চ করুন বা নিচের ক্যাটাগরি ব্রাউজ করুন',
-    searchPlaceholder: 'যেমন: পাসওয়ার্ড রিসেট, বিকাশ পেমেন্ট, স্মার্ট টিভি...',
+    searchPlaceholder: 'যেমন: সাবস্ক্রিপশন নবায়ন, টিভি অ্যাক্টিভেট, প্যারেন্টাল কন্ট্রোল...',
     searchBtn: 'সার্চ',
     quickSearches: ['পাসওয়ার্ড রিসেট', 'বিকাশ পেমেন্ট', 'সাবস্ক্রিপশন ক্যান্সেল', 'স্মার্ট টিভি সেটআপ'],
     browseByCategory: 'ক্যাটাগরি অনুযায়ী ব্রাউজ করুন', popularArticles: 'জনপ্রিয় আর্টিকেল',
@@ -1529,7 +1529,13 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
     setFsContent(null);
     setTranslatedContent(null);
     db.collection('articles').doc(articleId).get()
-      .then(doc => { if (doc.exists && doc.data().published !== false) setFsContent(doc.data()); })
+      .then(doc => {
+        if (doc.exists && doc.data().published !== false) {
+          setFsContent(doc.data());
+          // Increment view counter (fire-and-forget)
+          doc.ref.update({ views: firebase.firestore.FieldValue.increment(1) }).catch(() => {});
+        }
+      })
       .catch(() => {});
   }, [articleId]);
 
