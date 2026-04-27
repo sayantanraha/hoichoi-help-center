@@ -1289,7 +1289,7 @@ const renderContent = (text) => {
         <p style={{ color: 'var(--text-1)', fontSize: 14, lineHeight: 1.65, margin: 0 }}
           dangerouslySetInnerHTML={{ __html: line.slice(2).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') }} />
       </div>;
-    const calloutMatch = line.match(/^\[!(info|warning|tip)\]\s*(.+)$/i);
+    const calloutMatch = line.match(/^\[!?(info|warning|tip)\]\s*(.+)$/i);
     if (calloutMatch) {
       const type = calloutMatch[1].toLowerCase();
       const text = calloutMatch[2];
