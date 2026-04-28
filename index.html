@@ -1461,15 +1461,18 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
   );
 };
 
-const GetStartedView = ({ navigate, lang, onOpenTicket }) => {
+const GetStartedView = ({ navigate, lang, onOpenTicket, getStartedSteps }) => {
   const S = STRINGS[lang];
-  const steps = [
-    { step: 1, icon: 'mail',          title: 'Create your account',       titleBn: 'অ্যাকাউন্ট তৈরি করুন',          desc: 'Sign up with your email or phone at hoichoi.tv or on the app', descBn: 'hoichoi.tv-তে বা অ্যাপে আপনার ইমেইল বা ফোন দিয়ে সাইন আপ করুন', articleId: 'a2', catId: 'account' },
-    { step: 2, icon: 'creditCard',   title: 'Pick a plan & pay',          titleBn: 'প্ল্যান বেছে নিন',              desc: 'Choose Monthly or Annual. Pay via bKash, card, Google Play, or iTunes', descBn: 'মান্থলি বা অ্যানুয়াল প্ল্যান বেছে নিন। বিকাশ, কার্ড, Google Play বা iTunes-এ পেমেন্ট করুন', articleId: 'b2', catId: 'billing' },
-    { step: 3, icon: 'monitor',      title: 'Set up your device',         titleBn: 'ডিভাইস সেটআপ করুন',            desc: 'Install on your phone, Smart TV, or Fire Stick and log in', descBn: 'আপনার ফোন, স্মার্ট টিভি বা Fire Stick-এ ইন্সটল করুন এবং লগইন করুন', articleId: 't1', catId: 'tv' },
-    { step: 4, icon: 'users',        title: 'Add profiles',               titleBn: 'প্রোফাইল যোগ করুন',            desc: 'Create up to 5 profiles for different family members', descBn: 'পরিবারের বিভিন্ন সদস্যের জন্য সর্বোচ্চ ৫টি প্রোফাইল তৈরি করুন', articleId: 'p1', catId: 'app' },
-    { step: 5, icon: 'downloadArrow',title: 'Download for offline',       titleBn: 'অফলাইনের জন্য ডাউনলোড করুন',  desc: 'Save your favourite content to watch without internet', descBn: 'ইন্টারনেট ছাড়া দেখার জন্য আপনার পছন্দের কন্টেন্ট সেভ করুন', articleId: 'd1', catId: 'downloads' },
+  const HARDCODED_STEPS = [
+    { step: 1, icon: 'mail',         title: 'Create your account',  titleBn: 'অ্যাকাউন্ট তৈরি করুন',       desc: 'Sign up with your mobile number or social account at hoichoi.tv or on the app', descBn: 'hoichoi.tv-তে বা অ্যাপে আপনার মোবাইল নম্বর বা সোশ্যাল অ্যাকাউন্ট দিয়ে সাইন আপ করুন', articleId: 'create-account', catId: 'account'   },
+    { step: 2, icon: 'creditCard',   title: 'Pick a plan & pay',    titleBn: 'প্ল্যান বেছে নিন',           desc: 'Choose Monthly or Annual. Pay via bKash, card, Google Play, or iTunes',           descBn: 'মান্থলি বা অ্যানুয়াল প্ল্যান বেছে নিন। বিকাশ, কার্ড, Google Play বা iTunes-এ পেমেন্ট করুন', articleId: 'b5',             catId: 'billing'   },
+    { step: 3, icon: 'monitor',      title: 'Set up your device',   titleBn: 'ডিভাইস সেটআপ করুন',         desc: 'Install on your phone, Smart TV, or Fire Stick and log in',                       descBn: 'আপনার ফোন, স্মার্ট টিভি বা Fire Stick-এ ইন্সটল করুন এবং লগইন করুন',               articleId: 'tv-09',          catId: 'tv'        },
+    { step: 4, icon: 'downloadArrow',title: 'Download for offline', titleBn: 'অফলাইনের জন্য ডাউনলোড করুন', desc: 'Save your favourite content to watch without internet',                           descBn: 'ইন্টারনেট ছাড়া দেখার জন্য আপনার পছন্দের কন্টেন্ট সেভ করুন',                     articleId: 'dl-01',          catId: 'downloads' },
+    { step: 5, icon: 'monitor',      title: 'Supported devices',    titleBn: 'সাপোর্টেড ডিভাইস',          desc: 'See the full list of phones, TVs, and browsers supported by hoichoi',             descBn: 'hoichoi সমর্থিত ফোন, টিভি এবং ব্রাউজারের সম্পূর্ণ তালিকা দেখুন',                articleId: 'app-05',         catId: 'app'       },
   ];
+  const steps = HARDCODED_STEPS.map((s, i) =>
+    getStartedSteps?.[i] ? { ...s, articleId: getStartedSteps[i].articleId, catId: getStartedSteps[i].catId || s.catId } : s
+  );
   return (
     <div className="fade-in">
       <div style={{ background: 'var(--surface)', borderBottom: '1.5px solid var(--border)', padding: '40px 24px' }}>
@@ -1850,6 +1853,7 @@ function App() {
   const [categories, setCategories] = useState(CATEGORIES);
   const [siteQuickSearches, setSiteQuickSearches] = useState(null);
   const [siteVideos, setSiteVideos] = useState(null);
+  const [getStartedSteps, setGetStartedSteps] = useState(null);
 
   useEffect(() => {
     db.collection('articles').where('published', '==', true).get()
@@ -1866,6 +1870,7 @@ function App() {
         if (data.categories && data.categories.length > 0) setCategories(data.categories.filter(c => c.visible !== false));
         if (data.quickSearches && data.quickSearches.length > 0) setSiteQuickSearches(data.quickSearches);
         if (data.videos && data.videos.length > 0) setSiteVideos(data.videos);
+        if (data.getStartedSteps && data.getStartedSteps.length === 5) setGetStartedSteps(data.getStartedSteps);
       })
       .catch(() => {});
   }, []);
@@ -1887,7 +1892,7 @@ function App() {
   }, []);
 
   const onOpenTicket = useCallback(() => setShowTicket(true), []);
-  const viewProps = { navigate, lang, onOpenTicket, allArticles, popularArticles, categories, siteQuickSearches, siteVideos };
+  const viewProps = { navigate, lang, onOpenTicket, allArticles, popularArticles, categories, siteQuickSearches, siteVideos, getStartedSteps };
 
   const renderView = () => {
     switch (nav.view) {
