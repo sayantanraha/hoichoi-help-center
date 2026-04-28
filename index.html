@@ -1461,18 +1461,22 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
   );
 };
 
-const GetStartedView = ({ navigate, lang, onOpenTicket, getStartedSteps }) => {
+const GetStartedView = ({ navigate, lang, onOpenTicket, getStartedSteps, allArticles }) => {
   const S = STRINGS[lang];
   const HARDCODED_STEPS = [
-    { step: 1, icon: 'mail',         title: 'Create your account',  titleBn: 'অ্যাকাউন্ট তৈরি করুন',       desc: 'Sign up with your mobile number or social account at hoichoi.tv or on the app', descBn: 'hoichoi.tv-তে বা অ্যাপে আপনার মোবাইল নম্বর বা সোশ্যাল অ্যাকাউন্ট দিয়ে সাইন আপ করুন', articleId: 'create-account', catId: 'account'   },
-    { step: 2, icon: 'creditCard',   title: 'Pick a plan & pay',    titleBn: 'প্ল্যান বেছে নিন',           desc: 'Choose Monthly or Annual. Pay via bKash, card, Google Play, or iTunes',           descBn: 'মান্থলি বা অ্যানুয়াল প্ল্যান বেছে নিন। বিকাশ, কার্ড, Google Play বা iTunes-এ পেমেন্ট করুন', articleId: 'b5',             catId: 'billing'   },
-    { step: 3, icon: 'monitor',      title: 'Set up your device',   titleBn: 'ডিভাইস সেটআপ করুন',         desc: 'Install on your phone, Smart TV, or Fire Stick and log in',                       descBn: 'আপনার ফোন, স্মার্ট টিভি বা Fire Stick-এ ইন্সটল করুন এবং লগইন করুন',               articleId: 'tv-09',          catId: 'tv'        },
-    { step: 4, icon: 'downloadArrow',title: 'Download for offline', titleBn: 'অফলাইনের জন্য ডাউনলোড করুন', desc: 'Save your favourite content to watch without internet',                           descBn: 'ইন্টারনেট ছাড়া দেখার জন্য আপনার পছন্দের কন্টেন্ট সেভ করুন',                     articleId: 'dl-01',          catId: 'downloads' },
-    { step: 5, icon: 'monitor',      title: 'Supported devices',    titleBn: 'সাপোর্টেড ডিভাইস',          desc: 'See the full list of phones, TVs, and browsers supported by hoichoi',             descBn: 'hoichoi সমর্থিত ফোন, টিভি এবং ব্রাউজারের সম্পূর্ণ তালিকা দেখুন',                articleId: 'app-05',         catId: 'app'       },
+    { step: 1, icon: 'mail',         title: 'Create your account',  titleBn: 'অ্যাকাউন্ট তৈরি করুন',       desc: 'Sign up with your mobile number or social account at hoichoi.tv or on the app', descBn: 'hoichoi.tv-তে বা অ্যাপে আপনার মোবাইল নম্বর বা সোশ্যাল অ্যাকাউন্ট দিয়ে সাইন আপ করুন', articleIds: ['create-account'], catId: 'account'   },
+    { step: 2, icon: 'creditCard',   title: 'Pick a plan & pay',    titleBn: 'প্ল্যান বেছে নিন',           desc: 'Choose Monthly or Annual. Pay via bKash, card, Google Play, or iTunes',           descBn: 'মান্থলি বা অ্যানুয়াল প্ল্যান বেছে নিন। বিকাশ, কার্ড, Google Play বা iTunes-এ পেমেন্ট করুন', articleIds: ['b5'],             catId: 'billing'   },
+    { step: 3, icon: 'monitor',      title: 'Set up your device',   titleBn: 'ডিভাইস সেটআপ করুন',         desc: 'Install on your phone, Smart TV, or Fire Stick and log in',                       descBn: 'আপনার ফোন, স্মার্ট টিভি বা Fire Stick-এ ইন্সটল করুন এবং লগইন করুন',               articleIds: ['tv-09'],          catId: 'tv'        },
+    { step: 4, icon: 'downloadArrow',title: 'Download for offline', titleBn: 'অফলাইনের জন্য ডাউনলোড করুন', desc: 'Save your favourite content to watch without internet',                           descBn: 'ইন্টারনেট ছাড়া দেখার জন্য আপনার পছন্দের কন্টেন্ট সেভ করুন',                     articleIds: ['dl-01'],          catId: 'downloads' },
+    { step: 5, icon: 'monitor',      title: 'Supported devices',    titleBn: 'সাপোর্টেড ডিভাইস',          desc: 'See the full list of phones, TVs, and browsers supported by hoichoi',             descBn: 'hoichoi সমর্থিত ফোন, টিভি এবং ব্রাউজারের সম্পূর্ণ তালিকা দেখুন',                articleIds: ['app-05'],         catId: 'app'       },
   ];
-  const steps = HARDCODED_STEPS.map((s, i) =>
-    getStartedSteps?.[i] ? { ...s, articleId: getStartedSteps[i].articleId, catId: getStartedSteps[i].catId || s.catId } : s
-  );
+  const steps = HARDCODED_STEPS.map((s, i) => {
+    const cfg = getStartedSteps?.[i];
+    if (!cfg) return s;
+    // Support both new articleIds[] and legacy articleId
+    const articleIds = cfg.articleIds || (cfg.articleId ? [cfg.articleId] : s.articleIds);
+    return { ...s, articleIds, catId: cfg.catId || s.catId };
+  });
   return (
     <div className="fade-in">
       <div style={{ background: 'var(--surface)', borderBottom: '1.5px solid var(--border)', padding: '40px 24px' }}>
@@ -1492,10 +1496,24 @@ const GetStartedView = ({ navigate, lang, onOpenTicket, getStartedSteps }) => {
                 <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 15 }}>{lang === 'bn' ? s.titleBn : s.title}</p>
                 <p style={{ color: 'var(--text-2)', fontSize: 13, marginTop: 3, lineHeight: 1.5 }}>{lang === 'bn' ? s.descBn : s.desc}</p>
               </div>
-              <button className="getstarted-btn" onClick={() => navigate({ view: 'article', articleId: s.articleId, catId: s.catId })}
-                style={{ background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 600, color: 'var(--text-1)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
-                {S.learnMore}
-              </button>
+              {s.articleIds.length === 1 ? (
+                <button className="getstarted-btn" onClick={() => navigate({ view: 'article', articleId: s.articleIds[0], catId: s.catId })}
+                  style={{ background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 600, color: 'var(--text-1)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {S.learnMore}
+                </button>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
+                  {s.articleIds.map(id => {
+                    const meta = (allArticles || []).find(a => a.id === id);
+                    return (
+                      <button key={id} className="getstarted-btn" onClick={() => navigate({ view: 'article', articleId: id, catId: s.catId })}
+                        style={{ background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 10, padding: '7px 14px', fontSize: 12, fontWeight: 600, color: 'var(--text-1)', cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6, textAlign: 'left' }}>
+                        {meta ? meta.title : id}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           ))}
         </div>
