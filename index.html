@@ -1336,21 +1336,26 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
 
   const liveResults = useMemo(() => {
     if (!query || query.trim().length < 2) return [];
-    const q = query.toLowerCase();
-    const titleHits = [], bodyHits = [];
+    const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const scored = [];
     for (const a of allArticles) {
-      const inTitle = a.title.toLowerCase().includes(q) || (a.titleBn && a.titleBn.includes(q));
-      const inBody  = !inTitle && a.content && a.content.toLowerCase().includes(q);
-      const item = { ...a, catId: (a.categories && a.categories[0]) || a.categoryId || a.category, type: 'article' };
-      if (inTitle) titleHits.push(item);
-      else if (inBody) bodyHits.push(item);
+      const titleL = (a.title || '').toLowerCase();
+      const titleBnL = (a.titleBn || '').toLowerCase();
+      const bodyL = (a.content || '').toLowerCase();
+      const titleMatches = terms.filter(t => titleL.includes(t) || titleBnL.includes(t)).length;
+      const bodyMatches  = terms.filter(t => bodyL.includes(t)).length;
+      if (titleMatches === 0 && bodyMatches === 0) continue;
+      const score = titleMatches * 10 + bodyMatches;
+      scored.push({ ...a, catId: (a.categories && a.categories[0]) || a.categoryId || a.category, type: 'article', _score: score });
     }
+    scored.sort((a, b) => b._score - a._score);
     const videoHits = [];
     for (const v of VIDEOS) {
-      if (v.title.toLowerCase().includes(q) || v.titleBn.includes(q))
+      const terms2 = query.trim().toLowerCase().split(/\s+/);
+      if (terms2.some(t => v.title.toLowerCase().includes(t) || v.titleBn.includes(t)))
         videoHits.push({ ...v, type: 'video' });
     }
-    return [...titleHits, ...bodyHits, ...videoHits].slice(0, 8);
+    return [...scored, ...videoHits].slice(0, 8);
   }, [query, allArticles]);
 
   useEffect(() => {
@@ -1758,16 +1763,19 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
   const S = STRINGS[lang];
   const results = useMemo(() => {
     if (!query) return [];
-    const q = query.toLowerCase();
-    const titleHits = [], bodyHits = [];
+    const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const scored = [];
     for (const a of allArticles) {
-      const inTitle = a.title.toLowerCase().includes(q) || (a.titleBn && a.titleBn.includes(q));
-      const inBody  = !inTitle && a.content && a.content.toLowerCase().includes(q);
-      const item = { ...a, catId: (a.categories && a.categories[0]) || a.categoryId || a.category };
-      if (inTitle) titleHits.push(item);
-      else if (inBody) bodyHits.push(item);
+      const titleL = (a.title || '').toLowerCase();
+      const titleBnL = (a.titleBn || '').toLowerCase();
+      const bodyL = (a.content || '').toLowerCase();
+      const titleMatches = terms.filter(t => titleL.includes(t) || titleBnL.includes(t)).length;
+      const bodyMatches  = terms.filter(t => bodyL.includes(t)).length;
+      if (titleMatches === 0 && bodyMatches === 0) continue;
+      const score = titleMatches * 10 + bodyMatches;
+      scored.push({ ...a, catId: (a.categories && a.categories[0]) || a.categoryId || a.category, _score: score });
     }
-    return [...titleHits, ...bodyHits];
+    return scored.sort((a, b) => b._score - a._score);
   }, [query, allArticles]);
 
   // Log search query to Firestore for analytics (debounced 1s)
