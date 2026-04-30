@@ -1923,7 +1923,7 @@ function App() {
       case 'home':       return <HomeView {...viewProps} />;
       case 'getstarted': return <GetStartedView {...viewProps} />;
       case 'category':   return <CategoryView catId={nav.catId} {...viewProps} />;
-      case 'article':    return <ArticleView articleId={nav.articleId} catId={nav.catId} {...viewProps} />;
+      case 'article':    return <ArticleView key={nav.articleId} articleId={nav.articleId} catId={nav.catId} {...viewProps} />;
       case 'videos':     return <VideoLibraryView {...viewProps} />;
       case 'search':     return <SearchView query={nav.query || ''} {...viewProps} />;
       default:           return <HomeView {...viewProps} />;
