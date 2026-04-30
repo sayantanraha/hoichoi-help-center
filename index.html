@@ -1335,6 +1335,36 @@ const renderContent = (text) => {
   });
 };
 
+// ── Search scoring ────────────────────────────────────────────────────────────
+// Returns a relevance score for one article against an array of query terms.
+// Exact title match = 10pts, prefix/stem title match = 6pts (handles renew≈renewal)
+// Exact body match = 1pt, prefix/stem body match = 0.5pt
+// Views used only as tiebreaker in sort, not as a score factor.
+const prefixMatch = (term, text) => {
+  if (text.includes(term)) return false; // exact already handled
+  if (term.length < 4) return false;
+  return text.split(/\W+/).some(w => w.length >= 4 && (term.startsWith(w) || w.startsWith(term)));
+};
+const scoreArticles = (terms, allArticles) => {
+  const scored = [];
+  for (const a of allArticles) {
+    const titleL  = (a.title   || '').toLowerCase();
+    const titleBn = (a.titleBn || '').toLowerCase();
+    const bodyL   = (a.content || '').toLowerCase();
+    let score = 0;
+    for (const t of terms) {
+      const titleExact  = titleL.includes(t) || titleBn.includes(t);
+      const titlePrefix = !titleExact && (prefixMatch(t, titleL) || prefixMatch(t, titleBn));
+      const bodyExact   = bodyL.includes(t);
+      const bodyPrefix  = !bodyExact && prefixMatch(t, bodyL);
+      score += (titleExact ? 10 : 0) + (titlePrefix ? 6 : 0) + (bodyExact ? 1 : 0) + (bodyPrefix ? 0.5 : 0);
+    }
+    if (score === 0) continue;
+    scored.push({ ...a, catId: (a.categories && a.categories[0]) || a.categoryId || a.category, _score: score });
+  }
+  return scored.sort((a, b) => b._score !== a._score ? b._score - a._score : (b.views || 0) - (a.views || 0));
+};
+
 // ── Views ─────────────────────────────────────────────────────────────────────
 const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, categories, siteQuickSearches }) => {
   const S = STRINGS[lang];
@@ -1354,25 +1384,13 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
   const liveResults = useMemo(() => {
     if (!query || query.trim().length < 2) return [];
     const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
-    const scored = [];
-    for (const a of allArticles) {
-      const titleL = (a.title || '').toLowerCase();
-      const titleBnL = (a.titleBn || '').toLowerCase();
-      const bodyL = (a.content || '').toLowerCase();
-      const titleMatches = terms.filter(t => titleL.includes(t) || titleBnL.includes(t)).length;
-      const bodyMatches  = terms.filter(t => bodyL.includes(t)).length;
-      if (titleMatches === 0 && bodyMatches === 0) continue;
-      const score = titleMatches * 10 + bodyMatches;
-      scored.push({ ...a, catId: (a.categories && a.categories[0]) || a.categoryId || a.category, type: 'article', _score: score });
-    }
-    scored.sort((a, b) => b._score - a._score);
+    const scored = scoreArticles(terms, allArticles).map(a => ({ ...a, type: 'article' }));
     const videoHits = [];
     for (const v of VIDEOS) {
-      const terms2 = query.trim().toLowerCase().split(/\s+/);
-      if (terms2.some(t => v.title.toLowerCase().includes(t) || v.titleBn.includes(t)))
+      if (terms.some(t => v.title.toLowerCase().includes(t) || v.titleBn.toLowerCase().includes(t)))
         videoHits.push({ ...v, type: 'video' });
     }
-    return [...scored, ...videoHits].slice(0, 8);
+    return [...scored, ...videoHits];
   }, [query, allArticles]);
 
   useEffect(() => {
@@ -1408,9 +1426,9 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
             </button>
             {dropdownOpen && (
               <div className="search-dropdown" style={{ borderTop: '1px solid #E4E8F0', borderRadius: '0 0 14px 14px', textAlign: 'left' }}>
-                {liveResults.map((r, i) => (
+                {liveResults.slice(0, 5).map((r, i) => (
                   <div key={r.id + i} className="search-dropdown-item"
-                    style={{ padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, borderBottom: i < liveResults.length - 1 ? '1px solid var(--border)' : 'none' }}
+                    style={{ padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, borderBottom: i < Math.min(liveResults.length, 5) - 1 ? '1px solid var(--border)' : 'none' }}
                     onMouseDown={() => {
                       setDropdownOpen(false);
                       setQuery('');
@@ -1427,7 +1445,7 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
                     className="search-dropdown-item" style={{ padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
                     onMouseDown={() => { setDropdownOpen(false); navigate({ view: 'search', query }); }}>
                     <Icon name="search" size={13} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-                    <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 500 }}>{S.seeAllResultsFor} "{query}"</span>
+                    <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 500 }}>{S.seeAllResultsFor} "{query}" {liveResults.length > 0 ? `(${liveResults.length})` : ''}</span>
                   </div>
                 )}
               </div>
@@ -1795,18 +1813,7 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
   const results = useMemo(() => {
     if (!query) return [];
     const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
-    const scored = [];
-    for (const a of allArticles) {
-      const titleL = (a.title || '').toLowerCase();
-      const titleBnL = (a.titleBn || '').toLowerCase();
-      const bodyL = (a.content || '').toLowerCase();
-      const titleMatches = terms.filter(t => titleL.includes(t) || titleBnL.includes(t)).length;
-      const bodyMatches  = terms.filter(t => bodyL.includes(t)).length;
-      if (titleMatches === 0 && bodyMatches === 0) continue;
-      const score = titleMatches * 10 + bodyMatches;
-      scored.push({ ...a, catId: (a.categories && a.categories[0]) || a.categoryId || a.category, _score: score });
-    }
-    return scored.sort((a, b) => b._score - a._score);
+    return scoreArticles(terms, allArticles);
   }, [query, allArticles]);
 
   // Log search query to Firestore for analytics (debounced 1s)
