@@ -1492,9 +1492,16 @@ const GetStartedView = ({ navigate, lang, onOpenTicket, getStartedSteps }) => {
     { step: 4, icon: 'downloadArrow',title: 'Download for offline', titleBn: 'অফলাইনের জন্য ডাউনলোড করুন', desc: 'Save your favourite content to watch without internet',                           descBn: 'ইন্টারনেট ছাড়া দেখার জন্য আপনার পছন্দের কন্টেন্ট সেভ করুন',                     articleId: 'dl-01',          catId: 'downloads' },
     { step: 5, icon: 'monitor',      title: 'Supported devices',    titleBn: 'সাপোর্টেড ডিভাইস',          desc: 'See the full list of phones, TVs, and browsers supported by hoichoi',             descBn: 'hoichoi সমর্থিত ফোন, টিভি এবং ব্রাউজারের সম্পূর্ণ তালিকা দেখুন',                articleId: 'app-05',         catId: 'app'       },
   ];
-  const steps = HARDCODED_STEPS.map((s, i) =>
-    getStartedSteps?.[i] ? { ...s, articleId: getStartedSteps[i].articleId, catId: getStartedSteps[i].catId || s.catId } : s
-  );
+  const steps = HARDCODED_STEPS.map((s, i) => {
+    const cfg = getStartedSteps?.[i];
+    if (!cfg) return s;
+    return {
+      ...s,
+      articleId: cfg.articleId || s.articleId,
+      catId: cfg.catId || s.catId,
+      title: cfg.title || s.title,
+    };
+  });
   return (
     <div className="fade-in">
       <div style={{ background: 'var(--surface)', borderBottom: '1.5px solid var(--border)', padding: '40px 24px' }}>
