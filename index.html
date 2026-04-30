@@ -1275,11 +1275,28 @@ const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket, curren
 };
 
 // ── Content renderer ──────────────────────────────────────────────────────────
+const inlineHtml = (line) =>
+  line
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, txt, href) => {
+      const isExternal = /^https?:\/\//.test(href);
+      const url = isExternal ? href : `#article/${href}/`;
+      const attrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+      return `<a href="${url}"${attrs} style="color:var(--accent);text-decoration:underline;text-underline-offset:3px;font-weight:500">${txt}</a>`;
+    });
+
 const renderContent = (text) => {
   if (!text) return <p style={{ color: 'var(--text-2)' }}>Article content coming soon.</p>;
   return text.split('\n').map((line, i) => {
-    if (line.startsWith('**') && line.endsWith('**'))
-      return <h3 key={i} style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 15, marginTop: 24, marginBottom: 8 }}>{line.slice(2,-2)}</h3>;
+    // ## Section heading
+    if (/^##\s+/.test(line))
+      return <h2 key={i} style={{ color: 'var(--text-1)', fontWeight: 800, fontSize: 17, marginTop: 28, marginBottom: 8, letterSpacing: '-0.2px' }}>{line.replace(/^##\s+/, '')}</h2>;
+    // ### Sub-heading
+    if (/^###\s+/.test(line))
+      return <h3 key={i} style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 15, marginTop: 20, marginBottom: 6 }}>{line.replace(/^###\s+/, '')}</h3>;
+    // **Full-line bold** → section heading (existing convention)
+    if (/^\*\*[^*]+\*\*$/.test(line.trim()))
+      return <h3 key={i} style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 15, marginTop: 24, marginBottom: 8 }}>{line.trim().slice(2,-2)}</h3>;
     if (line.startsWith('---'))
       return <hr key={i} style={{ borderColor: 'var(--border)', marginTop: 24, marginBottom: 20 }} />;
     if (/^\d+\./.test(line))
@@ -1288,23 +1305,22 @@ const renderContent = (text) => {
           {line.match(/^(\d+)/)[1]}
         </span>
         <p style={{ color: 'var(--text-1)', fontSize: 14, lineHeight: 1.65, margin: 0 }}
-          dangerouslySetInnerHTML={{ __html: line.replace(/^\d+\.\s*/,'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') }} />
+          dangerouslySetInnerHTML={{ __html: inlineHtml(line.replace(/^\d+\.\s*/,'')) }} />
       </div>;
     if (line.startsWith('- '))
       return <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 6 }}>
         <span style={{ color: 'var(--accent)', fontWeight: 700, flexShrink: 0, marginTop: 1 }}>•</span>
         <p style={{ color: 'var(--text-1)', fontSize: 14, lineHeight: 1.65, margin: 0 }}
-          dangerouslySetInnerHTML={{ __html: line.slice(2).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') }} />
+          dangerouslySetInnerHTML={{ __html: inlineHtml(line.slice(2)) }} />
       </div>;
     const calloutMatch = line.match(/^\[!?(info|warning|tip)\]\s*(.+)$/i);
     if (calloutMatch) {
       const type = calloutMatch[1].toLowerCase();
-      const text = calloutMatch[2];
       const icons = { info: 'ℹ️', warning: '⚠️', tip: '💡' };
       return (
         <div key={i} className={`callout callout-${type}`}>
           <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>{icons[type]}</span>
-          <p dangerouslySetInnerHTML={{ __html: text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+          <p dangerouslySetInnerHTML={{ __html: inlineHtml(calloutMatch[2]) }} />
         </div>
       );
     }
@@ -1314,7 +1330,7 @@ const renderContent = (text) => {
         style={{ maxWidth: '100%', borderRadius: 10, margin: '12px 0', display: 'block', border: '1px solid var(--border)' }} />;
     if (!line.trim()) return <div key={i} style={{ height: 6 }} />;
     return <p key={i} style={{ color: 'var(--text-1)', fontSize: 14, lineHeight: 1.75, marginBottom: 8 }}
-      dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') }} />;
+      dangerouslySetInnerHTML={{ __html: inlineHtml(line) }} />;
   });
 };
 
