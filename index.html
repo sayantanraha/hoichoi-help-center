@@ -1553,17 +1553,70 @@ const GetStartedView = ({ navigate, lang, onOpenTicket, getStartedSteps }) => {
   );
 };
 
+const MiniSearchBar = ({ navigate, lang, allArticles, categories }) => {
+  const S = STRINGS[lang];
+  const [query, setQuery] = useState('');
+  const [open, setOpen] = useState(false);
+  const ref = React.useRef(null);
+  const results = useMemo(() => {
+    if (!query || query.trim().length < 2) return [];
+    const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    return scoreArticles(terms, allArticles).map(a => ({ ...a, type: 'article' }));
+  }, [query, allArticles]);
+  useEffect(() => { setOpen(results.length > 0); }, [results]);
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+  return (
+    <div ref={ref} style={{ position: 'relative', marginBottom: 20 }}>
+      <div style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-3)', zIndex: 1, pointerEvents: 'none' }}>
+        <Icon name="search" size={15} />
+      </div>
+      <input value={query}
+        onChange={e => setQuery(e.target.value)}
+        onKeyDown={e => { if (e.key === 'Enter' && query.trim()) { setOpen(false); navigate({ view: 'search', query }); } }}
+        onFocus={() => results.length > 0 && setOpen(true)}
+        placeholder={S.searchPlaceholder}
+        style={{ width: '100%', height: 42, paddingLeft: 40, paddingRight: 16, borderRadius: open ? '10px 10px 0 0' : 10, border: '1.5px solid var(--border)', fontSize: 14, color: 'var(--text-1)', background: 'var(--surface)', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.15s' }} />
+      {open && (
+        <div className="search-dropdown" style={{ borderTop: '1px solid var(--border)', borderRadius: '0 0 10px 10px' }}>
+          {results.slice(0, 5).map((r, i) => (
+            <div key={r.id} className="search-dropdown-item"
+              style={{ padding: '9px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, borderBottom: i < Math.min(results.length, 5) - 1 ? '1px solid var(--border)' : 'none' }}
+              onMouseDown={() => { setOpen(false); setQuery(''); navigate({ view: 'article', articleId: r.id, catId: r.catId }); }}>
+              <Icon name="search" size={12} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+              <span style={{ fontSize: 13, color: 'var(--text-1)', flex: 1 }}>{lang === 'bn' ? (r.titleBn || r.title) : r.title}</span>
+              <span style={{ fontSize: 11, color: 'var(--text-3)', flexShrink: 0 }}>{categories.find(c => c.id === r.catId)?.label}</span>
+            </div>
+          ))}
+          {query.trim().length >= 2 && (
+            <div className="search-dropdown-item"
+              style={{ padding: '9px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, borderTop: '1px solid var(--border)' }}
+              onMouseDown={() => { setOpen(false); navigate({ view: 'search', query }); }}>
+              <Icon name="search" size={12} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+              <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 500 }}>{S.seeAllResultsFor} "{query}" {results.length > 0 ? `(${results.length})` : ''}</span>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const CategoryView = ({ catId, navigate, lang, onOpenTicket, allArticles, categories }) => {
   const S = STRINGS[lang];
   const cat = categories.find(c => c.id === catId);
   const articles = allArticles.filter(a => (a.categories || [a.categoryId || a.category]).includes(catId));
   return (
     <div className="fade-in" style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 24px 60px' }}>
-      <div className="flex items-center gap-2 mb-6" style={{ fontSize: 13, color: 'var(--text-3)' }}>
+      <div className="flex items-center gap-2 mb-4" style={{ fontSize: 13, color: 'var(--text-3)' }}>
         <span className="cursor-pointer" style={{ color: 'var(--accent)' }} onClick={() => navigate({ view: 'home' })}>{S.knowledgeBase}</span>
         <span>/</span>
         <span style={{ color: 'var(--text-2)' }}>{lang === 'bn' ? cat?.labelBn : cat?.label}</span>
       </div>
+      <MiniSearchBar navigate={navigate} lang={lang} allArticles={allArticles} categories={categories} />
       <div className="flex items-center gap-4 mb-8">
         <div style={{ width: 52, height: 52, borderRadius: 14, background: cat?.color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', color: cat?.color }}><Icon name={cat?.icon} size={28} /></div>
         <div>
@@ -1656,15 +1709,17 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
   const title = lang === 'bn' ? (articleMeta.titleBn || content?.titleBn || content?.title) : (content?.title || articleMeta.title);
 
   return (
-    <div className="fade-in article-grid">
+    <div className="fade-in" style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 24px 60px' }}>
+      <div className="flex items-center gap-2 mb-4" style={{ fontSize: 13, color: 'var(--text-3)' }}>
+        <span className="cursor-pointer" style={{ color: 'var(--accent)' }} onClick={() => navigate({ view: 'home' })}>{S.knowledgeBase}</span>
+        <span>/</span>
+        <span className="cursor-pointer" style={{ color: 'var(--accent)' }} onClick={() => navigate({ view: 'category', catId })}>{lang === 'bn' ? (cat?.labelBn || cat?.label) : cat?.label}</span>
+        <span>/</span>
+        <span style={{ color: 'var(--text-2)' }}>{S.articleBreadcrumb}</span>
+      </div>
+      <MiniSearchBar navigate={navigate} lang={lang} allArticles={allArticles} categories={categories} />
+      <div className="article-grid" style={{ padding: 0, margin: 0, maxWidth: 'none' }}>
       <div>
-        <div className="flex items-center gap-2 mb-6" style={{ fontSize: 13, color: 'var(--text-3)' }}>
-          <span className="cursor-pointer" style={{ color: 'var(--accent)' }} onClick={() => navigate({ view: 'home' })}>{S.knowledgeBase}</span>
-          <span>/</span>
-          <span className="cursor-pointer" style={{ color: 'var(--accent)' }} onClick={() => navigate({ view: 'category', catId })}>{lang === 'bn' ? (cat?.labelBn || cat?.label) : cat?.label}</span>
-          <span>/</span>
-          <span style={{ color: 'var(--text-2)' }}>{S.articleBreadcrumb}</span>
-        </div>
         <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 16, padding: 32, boxShadow: 'var(--shadow)' }}>
           <div className="flex items-center gap-2 mb-4 flex-wrap">
             <span style={{ background: cat?.color + '18', color: cat?.color, padding: '3px 10px', borderRadius: 999, fontSize: 12, fontWeight: 600 }}>{lang === 'bn' ? (cat?.labelBn || cat?.label) : cat?.label}</span>
@@ -1803,6 +1858,7 @@ const VideoLibraryView = ({ navigate, lang, onOpenTicket, siteVideos }) => {
           ))}
         </div>
         <div style={{ marginTop: 48 }}><SupportBar onOpenTicket={onOpenTicket} lang={lang} /></div>
+      </div>
       </div>
     </div>
   );
