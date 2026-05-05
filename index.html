@@ -100,6 +100,7 @@
   .progress-bar { height: 3px; background: linear-gradient(135deg,#d20820,#6d0550); border-radius: 999px; transition: width 0.3s; }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  @keyframes blink-dot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.7); } }
   .spin { animation: spin 0.8s linear infinite; }
   @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   .slide-up { animation: slideUp 0.3s ease; }
@@ -1956,6 +1957,7 @@ function App() {
   const [siteQuickSearches, setSiteQuickSearches] = useState(null);
   const [siteVideos, setSiteVideos] = useState(null);
   const [getStartedSteps, setGetStartedSteps] = useState(null);
+  const [noticeBanner, setNoticeBanner] = useState(null);
 
   useEffect(() => {
     db.collection('articles').where('published', '==', true).get()
@@ -1973,6 +1975,7 @@ function App() {
         if (data.quickSearches && data.quickSearches.length > 0) setSiteQuickSearches(data.quickSearches);
         if (data.videos && data.videos.length > 0) setSiteVideos(data.videos);
         if (data.getStartedSteps && data.getStartedSteps.length === 5) setGetStartedSteps(data.getStartedSteps);
+        if (data.noticeBanner && data.noticeBanner.active && data.noticeBanner.message) setNoticeBanner(data.noticeBanner);
       })
       .catch(() => {});
   }, []);
@@ -2008,8 +2011,20 @@ function App() {
     }
   };
 
+  const bannerColors = {
+    critical: { bg: '#FEE2E2', text: '#991B1B', dot: '#E8173A' },
+    warning:  { bg: '#FEF3C7', text: '#78350F', dot: '#D97706' },
+    info:     { bg: '#E2E8F0', text: '#334155', dot: '#64748B' },
+  };
+
   return (
     <>
+      {noticeBanner && (
+        <div style={{ background: (bannerColors[noticeBanner.severity] || bannerColors.warning).bg, padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, position: 'sticky', top: 0, zIndex: 1000 }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, background: (bannerColors[noticeBanner.severity] || bannerColors.warning).dot, animation: 'blink-dot 1.4s ease-in-out infinite', display: 'inline-block' }} />
+          <span style={{ fontSize: 13, fontWeight: 500, color: (bannerColors[noticeBanner.severity] || bannerColors.warning).text, textAlign: 'center' }}>{noticeBanner.message}</span>
+        </div>
+      )}
       <Topbar theme={theme} setTheme={setTheme} lang={lang} setLang={setLang}
         navigate={navigate} onOpenTicket={onOpenTicket} currentView={nav.view} />
       {renderView()}
