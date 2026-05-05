@@ -708,8 +708,9 @@ const Icon = ({ name, size = 16, style = {}, className = '' }) => {
 };
 
 // ── Support CTA Bar ───────────────────────────────────────────────────────────
-const SupportBar = ({ compact = false, onOpenTicket, lang = 'en' }) => {
+const SupportBar = ({ compact = false, onOpenTicket, lang = 'en', chatEnabled = true, ticketEnabled = true }) => {
   const S = STRINGS[lang];
+  if (!chatEnabled && !ticketEnabled) return null;
   return (
   <div className="support-bar" style={{ padding: compact ? '14px 18px' : '20px 24px' }}>
     <div>
@@ -718,16 +719,20 @@ const SupportBar = ({ compact = false, onOpenTicket, lang = 'en' }) => {
       </p>
     </div>
     <div className="support-bar-btns">
-      <button onClick={openNuggetChat}
-        className="btn-ghost flex items-center gap-2 rounded-lg"
-        style={{ fontSize: 13, padding: '8px 16px' }}>
-        <Icon name="chat" size={15} /> {S.chatWithUs}
-      </button>
-      <button onClick={onOpenTicket}
-        className="btn-primary flex items-center gap-2 rounded-lg"
-        style={{ fontSize: 13, padding: '8px 16px' }}>
-        <Icon name="ticket" size={15} /> {S.raiseTicket}
-      </button>
+      {chatEnabled && (
+        <button onClick={openNuggetChat}
+          className="btn-ghost flex items-center gap-2 rounded-lg"
+          style={{ fontSize: 13, padding: '8px 16px' }}>
+          <Icon name="chat" size={15} /> {S.chatWithUs}
+        </button>
+      )}
+      {ticketEnabled && (
+        <button onClick={onOpenTicket}
+          className="btn-primary flex items-center gap-2 rounded-lg"
+          style={{ fontSize: 13, padding: '8px 16px' }}>
+          <Icon name="ticket" size={15} /> {S.raiseTicket}
+        </button>
+      )}
     </div>
   </div>
   );
@@ -1177,7 +1182,7 @@ const TicketModal = ({ onClose, lang = 'en' }) => {
 };
 
 // ── Topbar ────────────────────────────────────────────────────────────────────
-const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket, currentView }) => {
+const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket, currentView, ticketEnabled = true }) => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const S = STRINGS[lang];
   const navItems = [
@@ -1233,12 +1238,14 @@ const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket, curren
           </button>
 
           {/* Raise a Ticket */}
+          {ticketEnabled && (
           <button onClick={onOpenTicket}
             className="btn-primary topbar-ticket"
             style={{ alignItems: 'center', gap: 6, fontSize: 13, height: 36, padding: '0 16px', borderRadius: 8, fontWeight: 600, flexShrink: 0 }}>
             <Icon name="ticket" size={14} />
             <span className="topbar-btn-text">{S.raiseTicketBtn}</span>
           </button>
+          )}
 
           {/* Hamburger — mobile / tablet only */}
           <button className="topbar-hamburger btn-ghost"
@@ -1367,7 +1374,7 @@ const scoreArticles = (terms, allArticles) => {
 };
 
 // ── Views ─────────────────────────────────────────────────────────────────────
-const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, categories, siteQuickSearches }) => {
+const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, categories, siteQuickSearches, chatEnabled = true, ticketEnabled = true }) => {
   const S = STRINGS[lang];
   const [query, setQuery] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -1496,13 +1503,13 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
             })}
           </div>
         </div>
-        <div style={{ marginTop: 48 }}><SupportBar onOpenTicket={onOpenTicket} lang={lang} /></div>
+        <div style={{ marginTop: 48 }}><SupportBar onOpenTicket={onOpenTicket} lang={lang} chatEnabled={chatEnabled} ticketEnabled={ticketEnabled} /></div>
       </div>
     </div>
   );
 };
 
-const GetStartedView = ({ navigate, lang, onOpenTicket, getStartedSteps }) => {
+const GetStartedView = ({ navigate, lang, onOpenTicket, getStartedSteps, chatEnabled = true, ticketEnabled = true }) => {
   const S = STRINGS[lang];
   const HARDCODED_STEPS = [
     { step: 1, icon: 'mail',         title: 'Create your account',  titleBn: 'অ্যাকাউন্ট তৈরি করুন',       desc: 'Sign up with your mobile number or social account at hoichoi.tv or on the app', descBn: 'hoichoi.tv-তে বা অ্যাপে আপনার মোবাইল নম্বর বা সোশ্যাল অ্যাকাউন্ট দিয়ে সাইন আপ করুন', articleId: 'create-account', catId: 'account'   },
@@ -1548,7 +1555,7 @@ const GetStartedView = ({ navigate, lang, onOpenTicket, getStartedSteps }) => {
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 44 }}><SupportBar onOpenTicket={onOpenTicket} lang={lang} /></div>
+        <div style={{ marginTop: 44 }}><SupportBar onOpenTicket={onOpenTicket} lang={lang} chatEnabled={chatEnabled} ticketEnabled={ticketEnabled} /></div>
       </div>
     </div>
   );
@@ -1649,7 +1656,7 @@ const CategoryView = ({ catId, navigate, lang, onOpenTicket, allArticles, catego
   );
 };
 
-const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticles, categories }) => {
+const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticles, categories, chatEnabled = true, ticketEnabled = true }) => {
   const S = STRINGS[lang];
   const cat = categories.find(c => c.id === catId);
   const catArticles = allArticles.filter(a => (a.categories || [a.categoryId || a.category]).includes(catId));
@@ -1785,24 +1792,30 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
           ))}
         </div>
         {/* Inline support CTA in sidebar */}
+        {(chatEnabled || ticketEnabled) && (
         <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, padding: 20, boxShadow: 'var(--shadow)' }}>
           <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 14, marginBottom: 6 }}>{S.needMoreHelp}</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <button onClick={openNuggetChat} className="btn-ghost flex items-center justify-center gap-2 rounded-lg w-full" style={{ padding: '8px 12px', fontSize: 13 }}>
-              <Icon name="chat" size={14} /> {S.chatWithUs}
-            </button>
-            <button onClick={onOpenTicket} className="btn-primary flex items-center justify-center gap-2 rounded-lg w-full" style={{ padding: '8px 12px', fontSize: 13 }}>
-              <Icon name="ticket" size={14} /> {S.raiseTicket}
-            </button>
+            {chatEnabled && (
+              <button onClick={openNuggetChat} className="btn-ghost flex items-center justify-center gap-2 rounded-lg w-full" style={{ padding: '8px 12px', fontSize: 13 }}>
+                <Icon name="chat" size={14} /> {S.chatWithUs}
+              </button>
+            )}
+            {ticketEnabled && (
+              <button onClick={onOpenTicket} className="btn-primary flex items-center justify-center gap-2 rounded-lg w-full" style={{ padding: '8px 12px', fontSize: 13 }}>
+                <Icon name="ticket" size={14} /> {S.raiseTicket}
+              </button>
+            )}
           </div>
         </div>
+        )}
       </div>
       </div>
     </div>
   );
 };
 
-const VideoLibraryView = ({ navigate, lang, onOpenTicket, siteVideos }) => {
+const VideoLibraryView = ({ navigate, lang, onOpenTicket, siteVideos, chatEnabled = true, ticketEnabled = true }) => {
   const S = STRINGS[lang];
   const [activeFilter, setActiveFilter] = useState('All');
   const videos = siteVideos || VIDEOS;
@@ -1859,13 +1872,13 @@ const VideoLibraryView = ({ navigate, lang, onOpenTicket, siteVideos }) => {
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 48 }}><SupportBar onOpenTicket={onOpenTicket} lang={lang} /></div>
+        <div style={{ marginTop: 48 }}><SupportBar onOpenTicket={onOpenTicket} lang={lang} chatEnabled={chatEnabled} ticketEnabled={ticketEnabled} /></div>
       </div>
     </div>
   );
 };
 
-const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categories }) => {
+const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categories, chatEnabled = true, ticketEnabled = true }) => {
   const S = STRINGS[lang];
   const results = useMemo(() => {
     if (!query) return [];
@@ -1958,6 +1971,8 @@ function App() {
   const [siteVideos, setSiteVideos] = useState(null);
   const [getStartedSteps, setGetStartedSteps] = useState(null);
   const [noticeBanner, setNoticeBanner] = useState(null);
+  const [chatEnabled, setChatEnabled] = useState(true);
+  const [ticketEnabled, setTicketEnabled] = useState(true);
 
   useEffect(() => {
     db.collection('articles').where('published', '==', true).get()
@@ -1976,6 +1991,7 @@ function App() {
         if (data.videos && data.videos.length > 0) setSiteVideos(data.videos);
         if (data.getStartedSteps && data.getStartedSteps.length === 5) setGetStartedSteps(data.getStartedSteps);
         if (data.noticeBanner && data.noticeBanner.active && data.noticeBanner.message) setNoticeBanner(data.noticeBanner);
+        if (data.supportOptions) { if (data.supportOptions.chatEnabled === false) setChatEnabled(false); if (data.supportOptions.ticketEnabled === false) setTicketEnabled(false); }
       })
       .catch(() => {});
   }, []);
@@ -1997,7 +2013,7 @@ function App() {
   }, []);
 
   const onOpenTicket = useCallback(() => setShowTicket(true), []);
-  const viewProps = { navigate, lang, onOpenTicket, allArticles, popularArticles, categories, siteQuickSearches, siteVideos, getStartedSteps };
+  const viewProps = { navigate, lang, onOpenTicket, allArticles, popularArticles, categories, siteQuickSearches, siteVideos, getStartedSteps, chatEnabled, ticketEnabled };
 
   const renderView = () => {
     switch (nav.view) {
@@ -2011,22 +2027,20 @@ function App() {
     }
   };
 
-  const bannerColors = {
-    critical: { bg: '#FEE2E2', text: '#991B1B', dot: '#E8173A' },
-    warning:  { bg: '#FEF3C7', text: '#78350F', dot: '#D97706' },
-    info:     { bg: '#E2E8F0', text: '#334155', dot: '#64748B' },
-  };
+  const bannerBg = noticeBanner ? (noticeBanner.severity === 'critical' ? '#E8173A' : noticeBanner.severity === 'info' ? '#475569' : '#D97706') : null;
+  const bannerIcon = noticeBanner ? (noticeBanner.severity === 'critical' ? '🚨' : noticeBanner.severity === 'info' ? 'ℹ️' : '⚠️') : null;
 
   return (
     <>
       {noticeBanner && (
-        <div style={{ background: (bannerColors[noticeBanner.severity] || bannerColors.warning).bg, padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, position: 'sticky', top: 0, zIndex: 1000 }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, background: (bannerColors[noticeBanner.severity] || bannerColors.warning).dot, animation: 'blink-dot 1.4s ease-in-out infinite', display: 'inline-block' }} />
-          <span style={{ fontSize: 13, fontWeight: 500, color: (bannerColors[noticeBanner.severity] || bannerColors.warning).text, textAlign: 'center' }}>{noticeBanner.message}</span>
+        <div style={{ background: bannerBg, padding: '13px 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, position: 'sticky', top: 0, zIndex: 1000 }}>
+          <span style={{ fontSize: 16, flexShrink: 0 }}>{bannerIcon}</span>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, background: 'rgba(255,255,255,0.7)', animation: 'blink-dot 1.4s ease-in-out infinite', display: 'inline-block' }} />
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#fff', textAlign: 'center' }}>{noticeBanner.message}</span>
         </div>
       )}
       <Topbar theme={theme} setTheme={setTheme} lang={lang} setLang={setLang}
-        navigate={navigate} onOpenTicket={onOpenTicket} currentView={nav.view} />
+        navigate={navigate} onOpenTicket={onOpenTicket} currentView={nav.view} ticketEnabled={ticketEnabled} />
       {renderView()}
       {showTicket && <TicketModal onClose={() => setShowTicket(false)} lang={lang} />}
     </>
