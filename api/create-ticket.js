@@ -53,9 +53,12 @@ module.exports = async function handler(req, res) {
     created_by_id:        email,
     created_by_client_id: 1,
     priority:             'MEDIUM',
-    channel_handle:       'Support hoichoi',
     userInfo:             { phoneNumber: phone },
   };
+
+  // channel_handle from env — if not set, Nugget uses Default Ticketing Channel
+  const CHANNEL_HANDLE = process.env.NUGGET_CHANNEL_HANDLE;
+  if (CHANNEL_HANDLE) nuggetPayload.channel_handle = CHANNEL_HANDLE;
 
   try {
     const response = await fetch(
@@ -70,17 +73,24 @@ module.exports = async function handler(req, res) {
       }
     );
 
+    const responseText = await response.text();
+
     if (!response.ok) {
-      const errBody = await response.text();
-      console.error('Nugget API error:', response.status, errBody);
-      return res.status(502).json({ error: 'Ticket creation failed. Please try again.' });
+      console.error('Nugget API error:', response.status, responseText);
+      // Return Nugget's error detail to help debug
+      return res.status(502).json({
+        error: 'Ticket creation failed. Please try again.',
+        nugget_status: response.status,
+        nugget_error: responseText,
+      });
     }
 
-    const data = await response.json();
+    let data = {};
+    try { data = JSON.parse(responseText); } catch (_) {}
     return res.status(200).json({ ok: true, ticket_id: data.ticket_id });
 
   } catch (err) {
     console.error('create-ticket error:', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error', detail: err.message });
   }
 };
