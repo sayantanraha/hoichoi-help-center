@@ -896,6 +896,7 @@ const TicketModal = ({ onClose, lang = 'en' }) => {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [ticketId, setTicketId] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef();
 
@@ -972,12 +973,14 @@ const TicketModal = ({ onClose, lang = 'en' }) => {
         description: form.description.trim(),
         attachment,
       };
-      const res = await fetch('/api/send-ticket', {
+      const res = await fetch('/api/create-ticket', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error('Server error');
+      const data = await res.json();
+      setTicketId(data.ticket_id || null);
       setSubmitted(true);
     } catch (err) {
       setErrors({ submit: S.errSubmit });
@@ -1005,9 +1008,15 @@ const TicketModal = ({ onClose, lang = 'en' }) => {
               <Icon name="checkCircle" size={32} />
             </div>
             <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 18, marginBottom: 8 }}>{S.ticketSuccess}</p>
-            <p style={{ color: 'var(--text-2)', fontSize: 14, lineHeight: 1.6, maxWidth: 380, margin: '0 auto 24px' }}>
+            <p style={{ color: 'var(--text-2)', fontSize: 14, lineHeight: 1.6, maxWidth: 380, margin: '0 auto 16px' }}>
               {S.ticketSuccessMsg(form.email)}
             </p>
+            {ticketId && (
+              <div style={{ background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 10, padding: '10px 20px', display: 'inline-block', margin: '0 auto 16px' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Ticket ID</p>
+                <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--accent)', fontFamily: 'monospace' }}>#{ticketId}</p>
+              </div>
+            )}
             <button onClick={onClose} className="btn-primary px-6 py-2.5 rounded-xl font-semibold" style={{ fontSize: 14 }}>
               {S.doneBtn}
             </button>
