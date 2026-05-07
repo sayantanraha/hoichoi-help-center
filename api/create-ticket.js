@@ -62,6 +62,9 @@ module.exports = async function handler(req, res) {
         fd.append('Created_by_id',        email);
         fd.append('created_by_client_id', '1');
         fd.append('priority',             'MEDIUM');
+        fd.append('userInfo[uid]',        email);
+        fd.append('userInfo[displayName]', name);
+        fd.append('userInfo[email]',      email);
         fd.append('attachment_files[]',   blob, attachment.name);
 
         nuggetRes = await fetch(NUGGET_URL, {
@@ -83,6 +86,7 @@ module.exports = async function handler(req, res) {
           created_by_id:        email,
           created_by_client_id: 1,
           priority:             'MEDIUM',
+          userInfo:             { uid: email, displayName: name, email: email },
         };
 
         nuggetRes = await fetch(NUGGET_URL, {
