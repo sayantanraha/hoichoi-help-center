@@ -978,8 +978,12 @@ const TicketModal = ({ onClose, lang = 'en' }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error('Server error');
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setErrors({ submit: data.error || S.errSubmit });
+        setSubmitting(false);
+        return;
+      }
       setTicketId(data.ticket_id || null);
       setSubmitted(true);
     } catch (err) {

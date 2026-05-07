@@ -109,8 +109,18 @@ module.exports = async function handler(req, res) {
         return res.status(200).json({ ok: true, ticket_id: data.ticket_id, via: 'nugget' });
       }
 
-      // Nugget returned an error — log and fall through to Brevo
-      console.warn('Nugget ticket creation failed, falling back to Brevo. Status:', nuggetRes.status, nuggetText);
+      if (nuggetRes.status >= 400 && nuggetRes.status < 500) {
+        // Client-side error (bad input) — surface to the user, don't silently fall through
+        let nuggetMsg = '';
+        try { nuggetMsg = JSON.parse(nuggetText)?.error?.message || ''; } catch (_) {}
+        console.warn('Nugget rejected request (4xx):', nuggetRes.status, nuggetText);
+        return res.status(400).json({
+          error: nuggetMsg || 'Your submission could not be processed. Please check your details and try again.',
+        });
+      }
+
+      // 5xx / unexpected — log and fall through to Brevo
+      console.warn('Nugget server error, falling back to Brevo. Status:', nuggetRes.status, nuggetText);
 
     } catch (err) {
       // Network/parse error — fall through to Brevo
