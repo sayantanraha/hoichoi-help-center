@@ -58,9 +58,7 @@ module.exports = async function handler(req, res) {
         fd.append('description',          descText);
         fd.append('email',                email);
         fd.append('channel',              '3');
-        fd.append('requester_id',         email);
-        fd.append('requester_client_id',  '1');
-        fd.append('created_by_id',        email);
+        fd.append('created_by_id',        'hoichoi@nugget.com');
         fd.append('created_by_client_id', '1');
         fd.append('priority',             'MEDIUM');
         fd.append('attachment_files[]',   blob, attachment.name);
@@ -81,9 +79,7 @@ module.exports = async function handler(req, res) {
           description:          descText,
           email:                email,
           channel:              3,
-          requester_id:         email,
-          requester_client_id:  1,
-          created_by_id:        email,
+          created_by_id:        'hoichoi@nugget.com',
           created_by_client_id: 1,
           priority:             'MEDIUM',
           userInfo:             { displayName: name, email: email },
