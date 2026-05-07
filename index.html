@@ -464,7 +464,7 @@ const STRINGS = {
     errSubmit: 'Something went wrong. Please try again or email support@hoichoi.tv directly.',
     aiGetAnswer: 'Ask AI', aiAnswerTitle: 'AI Answer', aiSearching: 'Finding answer…',
     aiSources: 'Sources', aiNoAnswer: "I couldn't find a specific answer in our help articles. Please check the articles below or contact support.",
-    aiPoweredBy: 'Powered by GPT-4o Mini',
+    aiPoweredBy: '',
   },
   bn: {
     helpCenter: 'হেল্প সেন্টার', getStarted: 'শুরু করুন', helpArticles: 'হেল্প আর্টিকেল',
@@ -536,7 +536,7 @@ const STRINGS = {
     errSubmit: 'কিছু একটা ভুল হয়েছে। আবার চেষ্টা করুন বা সরাসরি support@hoichoi.tv-তে ইমেইল করুন।',
     aiGetAnswer: 'Ask AI', aiAnswerTitle: 'AI উত্তর', aiSearching: 'উত্তর খোঁজা হচ্ছে…',
     aiSources: 'সূত্র', aiNoAnswer: 'আমাদের হেল্প আর্টিকেলে সুনির্দিষ্ট উত্তর পাওয়া যায়নি। নিচের আর্টিকেলগুলি দেখুন বা সাপোর্টে যোগাযোগ করুন।',
-    aiPoweredBy: 'GPT-4o Mini দ্বারা চালিত',
+    aiPoweredBy: '',
   },
 };
 
@@ -2044,7 +2044,6 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
                     })}
                   </div>
                 )}
-                <p style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 10 }}>{S.aiPoweredBy}</p>
               </>
           }
         </div>
@@ -2219,10 +2218,7 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
 
             {/* Meta row */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginBottom: 44, padding: '4px 4px 0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                <Icon name="sparkles" size={10} style={{ color: 'var(--text-3)' }} />
-                <span style={{ fontSize: 11, color: 'var(--text-3)' }}>{S.aiPoweredBy}</span>
-              </div>
+              <div />
               <button onClick={() => navigate({ view: 'search', query })}
                 style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 12, cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
                 <Icon name="search" size={12} /> Browse all results
@@ -2360,6 +2356,9 @@ function App() {
       <Topbar theme={theme} setTheme={setTheme} lang={lang} setLang={setLang}
         navigate={navigate} onOpenTicket={onOpenTicket} currentView={nav.view} ticketEnabled={ticketEnabled} />
       {renderView()}
+      <footer style={{ textAlign: 'center', padding: '24px 16px', borderTop: '1px solid var(--border)', color: 'var(--text-3)', fontSize: 12 }}>
+        © 2026 hoichoi. All Rights Reserved.
+      </footer>
       {showTicket && <TicketModal onClose={() => setShowTicket(false)} lang={lang} />}
     </>
   );
