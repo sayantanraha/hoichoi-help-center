@@ -37,6 +37,7 @@ module.exports = async function handler(req, res) {
     ``,
     `Description:`,
     description.trim(),
+    ...(attachment?.name ? [``, `📎 Attachment included: ${attachment.name} — please check the Attachments section to view it.`] : []),
   ];
   const descText = descLines.join('<br>');
 
