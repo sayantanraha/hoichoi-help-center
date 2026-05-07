@@ -450,7 +450,7 @@ const STRINGS = {
     errFileType: 'Only JPG, PNG, WEBP, GIF or PDF allowed.',
     errFileSize: 'File must be under 5MB.',
     errSubmit: 'Something went wrong. Please try again or email support@hoichoi.tv directly.',
-    aiGetAnswer: 'Get Answer', aiAnswerTitle: 'AI Answer', aiSearching: 'Finding answer…',
+    aiGetAnswer: 'Ask AI', aiAnswerTitle: 'AI Answer', aiSearching: 'Finding answer…',
     aiSources: 'Sources', aiNoAnswer: "I couldn't find a specific answer in our help articles. Please check the articles below or contact support.",
     aiPoweredBy: 'Powered by GPT-4o Mini',
   },
@@ -522,7 +522,7 @@ const STRINGS = {
     errFileType: 'শুধুমাত্র JPG, PNG, WEBP, GIF বা PDF অনুমোদিত।',
     errFileSize: 'ফাইলের আকার ৫MB-এর মধ্যে হতে হবে।',
     errSubmit: 'কিছু একটা ভুল হয়েছে। আবার চেষ্টা করুন বা সরাসরি support@hoichoi.tv-তে ইমেইল করুন।',
-    aiGetAnswer: 'উত্তর পান', aiAnswerTitle: 'AI উত্তর', aiSearching: 'উত্তর খোঁজা হচ্ছে…',
+    aiGetAnswer: 'AI জিজ্ঞেস করুন', aiAnswerTitle: 'AI উত্তর', aiSearching: 'উত্তর খোঁজা হচ্ছে…',
     aiSources: 'সূত্র', aiNoAnswer: 'আমাদের হেল্প আর্টিকেলে সুনির্দিষ্ট উত্তর পাওয়া যায়নি। নিচের আর্টিকেলগুলি দেখুন বা সাপোর্টে যোগাযোগ করুন।',
     aiPoweredBy: 'GPT-4o Mini দ্বারা চালিত',
   },
@@ -1470,11 +1470,19 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
                   </div>
                 ))}
                 {query.trim().length >= 2 && (
-                  <div style={{ padding: '10px 16px', borderTop: '1px solid #E4E8F0' }}
-                    className="search-dropdown-item" style={{ padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
+                  <div className="search-dropdown-item"
+                    style={{ padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, borderTop: '1px solid #E4E8F0' }}
                     onMouseDown={() => { setDropdownOpen(false); navigate({ view: 'search', query }); }}>
                     <Icon name="search" size={13} style={{ color: 'var(--accent)', flexShrink: 0 }} />
                     <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 500 }}>{S.seeAllResultsFor} "{query}" {liveResults.length > 0 ? `(${liveResults.length})` : ''}</span>
+                  </div>
+                )}
+                {query.trim().length >= 2 && (
+                  <div className="search-dropdown-item"
+                    style={{ padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, borderTop: '1px solid #E4E8F0' }}
+                    onMouseDown={() => { setDropdownOpen(false); navigate({ view: 'search', query, autoAI: true }); }}>
+                    <Icon name="sparkles" size={13} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+                    <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 500 }}>{S.aiGetAnswer}</span>
                   </div>
                 )}
               </div>
@@ -1945,7 +1953,7 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
       if (!res.ok) throw new Error(data.error || 'AI search failed');
       setAiAnswer(data);
       // Log to Firestore for cost tracking
-      hcDb.collection('aiSearchLogs').add({
+      db.collection('aiSearchLogs').add({
         query, lang,
         inputTokens:  data.inputTokens,
         outputTokens: data.outputTokens,
@@ -1963,7 +1971,7 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
   useEffect(() => {
     if (!query || query.trim().length < 2) return;
     const t = setTimeout(() => {
-      hcDb.collection('searchLogs').add({
+      db.collection('searchLogs').add({
         query: query.trim().toLowerCase(),
         hasResults: results.length > 0,
         timestamp: Date.now(),
