@@ -4,6 +4,8 @@
 // returns an error, falls back to sending an email via Brevo.
 // All credentials are stored as Vercel environment variables.
 
+const NUGGET_URL = 'https://api.nugget.com/unified-support/api/v1/ticketing/external/tickets';
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -24,7 +26,7 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid email' });
   }
 
-  // Build a structured description (shared by both Nugget and Brevo)
+  // Build structured description — each field on its own line
   const descLines = [
     `Name: ${name}`,
     `Email: ${email}`,
@@ -35,7 +37,6 @@ module.exports = async function handler(req, res) {
     ``,
     `Description:`,
     description.trim(),
-    ...(attachment?.name ? [``, `[Attachment included: ${attachment.name}]`] : []),
   ];
   const descText = descLines.join('\n');
 
@@ -44,32 +45,60 @@ module.exports = async function handler(req, res) {
 
   if (NUGGET_BASIC_AUTH) {
     try {
-      const nuggetPayload = {
-        source:               'SOURCE_EMAIL',
-        title:                `[${category}] ${subcategory}`,
-        description:          descText,
-        email:                email,
-        channel:              3,
-        requester_id:         email,
-        requester_client_id:  1,
-        created_by_id:        email,
-        created_by_client_id: 1,
-        priority:             'MEDIUM',
-        userInfo:             { displayName: name, email: email },
-      };
+      let nuggetRes;
 
-      const nuggetRes = await fetch(
-        'https://api.nugget.com/unified-support/api/v1/ticketing/external/tickets',
-        {
+      if (attachment?.base64 && attachment?.name) {
+        // ── Multipart/form-data — required when sending attachment_files[] ──
+        const buffer = Buffer.from(attachment.base64, 'base64');
+        const blob   = new Blob([buffer], { type: attachment.type || 'application/octet-stream' });
+
+        const fd = new FormData();
+        fd.append('source',               'SOURCE_EMAIL');
+        fd.append('title',                `[${category}] ${subcategory}`);
+        fd.append('description',          descText);
+        fd.append('email',                email);
+        fd.append('channel',              '3');
+        fd.append('requester_id',         email);
+        fd.append('requester_client_id',  '1');
+        fd.append('created_by_id',        email);
+        fd.append('created_by_client_id', '1');
+        fd.append('priority',             'MEDIUM');
+        fd.append('attachment_files[]',   blob, attachment.name);
+
+        nuggetRes = await fetch(NUGGET_URL, {
+          method:  'POST',
+          headers: { 'Authorization': `Basic ${NUGGET_BASIC_AUTH}` },
+          // Do NOT set Content-Type — fetch sets it with the correct multipart boundary
+          body:    fd,
+          redirect: 'follow',
+        });
+
+      } else {
+        // ── JSON — no attachment ───────────────────────────────────────────
+        const nuggetPayload = {
+          source:               'SOURCE_EMAIL',
+          title:                `[${category}] ${subcategory}`,
+          description:          descText,
+          email:                email,
+          channel:              3,
+          requester_id:         email,
+          requester_client_id:  1,
+          created_by_id:        email,
+          created_by_client_id: 1,
+          priority:             'MEDIUM',
+          userInfo:             { displayName: name, email: email },
+        };
+
+        nuggetRes = await fetch(NUGGET_URL, {
           method:  'POST',
           headers: {
             'Authorization': `Basic ${NUGGET_BASIC_AUTH}`,
             'Content-Type':  'application/json',
           },
-          body: JSON.stringify(nuggetPayload),
+          body:    JSON.stringify(nuggetPayload),
           redirect: 'follow',
-        }
-      );
+        });
+      }
 
       const nuggetText = await nuggetRes.text();
 
