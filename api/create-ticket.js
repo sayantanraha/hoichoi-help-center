@@ -113,7 +113,7 @@ module.exports = async function handler(req, res) {
         // Client-side error (bad input) — surface to the user, don't silently fall through
         let nuggetMsg = '';
         try { nuggetMsg = JSON.parse(nuggetText)?.error?.message || ''; } catch (_) {}
-        console.warn('Nugget rejected request (4xx):', nuggetRes.status, nuggetText);
+        console.warn('Nugget rejected (4xx):', nuggetRes.status, nuggetText, '| payload:', JSON.stringify(nuggetPayload || {}));
         return res.status(400).json({
           error: nuggetMsg || 'Your submission could not be processed. Please check your details and try again.',
         });
