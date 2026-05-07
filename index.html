@@ -450,7 +450,7 @@ const STRINGS = {
     errFileType: 'Only JPG, PNG, WEBP, GIF or PDF allowed.',
     errFileSize: 'File must be under 5MB.',
     errSubmit: 'Something went wrong. Please try again or email support@hoichoi.tv directly.',
-    aiGetAnswer: 'Ask AI', aiAnswerTitle: 'AI Answer', aiSearching: 'Finding answer…',
+    aiGetAnswer: 'Instant Answer', aiAnswerTitle: 'AI Answer', aiSearching: 'Finding answer…',
     aiSources: 'Sources', aiNoAnswer: "I couldn't find a specific answer in our help articles. Please check the articles below or contact support.",
     aiPoweredBy: 'Powered by GPT-4o Mini',
   },
@@ -522,7 +522,7 @@ const STRINGS = {
     errFileType: 'শুধুমাত্র JPG, PNG, WEBP, GIF বা PDF অনুমোদিত।',
     errFileSize: 'ফাইলের আকার ৫MB-এর মধ্যে হতে হবে।',
     errSubmit: 'কিছু একটা ভুল হয়েছে। আবার চেষ্টা করুন বা সরাসরি support@hoichoi.tv-তে ইমেইল করুন।',
-    aiGetAnswer: 'AI জিজ্ঞেস করুন', aiAnswerTitle: 'AI উত্তর', aiSearching: 'উত্তর খোঁজা হচ্ছে…',
+    aiGetAnswer: 'তাৎক্ষণিক উত্তর', aiAnswerTitle: 'AI উত্তর', aiSearching: 'উত্তর খোঁজা হচ্ছে…',
     aiSources: 'সূত্র', aiNoAnswer: 'আমাদের হেল্প আর্টিকেলে সুনির্দিষ্ট উত্তর পাওয়া যায়নি। নিচের আর্টিকেলগুলি দেখুন বা সাপোর্টে যোগাযোগ করুন।',
     aiPoweredBy: 'GPT-4o Mini দ্বারা চালিত',
   },
@@ -1982,13 +1982,15 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
   }, [query]);
 
   const cat = (cId) => categories.find(c => c.id === cId);
+  // In autoAI mode show only the AI answer (no article list), unless AI errored
+  const showArticles = !autoAI || aiError;
   return (
     <div className="fade-in" style={{ maxWidth: 900, margin: '0 auto', padding: '36px 24px 60px' }}>
       <div className="flex items-center justify-between flex-wrap gap-3" style={{ marginBottom: 24 }}>
         <p style={{ color: 'var(--text-3)', fontSize: 13 }}>
           {results.length > 0 ? S.searchResultsText(results.length, query) : S.noResultsText(query)}
         </p>
-        {results.length > 0 && !aiAnswer && (
+        {results.length > 0 && !aiAnswer && !autoAI && (
           <button onClick={handleGetAnswer} disabled={aiLoading}
             className="btn-primary flex items-center gap-2 rounded-xl font-semibold"
             style={{ fontSize: 13, padding: '8px 16px', opacity: aiLoading ? 0.75 : 1 }}>
@@ -2036,7 +2038,7 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
         </div>
       )}
 
-      {results.length > 0 ? (
+      {showArticles && (results.length > 0 ? (
         <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
           {results.map((a, i) => (
             <div key={a.id} className="article-card cursor-pointer flex items-center gap-4"
@@ -2060,7 +2062,7 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
           <p style={{ color: 'var(--text-2)', fontSize: 14, marginBottom: 28 }}>{S.tryDifferent}</p>
           <button className="btn-primary px-6 py-2.5 rounded-lg font-semibold cursor-pointer" onClick={() => navigate({ view: 'home' })}>{S.browseCategories}</button>
         </div>
-      )}
+      ))}
       <div style={{ marginTop: 40 }}><SupportBar compact onOpenTicket={onOpenTicket} lang={lang} /></div>
     </div>
   );
