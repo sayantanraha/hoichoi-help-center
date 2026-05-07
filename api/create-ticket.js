@@ -26,7 +26,7 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid email' });
   }
 
-  // Build structured description — each field on its own line
+  // Build structured description — Nugget renders description as HTML so use <br> for line breaks
   const descLines = [
     `Name: ${name}`,
     `Email: ${email}`,
@@ -38,7 +38,7 @@ module.exports = async function handler(req, res) {
     `Description:`,
     description.trim(),
   ];
-  const descText = descLines.join('\n');
+  const descText = descLines.join('<br>');
 
   // ── 1. Try Nugget ──────────────────────────────────────────────────────────
   const NUGGET_BASIC_AUTH = process.env.NUGGET_BASIC_AUTH;
