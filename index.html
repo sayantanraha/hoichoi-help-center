@@ -450,6 +450,9 @@ const STRINGS = {
     errFileType: 'Only JPG, PNG, WEBP, GIF or PDF allowed.',
     errFileSize: 'File must be under 5MB.',
     errSubmit: 'Something went wrong. Please try again or email support@hoichoi.tv directly.',
+    aiGetAnswer: 'Get Answer', aiAnswerTitle: 'AI Answer', aiSearching: 'Finding answer…',
+    aiSources: 'Sources', aiNoAnswer: "I couldn't find a specific answer in our help articles. Please check the articles below or contact support.",
+    aiPoweredBy: 'Powered by GPT-4o Mini',
   },
   bn: {
     helpCenter: 'হেল্প সেন্টার', getStarted: 'শুরু করুন', helpArticles: 'হেল্প আর্টিকেল',
@@ -519,6 +522,9 @@ const STRINGS = {
     errFileType: 'শুধুমাত্র JPG, PNG, WEBP, GIF বা PDF অনুমোদিত।',
     errFileSize: 'ফাইলের আকার ৫MB-এর মধ্যে হতে হবে।',
     errSubmit: 'কিছু একটা ভুল হয়েছে। আবার চেষ্টা করুন বা সরাসরি support@hoichoi.tv-তে ইমেইল করুন।',
+    aiGetAnswer: 'উত্তর পান', aiAnswerTitle: 'AI উত্তর', aiSearching: 'উত্তর খোঁজা হচ্ছে…',
+    aiSources: 'সূত্র', aiNoAnswer: 'আমাদের হেল্প আর্টিকেলে সুনির্দিষ্ট উত্তর পাওয়া যায়নি। নিচের আর্টিকেলগুলি দেখুন বা সাপোর্টে যোগাযোগ করুন।',
+    aiPoweredBy: 'GPT-4o Mini দ্বারা চালিত',
   },
 };
 
@@ -704,6 +710,7 @@ const Icon = ({ name, size = 16, style = {}, className = '' }) => {
     film:         <svg {...p}><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>,
     helpCircle:   <svg {...p}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
     smartphone:   <svg {...p}><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>,
+    sparkles:     <svg {...p} stroke="none" fill="currentColor"><path d="M12 2l1.09 3.26L16.5 6l-3.41.74L12 10l-1.09-3.26L7.5 6l3.41-.74L12 2zm7 10l.63 1.87L21.5 14l-1.87.13L19 16l-.63-1.87L16.5 14l1.87-.13L19 12zm-14 0l.63 1.87L5.5 14l-1.87.13L3 16l-.63-1.87L.5 14l1.87-.13L3 12z"/></svg>,
   };
   return icons[name] || null;
 };
@@ -1621,6 +1628,14 @@ const MiniSearchBar = ({ navigate, lang, allArticles, categories }) => {
               <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 500 }}>{S.seeAllResultsFor} "{query}" {results.length > 0 ? `(${results.length})` : ''}</span>
             </div>
           )}
+          {query.trim().length >= 2 && (
+            <div className="search-dropdown-item"
+              style={{ padding: '9px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, borderTop: '1px solid var(--border)' }}
+              onMouseDown={() => { setOpen(false); navigate({ view: 'search', query, autoAI: true }); }}>
+              <Icon name="sparkles" size={12} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+              <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 500 }}>{S.aiGetAnswer}</span>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -1892,7 +1907,7 @@ const VideoLibraryView = ({ navigate, lang, onOpenTicket, siteVideos, chatEnable
   );
 };
 
-const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categories, chatEnabled = true, ticketEnabled = true }) => {
+const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categories, chatEnabled = true, ticketEnabled = true, autoAI = false }) => {
   const S = STRINGS[lang];
   const results = useMemo(() => {
     if (!query) return [];
@@ -1900,11 +1915,55 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
     return scoreArticles(terms, allArticles);
   }, [query, allArticles]);
 
+  const [aiAnswer,  setAiAnswer]  = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError,   setAiError]   = useState(null);
+
+  // Reset AI state when query changes
+  useEffect(() => { setAiAnswer(null); setAiError(null); }, [query]);
+
+  // Auto-trigger AI if navigated with autoAI flag
+  useEffect(() => {
+    if (autoAI && results.length > 0 && !aiAnswer && !aiLoading) handleGetAnswer();
+  }, [autoAI, results.length]);
+
+  const handleGetAnswer = async () => {
+    if (aiLoading || results.length === 0) return;
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const topArticles = results.slice(0, 5).map(a => ({
+        id: a.id, title: a.title, titleBn: a.titleBn || '',
+        content: (a.content || '').slice(0, 1500),
+      }));
+      const res = await fetch('/api/ai-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, lang, articles: topArticles }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'AI search failed');
+      setAiAnswer(data);
+      // Log to Firestore for cost tracking
+      hcDb.collection('aiSearchLogs').add({
+        query, lang,
+        inputTokens:  data.inputTokens,
+        outputTokens: data.outputTokens,
+        cost:         data.cost,
+        timestamp:    Date.now(),
+      }).catch(() => {});
+    } catch (err) {
+      setAiError(err.message);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   // Log search query to Firestore for analytics (debounced 1s)
   useEffect(() => {
     if (!query || query.trim().length < 2) return;
     const t = setTimeout(() => {
-      db.collection('searchLogs').add({
+      hcDb.collection('searchLogs').add({
         query: query.trim().toLowerCase(),
         hasResults: results.length > 0,
         timestamp: Date.now(),
@@ -1917,9 +1976,58 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
   const cat = (cId) => categories.find(c => c.id === cId);
   return (
     <div className="fade-in" style={{ maxWidth: 900, margin: '0 auto', padding: '36px 24px 60px' }}>
-      <p style={{ color: 'var(--text-3)', fontSize: 13, marginBottom: 24 }}>
-        {results.length > 0 ? S.searchResultsText(results.length, query) : S.noResultsText(query)}
-      </p>
+      <div className="flex items-center justify-between flex-wrap gap-3" style={{ marginBottom: 24 }}>
+        <p style={{ color: 'var(--text-3)', fontSize: 13 }}>
+          {results.length > 0 ? S.searchResultsText(results.length, query) : S.noResultsText(query)}
+        </p>
+        {results.length > 0 && !aiAnswer && (
+          <button onClick={handleGetAnswer} disabled={aiLoading}
+            className="btn-primary flex items-center gap-2 rounded-xl font-semibold"
+            style={{ fontSize: 13, padding: '8px 16px', opacity: aiLoading ? 0.75 : 1 }}>
+            {aiLoading
+              ? <><Icon name="loader" size={14} /> {S.aiSearching}</>
+              : <><Icon name="sparkles" size={14} /> {S.aiGetAnswer}</>}
+          </button>
+        )}
+      </div>
+
+      {/* AI Answer Box */}
+      {(aiAnswer || aiError) && (
+        <div style={{ background: 'linear-gradient(135deg, rgba(210,8,32,0.06), rgba(109,5,80,0.06))', border: '1.5px solid rgba(210,8,32,0.18)', borderRadius: 14, padding: '18px 20px', marginBottom: 24 }}>
+          <div className="flex items-center gap-2" style={{ marginBottom: 10 }}>
+            <Icon name="sparkles" size={15} style={{ color: 'var(--accent)' }} />
+            <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--accent)' }}>{S.aiAnswerTitle}</span>
+            <button onClick={() => { setAiAnswer(null); setAiError(null); }}
+              style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', padding: 0 }}>
+              <Icon name="x" size={14} />
+            </button>
+          </div>
+          {aiError
+            ? <p style={{ color: 'var(--text-2)', fontSize: 13 }}>{aiError}</p>
+            : <>
+                <p style={{ color: 'var(--text-1)', fontSize: 14, lineHeight: 1.7, marginBottom: aiAnswer.sources?.length ? 12 : 0 }}>
+                  {aiAnswer.answer || S.aiNoAnswer}
+                </p>
+                {aiAnswer.sources?.length > 0 && (
+                  <div className="flex items-center flex-wrap gap-2">
+                    <span style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{S.aiSources}:</span>
+                    {aiAnswer.sources.map(id => {
+                      const a = results.find(r => r.id === id);
+                      return a ? (
+                        <button key={id} onClick={() => navigate({ view: 'article', articleId: id, catId: a.catId })}
+                          style={{ fontSize: 12, color: 'var(--accent)', background: 'rgba(210,8,32,0.08)', border: '1px solid rgba(210,8,32,0.2)', borderRadius: 6, padding: '2px 10px', cursor: 'pointer', fontWeight: 500 }}>
+                          {lang === 'bn' ? (a.titleBn || a.title) : a.title}
+                        </button>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+                <p style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 10 }}>{S.aiPoweredBy}</p>
+              </>
+          }
+        </div>
+      )}
+
       {results.length > 0 ? (
         <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 14, overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
           {results.map((a, i) => (
@@ -2036,7 +2144,7 @@ function App() {
       case 'category':   return <CategoryView catId={nav.catId} {...viewProps} />;
       case 'article':    return <ArticleView key={nav.articleId} articleId={nav.articleId} catId={nav.catId} {...viewProps} />;
       case 'videos':     return <VideoLibraryView {...viewProps} />;
-      case 'search':     return <SearchView query={nav.query || ''} {...viewProps} />;
+      case 'search':     return <SearchView query={nav.query || ''} autoAI={nav.autoAI || false} {...viewProps} />;
       default:           return <HomeView {...viewProps} />;
     }
   };
