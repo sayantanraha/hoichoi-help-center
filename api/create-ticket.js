@@ -82,7 +82,6 @@ module.exports = async function handler(req, res) {
           created_by_id:        'hoichoi@nugget.com',
           created_by_client_id: 1,
           priority:             'MEDIUM',
-          userInfo:             { displayName: name, email: email },
         };
 
         nuggetRes = await fetch(NUGGET_URL, {
