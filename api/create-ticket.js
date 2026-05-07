@@ -60,7 +60,7 @@ module.exports = async function handler(req, res) {
       if (CHANNEL_HANDLE) nuggetPayload.channel_handle = CHANNEL_HANDLE;
 
       const nuggetRes = await fetch(
-        'https://api.nugget.com/unifiedsupport/api/v1/ticketing/external/tickets',
+        'https://api.nugget.com/unified-support/api/v1/ticketing/external/tickets',
         {
           method:  'POST',
           headers: {
