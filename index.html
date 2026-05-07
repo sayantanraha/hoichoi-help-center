@@ -110,6 +110,12 @@
   .ai-dot:nth-child(3) { animation-delay: 0.36s; }
   @keyframes aiAnswerIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
   .ai-answer-in { animation: aiAnswerIn 0.4s ease forwards; }
+  @keyframes aiLoaderSpin { to { transform: rotate(360deg); } }
+  @keyframes aiGlowPulse { 0%,100% { opacity:0.35; transform:scale(0.8); } 50% { opacity:1; transform:scale(1.2); } }
+  @keyframes aiScanLine { 0% { transform:translateX(-100%); opacity:0; } 40%,60% { opacity:1; } 100% { transform:translateX(100%); opacity:0; } }
+  .ai-loader-ring { position:absolute; inset:0; border-radius:50%; border:2.5px solid transparent; border-top-color:#d20820; border-right-color:rgba(109,5,80,0.5); animation:aiLoaderSpin 0.95s linear infinite; box-shadow:0 0 16px rgba(210,8,32,0.4); }
+  .ai-hero-input::placeholder { color:rgba(255,255,255,0.28); }
+  .ai-hero-input:focus { border-color:rgba(210,8,32,0.55) !important; box-shadow:0 0 0 3px rgba(210,8,32,0.14) !important; outline:none; }
   /* Responsive article layout */
   .article-grid { display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; max-width: 1100px; margin: 0 auto; padding: 36px 24px 60px; }
   .article-sidebar { position: sticky; top: 80px; display: flex; flex-direction: column; gap: 16px; }
@@ -2079,6 +2085,7 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
 // ── AiAnswerView ──────────────────────────────────────────────────────────────
 const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, categories, chatEnabled = true, ticketEnabled = true }) => {
   const S = STRINGS[lang];
+  const [searchInput, setSearchInput] = useState('');
 
   const articles = useMemo(() => {
     if (!query) return [];
@@ -2091,69 +2098,86 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
   const [aiLoading, setAiLoading] = useState(true);
 
   useEffect(() => {
-    if (!query || articles.length === 0) {
-      setAiLoading(false);
-      setAiError(S.aiNoAnswer);
-      return;
-    }
+    if (!query || articles.length === 0) { setAiLoading(false); setAiError(S.aiNoAnswer); return; }
     let cancelled = false;
     setAiLoading(true); setAiAnswer(null); setAiError(null);
     (async () => {
       try {
-        const topArticles = articles.map(a => ({
-          id: a.id, title: a.title, titleBn: a.titleBn || '',
-          content: (a.content || '').slice(0, 1500),
-        }));
-        const res = await fetch('/api/ai-search', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query, lang, articles: topArticles }),
-        });
+        const topArticles = articles.map(a => ({ id: a.id, title: a.title, titleBn: a.titleBn || '', content: (a.content || '').slice(0, 1500) }));
+        const res  = await fetch('/api/ai-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query, lang, articles: topArticles }) });
         const data = await res.json();
         if (cancelled) return;
         if (!res.ok) throw new Error(data.error || 'AI search failed');
         setAiAnswer(data);
-        db.collection('aiSearchLogs').add({
-          query, lang,
-          inputTokens: data.inputTokens, outputTokens: data.outputTokens, cost: data.cost,
-          timestamp: Date.now(),
-        }).catch(() => {});
-      } catch (err) {
-        if (!cancelled) setAiError(err.message);
-      } finally {
-        if (!cancelled) setAiLoading(false);
-      }
+        db.collection('aiSearchLogs').add({ query, lang, inputTokens: data.inputTokens, outputTokens: data.outputTokens, cost: data.cost, timestamp: Date.now() }).catch(() => {});
+      } catch (err) { if (!cancelled) setAiError(err.message); }
+      finally       { if (!cancelled) setAiLoading(false); }
     })();
     return () => { cancelled = true; };
   }, [query, lang]);
 
+  const handleSearch = (q) => { if (q.trim()) navigate({ view: 'ai-answer', query: q.trim() }); };
+
   return (
-    <div className="fade-in">
-      {/* Dark AI hero */}
-      <div style={{ background: 'linear-gradient(135deg, #0d0117 0%, #150222 50%, #0d0117 100%)', borderBottom: '1px solid rgba(210,8,32,0.2)', padding: '36px 24px 44px' }}>
-        <div style={{ maxWidth: 720, margin: '0 auto' }}>
-          <button onClick={() => navigate({ view: 'home' })}
-            style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, marginBottom: 28 }}>
+    <div>
+      {/* ── Glamour Hero ───────────────────────────────────────────────────── */}
+      <div style={{ position: 'relative', overflow: 'hidden', background: '#080b14', borderBottom: '1px solid rgba(210,8,32,0.18)', padding: '44px 24px 52px' }}>
+
+        {/* Grid overlay */}
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)', backgroundSize: '48px 48px', pointerEvents: 'none' }} />
+
+        {/* Radial glow */}
+        <div style={{ position: 'absolute', top: -120, left: '50%', transform: 'translateX(-50%)', width: 700, height: 400, borderRadius: '50%', background: 'radial-gradient(ellipse,rgba(210,8,32,0.28) 0%,rgba(109,5,80,0.16) 40%,transparent 70%)', filter: 'blur(1px)', pointerEvents: 'none' }} />
+        {/* Side orbs */}
+        <div style={{ position: 'absolute', top: 20, left: '5%', width: 220, height: 220, borderRadius: '50%', background: 'rgba(109,5,80,0.12)', filter: 'blur(55px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -40, right: '8%', width: 260, height: 260, borderRadius: '50%', background: 'rgba(210,8,32,0.1)', filter: 'blur(60px)', pointerEvents: 'none' }} />
+
+        <div style={{ maxWidth: 700, margin: '0 auto', position: 'relative' }}>
+          {/* Back */}
+          <button onClick={() => navigate({ view: 'home' })} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, marginBottom: 32 }}>
             <Icon name="chevronLeft" size={13} /> {S.knowledgeBase}
           </button>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(210,8,32,0.18)', border: '1px solid rgba(210,8,32,0.35)', borderRadius: 999, padding: '4px 14px 4px 10px', fontSize: 12, fontWeight: 600, color: '#f87171', marginBottom: 18, letterSpacing: '0.04em' }}>
-            <Icon name="sparkles" size={12} /> AI Answer
+
+          {/* Badge */}
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'rgba(210,8,32,0.14)', border: '1px solid rgba(210,8,32,0.4)', borderRadius: 999, padding: '5px 16px 5px 11px', fontSize: 11, fontWeight: 700, color: '#fca5a5', marginBottom: 22, letterSpacing: '0.07em', textTransform: 'uppercase', backdropFilter: 'blur(8px)' }}>
+            <Icon name="sparkles" size={11} /> AI Answer
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Your question</p>
-          <h2 style={{ color: '#fff', fontSize: 21, fontWeight: 700, lineHeight: 1.5, margin: 0 }}>"{query}"</h2>
+
+          {/* Query */}
+          <h1 style={{ color: '#fff', fontSize: 30, fontWeight: 800, lineHeight: 1.3, marginBottom: 36, letterSpacing: '-0.4px', textShadow: '0 0 40px rgba(210,8,32,0.35)' }}>
+            {query}
+          </h1>
+
+          {/* Search bar */}
+          <div style={{ position: 'relative', maxWidth: 580 }}>
+            <div style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)', zIndex: 1, pointerEvents: 'none' }}>
+              <Icon name="search" size={16} />
+            </div>
+            <input className="ai-hero-input"
+              value={searchInput}
+              onChange={e => setSearchInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleSearch(searchInput); }}
+              placeholder={S.searchPlaceholder}
+              style={{ width: '100%', height: 50, paddingLeft: 46, paddingRight: 130, borderRadius: 14, border: '1px solid rgba(255,255,255,0.1)', fontSize: 14, color: '#fff', background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)', transition: 'border-color 0.2s, box-shadow 0.2s' }} />
+            <button onClick={() => handleSearch(searchInput)}
+              style={{ position: 'absolute', right: 7, top: '50%', transform: 'translateY(-50%)', background: 'linear-gradient(135deg,#d20820,#6d0550)', color: '#fff', border: 'none', borderRadius: 10, height: 36, paddingInline: 18, fontWeight: 700, fontSize: 12, cursor: 'pointer', boxShadow: '0 2px 12px rgba(210,8,32,0.4)', letterSpacing: '0.03em' }}>
+              {S.aiGetAnswer}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div style={{ maxWidth: 720, margin: '0 auto', padding: '32px 24px 60px' }}>
+      {/* ── Content ──────────────────────────────────────────────────────────── */}
+      <div style={{ maxWidth: 700, margin: '0 auto', padding: '40px 24px 60px' }}>
 
-        {/* Loading state */}
+        {/* Loading */}
         {aiLoading && (
-          <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 16, padding: '40px 24px', textAlign: 'center' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 20 }}>
-              <span className="ai-dot" /><span className="ai-dot" /><span className="ai-dot" />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '64px 24px 56px' }}>
+            <div style={{ position: 'relative', width: 60, height: 60, marginBottom: 32 }}>
+              <div className="ai-loader-ring" />
+              <div style={{ position: 'absolute', inset: 10, borderRadius: '50%', background: 'radial-gradient(circle,rgba(210,8,32,0.35) 0%,transparent 70%)', animation: 'aiGlowPulse 1.6s ease-in-out infinite' }} />
             </div>
-            <p style={{ color: 'var(--text-1)', fontSize: 15, fontWeight: 600, marginBottom: 6 }}>{S.aiSearching}</p>
+            <p style={{ color: 'var(--text-1)', fontSize: 17, fontWeight: 700, marginBottom: 8, letterSpacing: '-0.2px' }}>{S.aiSearching}</p>
             <p style={{ color: 'var(--text-3)', fontSize: 13 }}>Reading through help articles…</p>
           </div>
         )}
@@ -2161,19 +2185,29 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
         {/* Answer */}
         {!aiLoading && aiAnswer && (
           <div className="ai-answer-in">
-            <div style={{ background: 'var(--surface)', border: '1.5px solid rgba(210,8,32,0.2)', borderRadius: 16, padding: '28px', boxShadow: '0 4px 32px rgba(210,8,32,0.07)', marginBottom: 20 }}>
-              <p style={{ color: 'var(--text-1)', fontSize: 15, lineHeight: 1.85, marginBottom: aiAnswer.sources?.length ? 22 : 0 }}>
+            {/* Answer card */}
+            <div style={{ background: 'var(--surface)', borderRadius: 20, padding: '30px 28px', marginBottom: 14, borderTop: '1.5px solid rgba(210,8,32,0.15)', borderRight: '1.5px solid rgba(210,8,32,0.15)', borderBottom: '1.5px solid rgba(210,8,32,0.15)', borderLeft: '4px solid #d20820', boxShadow: '0 8px 48px rgba(210,8,32,0.08), -3px 0 20px rgba(210,8,32,0.12)' }}>
+              {/* Card header */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18, paddingBottom: 16, borderBottom: '1px solid var(--border)' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,rgba(210,8,32,0.15),rgba(109,5,80,0.15))', border: '1px solid rgba(210,8,32,0.25)' }}>
+                  <Icon name="sparkles" size={13} style={{ color: 'var(--accent)' }} />
+                </span>
+                <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-1)' }}>{S.aiAnswerTitle}</span>
+              </div>
+
+              <p style={{ color: 'var(--text-1)', fontSize: 15, lineHeight: 1.9, marginBottom: aiAnswer.sources?.length ? 24 : 0 }}>
                 {aiAnswer.answer || S.aiNoAnswer}
               </p>
+
               {aiAnswer.sources?.length > 0 && (
                 <div>
-                  <p style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>{S.aiSources}</p>
+                  <p style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>{S.aiSources}</p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {aiAnswer.sources.map(id => {
                       const a = articles.find(r => r.id === id) || allArticles.find(r => r.id === id);
                       return a ? (
                         <button key={id} onClick={() => navigate({ view: 'article', articleId: id, catId: a.catId })}
-                          style={{ fontSize: 12, color: 'var(--accent)', background: 'rgba(210,8,32,0.07)', border: '1px solid rgba(210,8,32,0.2)', borderRadius: 8, padding: '5px 14px', cursor: 'pointer', fontWeight: 600 }}>
+                          style={{ fontSize: 12, color: 'var(--accent)', background: 'rgba(210,8,32,0.07)', border: '1px solid rgba(210,8,32,0.22)', borderRadius: 999, padding: '5px 14px', cursor: 'pointer', fontWeight: 600, transition: 'background 0.15s' }}>
                           {lang === 'bn' ? (a.titleBn || a.title) : a.title}
                         </button>
                       ) : null;
@@ -2182,25 +2216,32 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
                 </div>
               )}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginBottom: 36 }}>
-              <p style={{ fontSize: 11, color: 'var(--text-3)' }}>{S.aiPoweredBy}</p>
+
+            {/* Meta row */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginBottom: 44, padding: '4px 4px 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <Icon name="sparkles" size={10} style={{ color: 'var(--text-3)' }} />
+                <span style={{ fontSize: 11, color: 'var(--text-3)' }}>{S.aiPoweredBy}</span>
+              </div>
               <button onClick={() => navigate({ view: 'search', query })}
                 style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 12, cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
                 <Icon name="search" size={12} /> Browse all results
               </button>
             </div>
+
             <SupportBar onOpenTicket={onOpenTicket} lang={lang} chatEnabled={chatEnabled} ticketEnabled={ticketEnabled} />
           </div>
         )}
 
-        {/* Error / no results */}
+        {/* Error */}
         {!aiLoading && aiError && (
           <div className="ai-answer-in">
-            <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 16, padding: '40px 24px', textAlign: 'center', marginBottom: 32 }}>
-              <p style={{ color: 'var(--text-2)', fontSize: 14, marginBottom: 20 }}>{S.aiNoAnswer}</p>
+            <div style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 18, padding: '48px 24px', textAlign: 'center', marginBottom: 36 }}>
+              <Icon name="search" size={32} style={{ color: 'var(--text-3)', marginBottom: 16 }} />
+              <p style={{ color: 'var(--text-2)', fontSize: 15, marginBottom: 24 }}>{S.aiNoAnswer}</p>
               <button onClick={() => navigate({ view: 'search', query })}
                 className="btn-primary flex items-center gap-2 rounded-xl font-semibold"
-                style={{ fontSize: 13, padding: '9px 20px', margin: '0 auto' }}>
+                style={{ fontSize: 13, padding: '10px 22px', margin: '0 auto' }}>
                 <Icon name="search" size={14} /> Browse help articles
               </button>
             </div>
