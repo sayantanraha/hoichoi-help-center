@@ -48,16 +48,15 @@ module.exports = async function handler(req, res) {
         source:               'SOURCE_EMAIL',
         title:                `[${category}] ${subcategory}`,
         description:          descText,
+        email:                email,
+        channel:              3,
         requester_id:         email,
         requester_client_id:  1,
         created_by_id:        email,
         created_by_client_id: 1,
         priority:             'MEDIUM',
-        userInfo:             { phoneNumber: phone },
+        userInfo:             { displayName: name, email: email },
       };
-
-      const CHANNEL_HANDLE = process.env.NUGGET_CHANNEL_HANDLE;
-      if (CHANNEL_HANDLE) nuggetPayload.channel_handle = CHANNEL_HANDLE;
 
       const nuggetRes = await fetch(
         'https://api.nugget.com/unified-support/api/v1/ticketing/external/tickets',
