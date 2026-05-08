@@ -2209,7 +2209,11 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
 const renderAnswer = (text) => {
   if (!text) return null;
   const toBold = (s) => s.replace(/\*\*(.*?)\*\*/g, '<strong style="color:#fff;font-weight:700">$1</strong>');
-  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  // Normalise inline steps: "foo 1. bar 2. baz" → proper newlines
+  const normalised = text
+    .replace(/\s+(\d+[.)]\s)/g, '\n$1')  // split before each "1. " "2) " etc
+    .replace(/\s+(•|-|\*)\s/g, '\n$1 '); // split before inline bullets too
+  const lines = normalised.split('\n').map(l => l.trim()).filter(Boolean);
   const out = [];
   let stepNum = 0;
   let listType = null;
