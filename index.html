@@ -1333,11 +1333,13 @@ const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket, curren
             <span className="topbar-lang-text">{lang === 'en' ? 'বাংলা' : 'English'}</span>
           </button>
 
-          {/* Theme toggle */}
-          <button onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}
-            style={{ background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-2)', flexShrink: 0, transition: 'background 0.15s' }}>
-            <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={15} />
-          </button>
+          {/* Theme toggle — hidden on AI page */}
+          {currentView !== 'ai-answer' && (
+            <button onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}
+              style={{ background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-2)', flexShrink: 0, transition: 'background 0.15s' }}>
+              <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={15} />
+            </button>
+          )}
 
           {/* Raise a Ticket */}
           {ticketEnabled && (
