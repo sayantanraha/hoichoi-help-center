@@ -2063,9 +2063,9 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
     setAiLoading(true);
     setAiError(null);
     try {
-      const topArticles = results.slice(0, 5).map(a => ({
+      const topArticles = results.slice(0, 3).map(a => ({
         id: a.id, title: a.title, titleBn: a.titleBn || '',
-        content: (a.content || '').slice(0, 1500),
+        content: (a.content || '').slice(0, 500),
       }));
       const res = await fetch('/api/ai-search', {
         method: 'POST',
@@ -2205,6 +2205,57 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
 
 // ── App ───────────────────────────────────────────────────────────────────────
 // ── Hash routing helpers ──────────────────────────────────────────────────────
+// ── Answer renderer — parses numbered steps, bullets, bold ───────────────────
+const renderAnswer = (text) => {
+  if (!text) return null;
+  const toBold = (s) => s.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const out = [];
+  let listType = null;
+  let listItems = [];
+
+  const flushList = () => {
+    if (!listItems.length) return;
+    const Tag = listType === 'ol' ? 'ol' : 'ul';
+    out.push(
+      React.createElement(Tag, {
+        key: out.length,
+        style: { paddingLeft: 22, margin: '6px 0 10px', display: 'flex', flexDirection: 'column', gap: 8 }
+      },
+        listItems.map((item, i) =>
+          React.createElement('li', {
+            key: i,
+            style: { color: 'rgba(255,255,255,0.88)', fontSize: 15, lineHeight: 1.75 },
+            dangerouslySetInnerHTML: { __html: toBold(item) }
+          })
+        )
+      )
+    );
+    listItems = []; listType = null;
+  };
+
+  lines.forEach((line, i) => {
+    const numMatch    = line.match(/^(\d+)[.)]\s+(.+)/);
+    const bulletMatch = line.match(/^[•\-\*]\s+(.+)/);
+    if (numMatch) {
+      if (listType && listType !== 'ol') flushList();
+      listType = 'ol'; listItems.push(numMatch[2]);
+    } else if (bulletMatch) {
+      if (listType && listType !== 'ul') flushList();
+      listType = 'ul'; listItems.push(bulletMatch[1]);
+    } else {
+      flushList();
+      out.push(React.createElement('p', {
+        key: i,
+        style: { color: 'rgba(255,255,255,0.82)', fontSize: 15, lineHeight: 1.8, margin: '0 0 8px' },
+        dangerouslySetInnerHTML: { __html: toBold(line) }
+      }));
+    }
+  });
+  flushList();
+  return out;
+};
+
 // ── AiAnswerView ──────────────────────────────────────────────────────────────
 const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, categories, chatEnabled = true, ticketEnabled = true }) => {
   const S = STRINGS[lang];
@@ -2427,9 +2478,9 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
                   <span style={{ marginLeft: 'auto', fontSize: 11, color: 'rgba(255,255,255,0.25)', fontWeight: 500 }}>AI-generated</span>
                 </div>
 
-                <p style={{ color: 'rgba(255,255,255,0.88)', fontSize: 15, lineHeight: 1.9, marginBottom: aiAnswer.sources?.length ? 24 : 0 }}>
-                  {aiAnswer.answer || S.aiNoAnswer}
-                </p>
+                <div style={{ marginBottom: aiAnswer.sources?.length ? 24 : 0 }}>
+                  {renderAnswer(aiAnswer.answer) || <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 15 }}>{S.aiNoAnswer}</p>}
+                </div>
 
                 {aiAnswer.sources?.length > 0 && (
                   <div>
@@ -2439,8 +2490,13 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
                         const a = articles.find(r => r.id === id) || allArticles.find(r => r.id === id);
                         return a ? (
                           <button key={id} onClick={() => navigate({ view: 'article', articleId: id, catId: a.catId })}
-                            style={{ fontSize: 12, color: '#fca5a5', background: 'rgba(229,9,20,0.12)', border: '1px solid rgba(229,9,20,0.3)', borderRadius: 999, padding: '5px 14px', cursor: 'pointer', fontWeight: 600, transition: 'all 0.15s' }}>
+                            className="askai-citation"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 12, color: 'rgba(255,255,255,0.75)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '7px 12px', cursor: 'pointer', fontWeight: 500, transition: 'all 0.15s', backdropFilter: 'blur(8px)' }}
+                            onMouseEnter={e => { e.currentTarget.style.background='rgba(210,8,32,0.15)'; e.currentTarget.style.borderColor='rgba(210,8,32,0.45)'; e.currentTarget.style.color='#fff'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background='rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.12)'; e.currentTarget.style.color='rgba(255,255,255,0.75)'; }}>
+                            <Icon name="fileText" size={11} style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0 }} />
                             {lang === 'bn' ? (a.titleBn || a.title) : a.title}
+                            <Icon name="arrowRight" size={10} style={{ color: 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
                           </button>
                         ) : null;
                       })}
