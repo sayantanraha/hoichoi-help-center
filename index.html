@@ -170,6 +170,34 @@
   .topbar-inner { max-width: 1280px; margin: 0 auto; padding: 0 48px; height: 56px; display: flex; align-items: center; overflow: hidden; position: relative; }
   @media (max-width: 1023px) { .topbar-inner { padding: 0 24px; height: 50px; } }
   @media (max-width: 479px)  { .topbar-inner { padding: 0 16px; } }
+
+  /* ── Mobile fixes ────────────────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    /* Home hero */
+    .hero-gradient { padding: 32px 16px 36px !important; }
+    .hero-inner { padding: 0 !important; }
+    .hero-search-bar { padding: 5px 5px 5px 14px !important; }
+    .search-askai-btn { display: none !important; }
+
+    /* Home categories */
+    .category-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+
+    /* AI page — watermark scale down so it doesn't flood the screen */
+    .askai-watermark { font-size: 140px !important; right: -20px !important; top: 20px !important; }
+
+    /* AI page — hero tighter on mobile */
+    .askai-hero { padding: 32px 16px 24px !important; }
+
+    /* AI page — input form: hide Ask button text, keep icon only */
+    .askai-ask-btn { padding: 10px 14px !important; font-size: 0 !important; }
+    .askai-ask-btn svg { display: block !important; }
+
+    /* AI page — feature cards single column */
+    .askai-caps-grid { grid-template-columns: 1fr !important; }
+
+    /* AI page — suggestion pills wrap tightly */
+    .askai-suggest-row { gap: 6px !important; }
+  }
   /* hoichoi logo — CSS gradient text, no SVG whitespace */
   .topbar-logo { font-family: var(--font-display),-apple-system,BlinkMacSystemFont,sans-serif; font-weight: 900; font-size: 24px; letter-spacing: -0.8px; line-height: 1; white-space: nowrap; background: var(--hc-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; flex-shrink: 0; }
   [data-theme="dark"] .topbar { background: rgba(5,5,6,0.72) !important; backdrop-filter: blur(20px) saturate(140%); -webkit-backdrop-filter: blur(20px) saturate(140%); border-bottom: 1px solid rgba(255,255,255,0.07) !important; }
@@ -1542,7 +1570,7 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
           </h1>
           <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 15, lineHeight: 1.7, maxWidth: 560, margin: '0 auto 24px' }}>Search the knowledge base, browse by topic, or ask our AI — drawn live from every help‑center article, with sources you can click.</p>
           <div ref={searchRef} style={{ position: 'relative', maxWidth: 580, margin: '0 auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.13)', borderRadius: dropdownOpen ? '16px 16px 0 0' : 16, padding: '6px 6px 6px 18px', boxShadow: '0 24px 72px rgba(176,6,15,0.22), 0 1px 0 rgba(255,255,255,0.04) inset', backdropFilter: 'blur(12px)', transition: 'box-shadow 0.2s' }}>
+            <div className="hero-search-bar" style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.13)', borderRadius: dropdownOpen ? '16px 16px 0 0' : 16, padding: '6px 6px 6px 18px', boxShadow: '0 24px 72px rgba(176,6,15,0.22), 0 1px 0 rgba(255,255,255,0.04) inset', backdropFilter: 'blur(12px)', transition: 'box-shadow 0.2s' }}>
               <Icon name="search" size={17} style={{ color: 'rgba(255,255,255,0.4)', flexShrink: 0 }} />
               <input value={query}
                 onChange={e => { setQuery(e.target.value); }}
@@ -1551,7 +1579,7 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
                 placeholder={S.searchPlaceholder}
                 className="ai-hero-input"
                 style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', color: '#fff', fontSize: 15, fontFamily: 'inherit', padding: '14px 12px' }} />
-              <button onClick={() => { if (query.trim()) { setDropdownOpen(false); navigate({ view: 'ai-answer', query }); } }}
+              <button className="search-askai-btn" onClick={() => { if (query.trim()) { setDropdownOpen(false); navigate({ view: 'ai-answer', query }); } }}
                 style={{ background: 'transparent', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, height: 36, paddingInline: 14, fontWeight: 600, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, marginRight: 6, flexShrink: 0 }}>
                 <span style={{ width: 10, height: 10, borderRadius: 999, background: 'conic-gradient(from 0deg, #E50914, #FFD66B, #E50914)', flexShrink: 0 }} />
                 {S.aiGetAnswer}
@@ -2330,7 +2358,7 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
         <div className="aurora-blob aurora-2" style={{ position: 'absolute', width: 550, height: 550, bottom: -180, left: -120, borderRadius: '50%', background: 'radial-gradient(circle, rgba(100,20,60,0.45), transparent 65%)', filter: 'blur(100px)' }} />
         <div className="aurora-blob aurora-3" style={{ position: 'absolute', width: 400, height: 400, top: '45%', right: '15%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(160,40,10,0.3), transparent 65%)', filter: 'blur(90px)' }} />
         {/* Bengali watermark — sits in front of blobs */}
-        <div style={{ position: 'absolute', right: -60, top: 40, fontFamily: "'Noto Sans Bengali', sans-serif", fontWeight: 700, fontSize: 340, color: 'rgba(200,100,40,0.16)', lineHeight: 0.9, pointerEvents: 'none', letterSpacing: '-0.04em' }}>হইচই</div>
+        <div className="askai-watermark" style={{ position: 'absolute', right: -60, top: 40, fontFamily: "'Noto Sans Bengali', sans-serif", fontWeight: 700, fontSize: 340, color: 'rgba(200,100,40,0.16)', lineHeight: 0.9, pointerEvents: 'none', letterSpacing: '-0.04em' }}>হইচই</div>
         {/* Scan lines */}
         <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(180deg, transparent 0 3px, rgba(0,0,0,0.12) 3px 4px)', opacity: 0.5 }} />
         {/* Star dots */}
@@ -2357,7 +2385,7 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
       <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: query ? '40px 24px 28px' : '56px 24px 32px', textAlign: 'center' }}>
+      <div className="askai-hero" style={{ maxWidth: 760, margin: '0 auto', padding: query ? '40px 24px 28px' : '56px 24px 32px', textAlign: 'center' }}>
 
         {/* Back nav — only when answered */}
         {query && (
@@ -2377,14 +2405,14 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
         {/* Headline */}
         {query
           ? <h1 className="stagger-1" style={{ color: '#fff', fontFamily: 'var(--font-display)', fontSize: 'clamp(22px,3.5vw,36px)', fontWeight: 800, lineHeight: 1.25, marginBottom: 28, letterSpacing: '-0.3px' }}>{query}</h1>
-          : <h1 className="stagger-2" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(40px,5vw,64px)', lineHeight: 1.04, letterSpacing: '-0.025em', margin: '0 0 16px', color: '#fff' }}>
+          : <h1 className="stagger-2" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(32px,5vw,64px)', lineHeight: 1.1, letterSpacing: '-0.025em', margin: '0 0 16px', color: '#fff' }}>
               Ask. Anything.
               <br />
               <span style={{ background: 'linear-gradient(90deg, #FFD66B 0%, #d20820 60%, #6d0550 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>About hoichoi.</span>
             </h1>
         }
 
-        {!query && <p className="stagger-3" style={{ fontSize: 17, lineHeight: 1.65, margin: '0 auto 36px', maxWidth: 560, color: 'rgba(255,255,255,0.7)' }}>Get instant answers about your account, subscription, devices and streaming — drawn live from our help center.</p>}
+        {!query && <p className="stagger-3" style={{ fontSize: 'clamp(14px,2.5vw,17px)', lineHeight: 1.65, margin: '0 auto 28px', maxWidth: 560, color: 'rgba(255,255,255,0.7)' }}>Get instant answers about your account, subscription, devices and streaming — drawn live from our help center.</p>}
 
         {/* PromptInput — matching design's glowing shell with embedded AIOrb */}
         <form className="stagger-4" onSubmit={(e) => { e.preventDefault(); handleSearch(searchInput); }}
@@ -2403,7 +2431,7 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
             onChange={e => setSearchInput(e.target.value)}
             placeholder="Ask anything about hoichoi…"
             style={{ flex: 1, border: 0, outline: 0, background: 'transparent', color: '#fff', fontWeight: 500, fontSize: query ? 16 : 18, padding: query ? '14px 14px' : '20px 14px' }} />
-          <button type="submit"
+          <button type="submit" className="askai-ask-btn"
             style={{ background: 'var(--hc-gradient)', color: '#fff', border: 0, borderRadius: 14, padding: '12px 22px', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 8px 18px rgba(210,8,32,.45), inset 0 1px 0 rgba(255,255,255,.18)', display: 'flex', gap: 8, alignItems: 'center', whiteSpace: 'nowrap', flexShrink: 0 }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 14 0"/><path d="m13 6 6 6-6 6"/></svg>
             Ask
@@ -2416,7 +2444,7 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
         <div className="stagger-5" style={{ maxWidth: 760, margin: '0 auto', padding: '8px 24px 80px' }}>
           <div style={{ textAlign: 'center', marginBottom: 28 }}>
             <div style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 700, color: 'rgba(255,255,255,0.55)', marginBottom: 14 }}>Try asking</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center' }}>
+            <div className="askai-suggest-row" style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center' }}>
               {['How do I reset my password?', 'Cancel auto-renewal', 'OTP not received', 'Devices limit'].map(s => (
                 <button key={s} onClick={() => handleSearch(s)} className="hc-quick-pill"
                   style={{ padding: '9px 16px', borderRadius: 999, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.88)', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>
@@ -2426,7 +2454,7 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
             </div>
           </div>
           {/* Feature cards (CapsRow) */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
+          <div className="askai-caps-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
             {[
               { icon: 'eye',      title: 'Reads every article',   text: `Indexed across ${allArticles.length > 0 ? allArticles.length.toLocaleString() : '—'} help-center articles in real time.` },
               { icon: 'check',    title: 'Sources every answer',  text: 'Click a source pill to jump straight to the original article.' },
