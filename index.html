@@ -2205,32 +2205,55 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
 
 // ── App ───────────────────────────────────────────────────────────────────────
 // ── Hash routing helpers ──────────────────────────────────────────────────────
-// ── Answer renderer — parses numbered steps, bullets, bold ───────────────────
+// ── Answer renderer — styled steps, bullets, bold ────────────────────────────
 const renderAnswer = (text) => {
   if (!text) return null;
-  const toBold = (s) => s.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  const toBold = (s) => s.replace(/\*\*(.*?)\*\*/g, '<strong style="color:#fff;font-weight:700">$1</strong>');
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
   const out = [];
+  let stepNum = 0;
   let listType = null;
   let listItems = [];
 
   const flushList = () => {
     if (!listItems.length) return;
-    const Tag = listType === 'ol' ? 'ol' : 'ul';
-    out.push(
-      React.createElement(Tag, {
-        key: out.length,
-        style: { paddingLeft: 22, margin: '6px 0 10px', display: 'flex', flexDirection: 'column', gap: 8 }
-      },
-        listItems.map((item, i) =>
-          React.createElement('li', {
-            key: i,
-            style: { color: 'rgba(255,255,255,0.88)', fontSize: 15, lineHeight: 1.75 },
-            dangerouslySetInnerHTML: { __html: toBold(item) }
-          })
+    if (listType === 'ol') {
+      out.push(
+        React.createElement('div', { key: `ol-${out.length}`, style: { display: 'flex', flexDirection: 'column', gap: 10, margin: '10px 0 14px' } },
+          listItems.map((item, i) =>
+            React.createElement('div', { key: i, style: { display: 'flex', gap: 12, alignItems: 'flex-start' } },
+              React.createElement('div', {
+                style: { width: 26, height: 26, borderRadius: '50%', flexShrink: 0, marginTop: 1,
+                  background: 'linear-gradient(135deg, #d20820, #6d0550)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 11, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px' }
+              }, i + 1),
+              React.createElement('span', {
+                style: { color: 'rgba(255,255,255,0.88)', fontSize: 15, lineHeight: 1.75, paddingTop: 3 },
+                dangerouslySetInnerHTML: { __html: toBold(item) }
+              })
+            )
+          )
         )
-      )
-    );
+      );
+    } else {
+      out.push(
+        React.createElement('div', { key: `ul-${out.length}`, style: { display: 'flex', flexDirection: 'column', gap: 8, margin: '8px 0 12px' } },
+          listItems.map((item, i) =>
+            React.createElement('div', { key: i, style: { display: 'flex', gap: 10, alignItems: 'flex-start' } },
+              React.createElement('div', {
+                style: { width: 6, height: 6, borderRadius: '50%', flexShrink: 0, marginTop: 8,
+                  background: 'linear-gradient(135deg, #d20820, #6d0550)' }
+              }),
+              React.createElement('span', {
+                style: { color: 'rgba(255,255,255,0.88)', fontSize: 15, lineHeight: 1.75 },
+                dangerouslySetInnerHTML: { __html: toBold(item) }
+              })
+            )
+          )
+        )
+      );
+    }
     listItems = []; listType = null;
   };
 
@@ -2246,8 +2269,8 @@ const renderAnswer = (text) => {
     } else {
       flushList();
       out.push(React.createElement('p', {
-        key: i,
-        style: { color: 'rgba(255,255,255,0.82)', fontSize: 15, lineHeight: 1.8, margin: '0 0 8px' },
+        key: `p-${i}`,
+        style: { color: 'rgba(255,255,255,0.65)', fontSize: 14, lineHeight: 1.75, margin: '0 0 10px', fontStyle: 'normal' },
         dangerouslySetInnerHTML: { __html: toBold(line) }
       }));
     }
@@ -2491,12 +2514,12 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
                         return a ? (
                           <button key={id} onClick={() => navigate({ view: 'article', articleId: id, catId: a.catId })}
                             className="askai-citation"
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 12, color: 'rgba(255,255,255,0.75)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '7px 12px', cursor: 'pointer', fontWeight: 500, transition: 'all 0.15s', backdropFilter: 'blur(8px)' }}
-                            onMouseEnter={e => { e.currentTarget.style.background='rgba(210,8,32,0.15)'; e.currentTarget.style.borderColor='rgba(210,8,32,0.45)'; e.currentTarget.style.color='#fff'; }}
-                            onMouseLeave={e => { e.currentTarget.style.background='rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.12)'; e.currentTarget.style.color='rgba(255,255,255,0.75)'; }}>
-                            <Icon name="fileText" size={11} style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0 }} />
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 12, color: 'rgba(255,255,255,0.78)', background: 'linear-gradient(rgba(20,12,14,0.9), rgba(20,12,14,0.9)) padding-box, linear-gradient(135deg, rgba(210,8,32,0.55), rgba(109,5,80,0.45)) border-box', border: '1px solid transparent', borderRadius: 8, padding: '7px 13px', cursor: 'pointer', fontWeight: 500, transition: 'all 0.18s' }}
+                            onMouseEnter={e => { e.currentTarget.style.background='linear-gradient(rgba(210,8,32,0.12),rgba(109,5,80,0.08)) padding-box, linear-gradient(135deg,#d20820,#6d0550) border-box'; e.currentTarget.style.color='#fff'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background='linear-gradient(rgba(20,12,14,0.9),rgba(20,12,14,0.9)) padding-box, linear-gradient(135deg,rgba(210,8,32,0.55),rgba(109,5,80,0.45)) border-box'; e.currentTarget.style.color='rgba(255,255,255,0.78)'; }}>
+                            <Icon name="fileText" size={11} style={{ color: 'rgba(210,8,32,0.7)', flexShrink: 0 }} />
                             {lang === 'bn' ? (a.titleBn || a.title) : a.title}
-                            <Icon name="arrowRight" size={10} style={{ color: 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
+                            <Icon name="arrowRight" size={10} style={{ color: 'rgba(255,255,255,0.3)', flexShrink: 0 }} />
                           </button>
                         ) : null;
                       })}
