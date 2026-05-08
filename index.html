@@ -188,9 +188,12 @@
     /* AI page — hero tighter on mobile */
     .askai-hero { padding: 32px 16px 24px !important; }
 
-    /* AI page — input form: hide Ask button text, keep icon only */
-    .askai-ask-btn { padding: 10px 14px !important; font-size: 0 !important; }
-    .askai-ask-btn svg { display: block !important; }
+    /* AI page — Ask button: compact on mobile, hide label keep icon */
+    .askai-ask-btn { padding: 10px 12px !important; }
+    .askai-ask-label { display: none !important; }
+    /* Home search button: icon only on mobile */
+    .home-search-btn { padding: 0 !important; width: 40px !important; height: 40px !important; justify-content: center !important; }
+    .home-search-btn-label { display: none !important; }
 
     /* AI page — feature cards single column */
     .askai-caps-grid { grid-template-columns: 1fr !important; }
@@ -1578,15 +1581,17 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
                 onFocus={() => liveResults.length > 0 && setDropdownOpen(true)}
                 placeholder={S.searchPlaceholder}
                 className="ai-hero-input"
+                enterKeyHint="search"
                 style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', color: '#fff', fontSize: 15, fontFamily: 'inherit', padding: '14px 12px' }} />
               <button className="search-askai-btn" onClick={() => { if (query.trim()) { setDropdownOpen(false); navigate({ view: 'ai-answer', query }); } }}
                 style={{ background: 'transparent', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, height: 36, paddingInline: 14, fontWeight: 600, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, marginRight: 6, flexShrink: 0 }}>
                 <span style={{ width: 10, height: 10, borderRadius: 999, background: 'conic-gradient(from 0deg, #E50914, #FFD66B, #E50914)', flexShrink: 0 }} />
                 {S.aiGetAnswer}
               </button>
-              <button onClick={() => { if (query.trim()) { setDropdownOpen(false); navigate({ view: 'search', query }); } }}
-                style={{ background: 'var(--hc-gradient)', color: '#fff', border: 'none', borderRadius: 12, height: 40, paddingInline: 20, fontWeight: 700, fontSize: 13, cursor: 'pointer', boxShadow: '0 6px 18px rgba(229,9,20,0.4)', flexShrink: 0 }}>
-                {S.searchBtn}
+              <button className="home-search-btn" onClick={() => { if (query.trim()) { setDropdownOpen(false); navigate({ view: 'search', query }); } }}
+                style={{ background: 'var(--hc-gradient)', color: '#fff', border: 'none', borderRadius: 12, height: 40, paddingInline: 20, fontWeight: 700, fontSize: 13, cursor: 'pointer', boxShadow: '0 6px 18px rgba(229,9,20,0.4)', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <svg className="home-search-btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span className="home-search-btn-label">{S.searchBtn}</span>
               </button>
             </div>
             {dropdownOpen && (
@@ -2430,11 +2435,12 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
             value={searchInput}
             onChange={e => setSearchInput(e.target.value)}
             placeholder="Ask anything about hoichoi…"
+            enterKeyHint="search"
             style={{ flex: 1, border: 0, outline: 0, background: 'transparent', color: '#fff', fontWeight: 500, fontSize: query ? 16 : 18, padding: query ? '14px 14px' : '20px 14px' }} />
           <button type="submit" className="askai-ask-btn"
             style={{ background: 'var(--hc-gradient)', color: '#fff', border: 0, borderRadius: 14, padding: '12px 22px', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 8px 18px rgba(210,8,32,.45), inset 0 1px 0 rgba(255,255,255,.18)', display: 'flex', gap: 8, alignItems: 'center', whiteSpace: 'nowrap', flexShrink: 0 }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 14 0"/><path d="m13 6 6 6-6 6"/></svg>
-            Ask
+            <span className="askai-ask-label">Ask</span>
           </button>
         </form>
       </div>
