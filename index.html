@@ -377,17 +377,44 @@ const firebaseConfig = {
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ── Nugget Chat ───────────────────────────────────────────────────────────────
-// Wire up the Nugget SDK here once you have the embed snippet.
-// Replace the alert with: window.NuggetChat?.open() or equivalent SDK call.
-function openNuggetChat() {
-  if (window.NuggetChat) {
-    window.NuggetChat.showWidget();
-    window.NuggetChat.open();
+// ── Chat with Us ──────────────────────────────────────────────────────────────
+// Detects whether the page is running inside a native app WebView.
+// Priority: 1) ?source=app URL param  2) Android WebView UA  3) iOS WKWebView UA
+function isNativeWebView() {
+  try {
+    if (new URLSearchParams(window.location.search).get('source') === 'app') return true;
+    var ua = navigator.userAgent;
+    var isAndroidWV = /Android/.test(ua) && /wv/.test(ua);
+    var isIOSWV     = /iPhone|iPad|iPod/.test(ua) && !/Safari/.test(ua);
+    return isAndroidWV || isIOSWV;
+  } catch(_) { return false; }
+}
+
+// Called when user taps "Chat with Us"
+// • WebView  → signals the native app to open its chat SDK
+// • Browser  → opens WhatsApp with a pre-filled message
+function openChatWithUs() {
+  if (isNativeWebView()) {
+    // Try React Native bridge first, then Android JS interface, then URL scheme
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(JSON.stringify({ action: 'open_chat' }));
+    } else if (window.HoichoiApp && typeof window.HoichoiApp.openChat === 'function') {
+      window.HoichoiApp.openChat();
+    } else {
+      // Universal fallback — native app intercepts this URL scheme
+      window.location.href = 'hoichoi://open_chat';
+    }
   } else {
-    alert('Chat coming soon — please raise a ticket or email support@hoichoi.tv');
+    // Web browser → WhatsApp
+    window.open(
+      'https://wa.me/916293666600?text=' + encodeURIComponent('Hi, I need help'),
+      '_blank', 'noopener,noreferrer'
+    );
   }
 }
+
+// Keep openNuggetChat as an alias for when the SDK is re-enabled
+function openNuggetChat() { openChatWithUs(); }
 
 // ── KB Data ───────────────────────────────────────────────────────────────────
 const CATEGORIES = [
