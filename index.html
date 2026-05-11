@@ -2109,9 +2109,7 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
       if (!res.ok) throw new Error(data.error || 'AI search failed');
       setAiAnswer(data);
       // Log to Firestore for cost tracking
-      const logPayload = { query, lang, inputTokens: data.inputTokens, outputTokens: data.outputTokens, cost: data.cost, timestamp: Date.now() };
-      console.log('[aiSearchLogs] writing:', logPayload);
-      db.collection('aiSearchLogs').add(logPayload).catch(e => console.error('aiSearchLogs write failed:', e));
+      db.collection('aiSearchLogs').add({ query, lang, inputTokens: data.inputTokens, outputTokens: data.outputTokens, cost: data.cost, timestamp: Date.now() }).catch(e => console.error('aiSearchLogs write failed:', e));
     } catch (err) {
       setAiError(err.message);
     } finally {
