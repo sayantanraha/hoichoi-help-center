@@ -416,6 +416,32 @@ function openChatWithUs() {
 // Keep openNuggetChat as an alias for when the SDK is re-enabled
 function openNuggetChat() { openChatWithUs(); }
 
+// ── Support Event Analytics ───────────────────────────────────────────────────
+function getAnalyticsSid() {
+  var k = 'hc_analytics_sid', sid = sessionStorage.getItem(k);
+  if (!sid) { sid = Date.now().toString(36) + Math.random().toString(36).slice(2); sessionStorage.setItem(k, sid); }
+  return sid;
+}
+function markSessionSearched() {
+  sessionStorage.setItem('hc_has_searched', '1');
+}
+function logSupportEvent(action, articleId, articleTitle, lang) {
+  try {
+    var hasSearched = sessionStorage.getItem('hc_has_searched') === '1';
+    var context = articleId ? 'post_article' : (hasSearched ? 'post_search' : 'direct');
+    db.collection('supportEvents').add({
+      action:        action,         // 'chat' | 'ticket'
+      context:       context,        // 'direct' | 'post_search' | 'post_article'
+      articleId:     articleId    || null,
+      articleTitle:  articleTitle || null,
+      searchedFirst: hasSearched,
+      sessionId:     getAnalyticsSid(),
+      lang:          lang || 'en',
+      timestamp:     Date.now(),
+    }).catch(function(){});
+  } catch(_) {}
+}
+
 // ── KB Data ───────────────────────────────────────────────────────────────────
 const CATEGORIES = [
   { id: 'account',   icon: 'user',          label: 'Account & Login',          labelBn: 'অ্যাকাউন্ট ও লগইন',         count: 12, color: '#3B82F6' },
@@ -857,7 +883,7 @@ const Icon = ({ name, size = 16, style = {}, className = '' }) => {
 };
 
 // ── Support CTA Bar ───────────────────────────────────────────────────────────
-const SupportBar = ({ compact = false, onOpenTicket, lang = 'en', chatEnabled = true, ticketEnabled = true }) => {
+const SupportBar = ({ compact = false, onOpenTicket, lang = 'en', chatEnabled = true, ticketEnabled = true, articleId = null, articleTitle = null }) => {
   const S = STRINGS[lang];
   if (!chatEnabled && !ticketEnabled) return null;
   return (
@@ -869,14 +895,14 @@ const SupportBar = ({ compact = false, onOpenTicket, lang = 'en', chatEnabled = 
     </div>
     <div className="support-bar-btns">
       {chatEnabled && (
-        <button onClick={openNuggetChat}
+        <button onClick={() => { logSupportEvent('chat', articleId, articleTitle, lang); openChatWithUs(); }}
           className="btn-ghost flex items-center gap-2 rounded-lg"
           style={{ fontSize: 13, padding: '8px 16px' }}>
           <Icon name="chat" size={15} /> {S.chatWithUs}
         </button>
       )}
       {ticketEnabled && (
-        <button onClick={onOpenTicket}
+        <button onClick={() => { logSupportEvent('ticket', articleId, articleTitle, lang); onOpenTicket(); }}
           className="btn-primary flex items-center gap-2 rounded-lg"
           style={{ fontSize: 13, padding: '8px 16px' }}>
           <Icon name="ticket" size={15} /> {S.raiseTicket}
@@ -1403,7 +1429,7 @@ const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket, curren
 
           {/* Raise a Ticket */}
           {ticketEnabled && (
-          <button onClick={onOpenTicket}
+          <button onClick={() => { logSupportEvent('ticket', null, null, lang); onOpenTicket(); }}
             className="btn-primary topbar-ticket"
             style={{ alignItems: 'center', gap: 6, fontSize: 13, height: 36, padding: '0 16px', borderRadius: 8, fontWeight: 600, flexShrink: 0 }}>
             <Icon name="ticket" size={14} />
@@ -2017,12 +2043,12 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
           <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 14, marginBottom: 6 }}>{S.needMoreHelp}</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {chatEnabled && (
-              <button onClick={openNuggetChat} className="btn-ghost flex items-center justify-center gap-2 rounded-lg w-full" style={{ padding: '8px 12px', fontSize: 13 }}>
+              <button onClick={() => { logSupportEvent('chat', articleId, title, lang); openChatWithUs(); }} className="btn-ghost flex items-center justify-center gap-2 rounded-lg w-full" style={{ padding: '8px 12px', fontSize: 13 }}>
                 <Icon name="chat" size={14} /> {S.chatWithUs}
               </button>
             )}
             {ticketEnabled && (
-              <button onClick={onOpenTicket} className="btn-primary flex items-center justify-center gap-2 rounded-lg w-full" style={{ padding: '8px 12px', fontSize: 13 }}>
+              <button onClick={() => { logSupportEvent('ticket', articleId, title, lang); onOpenTicket(); }} className="btn-primary flex items-center justify-center gap-2 rounded-lg w-full" style={{ padding: '8px 12px', fontSize: 13 }}>
                 <Icon name="ticket" size={14} /> {S.raiseTicket}
               </button>
             )}
@@ -2135,7 +2161,7 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'AI search failed');
       setAiAnswer(data);
-      // Log to Firestore for cost tracking
+      markSessionSearched();
       db.collection('aiSearchLogs').add({ query, lang, inputTokens: data.inputTokens, outputTokens: data.outputTokens, cost: data.cost, timestamp: Date.now() }).catch(e => console.error('aiSearchLogs write failed:', e));
     } catch (err) {
       setAiError(err.message);
@@ -2148,6 +2174,7 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
   useEffect(() => {
     if (!query || query.trim().length < 2) return;
     const t = setTimeout(() => {
+      markSessionSearched();
       db.collection('searchLogs').add({
         query: query.trim().toLowerCase(),
         hasResults: results.length > 0,
@@ -2361,6 +2388,7 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
         if (cancelled) return;
         if (!res.ok) throw new Error(data.error || 'AI search failed');
         setAiAnswer(data);
+        markSessionSearched();
         db.collection('aiSearchLogs').add({ query, lang, inputTokens: data.inputTokens, outputTokens: data.outputTokens, cost: data.cost, timestamp: Date.now() }).catch(e => console.error('aiSearchLogs write failed:', e));
       } catch (err) { if (!cancelled) setAiError(err.message); }
       finally       { if (!cancelled) setAiLoading(false); }
