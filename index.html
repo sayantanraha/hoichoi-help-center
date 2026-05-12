@@ -441,6 +441,23 @@ function logSupportEvent(action, articleId, articleTitle, lang) {
     }).catch(function(){});
   } catch(_) {}
 }
+function logSessionStart(lang) {
+  // Fire once per browser session — gives us the total session denominator for deflection rate
+  if (sessionStorage.getItem('hc_session_logged')) return;
+  sessionStorage.setItem('hc_session_logged', '1');
+  try {
+    db.collection('supportEvents').add({
+      action:    'session_start',
+      context:   null,
+      articleId: null,
+      articleTitle: null,
+      searchedFirst: false,
+      sessionId: getAnalyticsSid(),
+      lang:      lang || 'en',
+      timestamp: Date.now(),
+    }).catch(function(){});
+  } catch(_) {}
+}
 
 // ── KB Data ───────────────────────────────────────────────────────────────────
 const CATEGORIES = [
@@ -2705,6 +2722,9 @@ function App() {
       })
       .catch(() => {});
   }, []);
+
+  // Log session start once per browser session — enables deflection rate calculation
+  useEffect(() => { logSessionStart(lang); }, []);
 
   useEffect(() => { document.documentElement.setAttribute('data-theme', theme); }, [theme]);
   useEffect(() => {
