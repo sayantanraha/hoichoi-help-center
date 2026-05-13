@@ -10,6 +10,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@600;700;800&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet" />
 
 <!-- ── Nugget Chat SDK ─────────────────────────────────────────────────────────
@@ -1505,15 +1506,20 @@ const Topbar = ({ theme, setTheme, lang, setLang, navigate, onOpenTicket, curren
 };
 
 // ── Content renderer ──────────────────────────────────────────────────────────
-const inlineHtml = (line) =>
+const _purify = (html) => (typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(html, { USE_PROFILES: { html: true } }) : html);
+
+const inlineHtml = (line) => _purify(
   line
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, txt, href) => {
       const isExternal = /^https?:\/\//.test(href);
+      // Block non-http(s) schemes (javascript:, data:, vbscript:, etc.)
+      if (!isExternal && !/^#/.test(href)) return txt;
       const url = isExternal ? href : `#article/${href}/`;
       const attrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
       return `<a href="${url}"${attrs} style="color:var(--accent);text-decoration:underline;text-underline-offset:3px;font-weight:500">${txt}</a>`;
-    });
+    })
+);
 
 const renderContent = (text) => {
   if (!text) return <p style={{ color: 'var(--text-2)' }}>Article content coming soon.</p>;
@@ -2320,7 +2326,7 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
 // ── Answer renderer — styled steps, bullets, bold ────────────────────────────
 const renderAnswer = (text) => {
   if (!text) return null;
-  const toBold = (s) => s.replace(/\*\*(.*?)\*\*/g, '<strong style="color:#fff;font-weight:700">$1</strong>');
+  const toBold = (s) => _purify(s.replace(/\*\*(.*?)\*\*/g, '<strong style="color:#fff;font-weight:700">$1</strong>'));
   // Normalise inline steps: "foo 1. bar 2. baz" → proper newlines
   const normalised = text
     .replace(/\s+(\d+[.)]\s)/g, '\n$1')  // split before each "1. " "2) " etc
