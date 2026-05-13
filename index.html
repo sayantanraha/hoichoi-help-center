@@ -41,7 +41,7 @@
     --topbar-bg: transparent; --hover: rgba(255,255,255,0.05);
     --shadow: 0 1px 4px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
     --shadow-md: 0 4px 24px rgba(0,0,0,0.5); --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
-    --accent: #d44060; --accent2: #a82840;
+    --accent: #ff3347; --accent2: #d20820;
   }
   * { font-family: 'Inter', sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
   html { overscroll-behavior: none; }
@@ -1791,30 +1791,33 @@ const HomeView = ({ navigate, lang, onOpenTicket, allArticles, popularArticles, 
                 {liveResults.length === 0 && query.trim().length >= 2 && (
                   <a href={`https://hoichoi.tv/search?search=${encodeURIComponent(query)}`} target="_blank" rel="noopener noreferrer"
                     className="search-dropdown-item"
-                    style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', background: 'linear-gradient(90deg, rgba(210,8,32,0.08) 0%, rgba(109,5,80,0.05) 100%)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                    style={{ padding: '13px 16px 13px 13px', display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', background: 'linear-gradient(135deg, rgba(210,8,32,0.14) 0%, rgba(109,5,80,0.09) 100%)', borderLeft: '3px solid #d20820', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
                     onMouseDown={e => { e.preventDefault(); setDropdownOpen(false); window.open(`https://hoichoi.tv/search?search=${encodeURIComponent(query)}`, '_blank', 'noopener,noreferrer'); }}>
-                    <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--hc-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 13, fontWeight: 800, color: '#fff' }}>h</div>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #d20820, #6d0550)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 17, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', boxShadow: '0 4px 14px rgba(210,8,32,0.5)' }}>h</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>{S.contentRedirectHeading}</div>
-                      <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.9)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{S.contentRedirectText(query)}</div>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>{S.contentRedirectHeading}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'baseline', gap: 5, overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                        <span style={{ background: 'linear-gradient(90deg,#ff6b7a,#ff3347)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '55%', flexShrink: 1 }}>"{query}"</span>
+                        <span style={{ color: 'rgba(255,255,255,0.65)', fontSize: 13, fontWeight: 500, flexShrink: 0 }}>{lang === 'bn' ? 'hoichoi.tv-তে খুঁজুন' : 'on hoichoi.tv'}</span>
+                      </div>
                     </div>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    <div style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 999, background: 'rgba(210,8,32,0.18)', border: '1px solid rgba(210,8,32,0.35)', color: '#ff7a8a', fontSize: 11, fontWeight: 700, letterSpacing: '0.02em', whiteSpace: 'nowrap' }}>Open ↗</div>
                   </a>
                 )}
                 {query.trim().length >= 2 && (
                   <div className="search-dropdown-item"
-                    style={{ padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, borderTop: '1px solid #E4E8F0' }}
+                    style={{ padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, borderTop: '1px solid rgba(255,255,255,0.07)' }}
                     onMouseDown={() => { setDropdownOpen(false); navigate({ view: 'search', query }); }}>
-                    <Icon name="search" size={13} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-                    <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 500 }}>{S.seeAllResultsFor} "{query}" {liveResults.length > 0 ? `(${liveResults.length})` : ''}</span>
+                    <Icon name="search" size={13} style={{ color: '#ff5266', flexShrink: 0 }} />
+                    <span style={{ fontSize: 13, color: '#ff5266', fontWeight: 500 }}>{S.seeAllResultsFor} "{query}" {liveResults.length > 0 ? `(${liveResults.length})` : ''}</span>
                   </div>
                 )}
                 {query.trim().length >= 2 && (
                   <div className="search-dropdown-item"
-                    style={{ padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, borderTop: '1px solid #E4E8F0', background: 'linear-gradient(90deg, rgba(210,8,32,0.06) 0%, rgba(109,5,80,0.04) 100%)' }}
+                    style={{ padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, borderTop: '1px solid rgba(255,255,255,0.07)', background: 'linear-gradient(90deg, rgba(210,8,32,0.07) 0%, rgba(109,5,80,0.04) 100%)' }}
                     onMouseDown={() => { setDropdownOpen(false); navigate({ view: 'ai-answer', query }); }}>
-                    <Icon name="sparkles" size={13} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-                    <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 700, letterSpacing: '0.01em' }}>{S.aiGetAnswer}</span>
+                    <Icon name="sparkles" size={13} style={{ color: '#ff5266', flexShrink: 0 }} />
+                    <span style={{ fontSize: 13, color: '#ff5266', fontWeight: 700, letterSpacing: '0.01em' }}>{S.aiGetAnswer}</span>
                   </div>
                 )}
               </div>
