@@ -10,7 +10,7 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   if (!checkSecret(req, res)) return;
-  if (!rateLimit(req, res, 30, 5 * 60 * 1000)) return; // 30 req / 5 min per IP
+  if (!rateLimit(req, res, 120, 5 * 60 * 1000)) return; // 120 req / 5 min per IP (generous for CGNAT)
 
   const { query, lang = 'en', articles = [] } = req.body || {};
   if (!query || query.trim().length < 3)              return res.status(400).json({ error: 'Query too short' });
