@@ -340,6 +340,7 @@ async function fetchNuggetToken() {
   var cached = sessionStorage.getItem('hc_nugget_token');
   if (cached) return cached;
   var res = await fetch('/api/nugget-token?uid=' + encodeURIComponent(uid), { headers: { 'X-HC-Secret': window.__HC_SECRET__ || '' } });
+  if (!res.ok && window._logApiError) window._logApiError('/api/nugget-token', res.status, 'Token fetch failed');
   var data = await res.json();
   if (data.accessToken) {
     sessionStorage.setItem('hc_nugget_token', data.accessToken);
@@ -370,6 +371,84 @@ NuggetChat.hideWidget();
   ──────────────────────────────────────────────────────────────────────────── -->
 <script>window.__HC_SECRET__ = '747a822f800884bb81624efbe1fe614a838d31ff4f1406a4';</script>
 
+<!-- ── Client-side Error Monitor ───────────────────────────────────────────────
+  Catches JS errors, unhandled promise rejections, and API failures.
+  Logs to Firestore clientErrors collection (max 20 per session, deduped).
+  ──────────────────────────────────────────────────────────────────────────── -->
+<script>
+(function() {
+  var SESSION_LIMIT = 20;
+  var _errCount = 0;
+  var _loggedMsgs = {};   // dedupe within session: msg → true
+  var _ready = false;     // db available after Firebase init
+  var _queue = [];        // buffer errors that arrive before db is ready
+
+  function simplifyUA() {
+    var ua = navigator.userAgent;
+    var os  = /Android/.test(ua) ? 'Android' : /iPhone|iPad|iPod/.test(ua) ? 'iOS' : /Windows/.test(ua) ? 'Windows' : /Mac/.test(ua) ? 'Mac' : /Linux/.test(ua) ? 'Linux' : 'Unknown';
+    var br  = /EdgA?\//.test(ua) ? 'Edge' : /OPR\/|Opera/.test(ua) ? 'Opera' : /SamsungBrowser/.test(ua) ? 'Samsung' : /Chrome\//.test(ua) ? 'Chrome' : /Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : 'Other';
+    return br + ' / ' + os;
+  }
+
+  function writeError(payload) {
+    if (_errCount >= SESSION_LIMIT) return;
+    var key = payload.type + '|' + payload.message.slice(0, 80);
+    if (_loggedMsgs[key]) return; // same error already logged this session
+    _loggedMsgs[key] = true;
+    _errCount++;
+    payload.browser    = simplifyUA();
+    payload.sessionId  = (sessionStorage.getItem('hc_analytics_sid') || 'unknown');
+    payload.url        = window.location.hash || '/';
+    payload.timestamp  = Date.now();
+    if (_ready && window._hcDb) {
+      window._hcDb.collection('clientErrors').add(payload).catch(function(){});
+    } else {
+      _queue.push(payload);
+    }
+  }
+
+  // Flush queue once Firebase is ready
+  window._hcFlushErrorQueue = function(db) {
+    _ready = true;
+    window._hcDb = db;
+    _queue.splice(0).forEach(function(p) {
+      db.collection('clientErrors').add(p).catch(function(){});
+    });
+  };
+
+  // JS errors
+  window.onerror = function(msg, src, line, col, err) {
+    if (!msg || String(msg).indexOf('Script error') > -1) return false; // cross-origin noise
+    writeError({
+      type:    'js_error',
+      message: String(msg).slice(0, 300),
+      source:  (src || '').replace(/.*\//, '') + (line ? ':' + line : ''),
+    });
+    return false;
+  };
+
+  // Unhandled promise rejections
+  window.addEventListener('unhandledrejection', function(e) {
+    var msg = (e.reason && e.reason.message) ? e.reason.message : String(e.reason || 'Unhandled rejection');
+    writeError({
+      type:    'promise_rejection',
+      message: msg.slice(0, 300),
+      source:  '',
+    });
+  });
+
+  // Expose log function for API errors
+  window._logApiError = function(endpoint, status, message) {
+    writeError({
+      type:     'api_error',
+      message:  (message || 'HTTP ' + status).slice(0, 300),
+      source:   endpoint,
+      status:   status || 0,
+    });
+  };
+})();
+</script>
+
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
@@ -391,6 +470,8 @@ const firebaseConfig = {
 };
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+// Make db available to the error monitor and flush any queued errors
+if (window._hcFlushErrorQueue) window._hcFlushErrorQueue(db);
 
 // ── Chat with Us ──────────────────────────────────────────────────────────────
 // Detects whether the page is running inside a native app WebView.
@@ -1186,6 +1267,7 @@ const TicketModal = ({ onClose, lang = 'en' }) => {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
+        if (window._logApiError) window._logApiError('/api/create-ticket', res.status, data.error || 'Ticket creation failed');
         setErrors({ submit: data.error || S.errSubmit });
         setSubmitting(false);
         return;
@@ -1975,7 +2057,7 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
       headers: { 'Content-Type': 'application/json', 'X-HC-Secret': HC_API_SECRET },
       body: JSON.stringify({ text: rawContent, target: 'bn' }),
     })
-      .then(r => r.json())
+      .then(r => { if (!r.ok && window._logApiError) window._logApiError('/api/translate', r.status, 'Translation failed'); return r.json(); })
       .then(data => {
         if (data.translated) {
           localStorage.setItem(cacheKey, data.translated);
@@ -2196,7 +2278,7 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
         body: JSON.stringify({ query, lang, articles: topArticles }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'AI search failed');
+      if (!res.ok) { if (window._logApiError) window._logApiError('/api/ai-search', res.status, data.error || 'AI search failed'); throw new Error(data.error || 'AI search failed'); }
       setAiAnswer(data);
       markSessionSearched();
       db.collection('aiSearchLogs').add({ query: query.trim().toLowerCase(), lang, inputTokens: data.inputTokens, outputTokens: data.outputTokens, cost: data.cost, hadArticles: results.length > 0, sessionId: getAnalyticsSid(), timestamp: Date.now() }).catch(e => console.error('aiSearchLogs write failed:', e));
@@ -2423,7 +2505,7 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
         const res  = await fetch('/api/ai-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query, lang, articles: topArticles }) });
         const data = await res.json();
         if (cancelled) return;
-        if (!res.ok) throw new Error(data.error || 'AI search failed');
+        if (!res.ok) { if (window._logApiError) window._logApiError('/api/ai-search', res.status, data.error || 'AI search failed'); throw new Error(data.error || 'AI search failed'); }
         setAiAnswer(data);
         markSessionSearched();
         db.collection('aiSearchLogs').add({ query: query.trim().toLowerCase(), lang, inputTokens: data.inputTokens, outputTokens: data.outputTokens, cost: data.cost, hadArticles: articles.length > 0, sessionId: getAnalyticsSid(), timestamp: Date.now() }).catch(e => console.error('aiSearchLogs write failed:', e));
