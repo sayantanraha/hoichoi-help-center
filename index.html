@@ -703,6 +703,8 @@ const STRINGS = {
     browseCategories: 'Browse categories',
     searchResultsText: (n, q) => `${n} result${n !== 1 ? 's' : ''} for "${q}"`,
     noResultsText: (q) => `No results found for "${q}"`,
+    contentRedirectHeading: 'Searching for a show or movie?',
+    contentRedirectText: (q) => `Find "${q}" on hoichoi.tv`,
     ticketTitle: 'Raise a support ticket',
     ticketSubtitle: "We'll respond to your registered email within 24 hours",
     fullName: 'Full Name', namePlaceholder: 'Your full name',
@@ -775,6 +777,8 @@ const STRINGS = {
     browseCategories: 'ক্যাটাগরি ব্রাউজ করুন',
     searchResultsText: (n, q) => `"${q}" এর জন্য ${n}টি রেজাল্ট`,
     noResultsText: (q) => `"${q}" এর জন্য কোনো রেজাল্ট পাওয়া যায়নি`,
+    contentRedirectHeading: 'কোনো শো বা মুভি খুঁজছেন?',
+    contentRedirectText: (q) => `"${q}" hoichoi.tv-তে খুঁজুন`,
     ticketTitle: 'সাপোর্ট টিকেট করুন',
     ticketSubtitle: 'আমরা ২৪ ঘণ্টার মধ্যে আপনার রেজিস্টার্ড ইমেইলে সাড়া দেব',
     fullName: 'পূর্ণ নাম', namePlaceholder: 'আপনার পূর্ণ নাম',
@@ -2383,6 +2387,20 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
           <p style={{ color: 'var(--text-1)', fontWeight: 700, fontSize: 18, marginBottom: 8 }}>{S.noResultsHeading}</p>
           <p style={{ color: 'var(--text-2)', fontSize: 14, marginBottom: 28 }}>{S.tryDifferent}</p>
           <button className="btn-primary px-6 py-2.5 rounded-lg font-semibold cursor-pointer" onClick={() => navigate({ view: 'home' })}>{S.browseCategories}</button>
+
+          {/* Content redirect — for users searching show/movie titles */}
+          <a href={`https://hoichoi.tv/search?search=${encodeURIComponent(query)}`} target="_blank" rel="noopener noreferrer"
+            style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, marginTop:28, padding:'16px 20px', borderRadius:14, background:'linear-gradient(135deg,rgba(210,8,32,0.06),rgba(109,5,80,0.04))', border:'1px solid rgba(210,8,32,0.2)', textDecoration:'none', cursor:'pointer', transition:'border-color 0.15s' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor='rgba(210,8,32,0.5)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor='rgba(210,8,32,0.2)'}>
+            <div style={{ textAlign:'left' }}>
+              <p style={{ fontSize:13, fontWeight:700, color:'var(--text-1)', marginBottom:3 }}>{S.contentRedirectHeading}</p>
+              <p style={{ fontSize:13, color:'var(--accent)' }}>{S.contentRedirectText(query)}</p>
+            </div>
+            <div style={{ background:'var(--hc-gradient)', borderRadius:8, padding:'7px 14px', fontSize:13, fontWeight:700, color:'#fff', flexShrink:0, whiteSpace:'nowrap' }}>
+              hoichoi.tv →
+            </div>
+          </a>
         </div>
       ))}
       {/* Ask AI nudge — bottom of results */}
