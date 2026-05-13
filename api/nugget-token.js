@@ -2,15 +2,21 @@
 // Server-side proxy — calls Nugget S2S API with Basic Auth credentials.
 // Never exposes credentials to the frontend.
 
+const { setCors, checkSecret, rateLimit } = require('./_shared');
+
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  setCors(req, res);
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (!checkSecret(req, res)) return;
+  if (!rateLimit(req, res, 60, 5 * 60 * 1000)) return; // 60 req / 5 min per IP
 
   const uid = req.query.uid;
-  if (!uid) return res.status(400).json({ error: 'Missing uid' });
+  if (!uid || typeof uid !== 'string' || uid.length > 128) {
+    return res.status(400).json({ error: 'Missing or invalid uid' });
+  }
 
-  const BASIC_AUTH  = process.env.NUGGET_BASIC_AUTH;
-  const CLIENT_ID   = parseInt(process.env.NUGGET_CLIENT_ID, 10);
+  const BASIC_AUTH = process.env.NUGGET_BASIC_AUTH;
+  const CLIENT_ID  = parseInt(process.env.NUGGET_CLIENT_ID, 10);
 
   if (!BASIC_AUTH || !CLIENT_ID) {
     return res.status(500).json({ error: 'Nugget not configured' });

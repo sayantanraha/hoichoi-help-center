@@ -6,12 +6,14 @@
 
 const NUGGET_URL = 'https://api.nugget.com/unified-support/api/v1/ticketing/external/tickets';
 
+const { setCors, checkSecret, rateLimit } = require('./_shared');
+
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  setCors(req, res);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (!checkSecret(req, res)) return;
+  if (!rateLimit(req, res, 10, 5 * 60 * 1000)) return; // 10 ticket submissions / 5 min per IP
 
   const {
     name, email, phone, category, subcategory,

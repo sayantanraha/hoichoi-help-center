@@ -338,7 +338,7 @@ async function fetchNuggetToken() {
   }
   var cached = sessionStorage.getItem('hc_nugget_token');
   if (cached) return cached;
-  var res = await fetch('/api/nugget-token?uid=' + encodeURIComponent(uid));
+  var res = await fetch('/api/nugget-token?uid=' + encodeURIComponent(uid), { headers: { 'X-HC-Secret': window.__HC_SECRET__ || '' } });
   var data = await res.json();
   if (data.accessToken) {
     sessionStorage.setItem('hc_nugget_token', data.accessToken);
@@ -362,8 +362,22 @@ NuggetChat.hideWidget();
 <!-- ─────────────────────────────────────────────────────────────────────────── -->
 
 <div id="root"></div>
+
+<!-- ── API Secret ──────────────────────────────────────────────────────────────
+  Set this to the same value as HC_API_SECRET in your Vercel env vars.
+  Keep it short, random, and hard to guess (e.g. a UUID or random hex string).
+  ──────────────────────────────────────────────────────────────────────────── -->
+<script>window.__HC_SECRET__ = '';</script>
+
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+// ── API Secret ───────────────────────────────────────────────────────────────
+// Must match HC_API_SECRET Vercel env var. Acts as a shared secret so only
+// this page can call the /api/* endpoints. Not cryptographically strong
+// (visible in source), but stops automated scanners and adds a meaningful
+// barrier when combined with per-IP rate limiting on the server.
+const HC_API_SECRET = window.__HC_SECRET__ || '';
 
 // ── Firebase ─────────────────────────────────────────────────────────────────
 const firebaseConfig = {
@@ -1166,7 +1180,7 @@ const TicketModal = ({ onClose, lang = 'en' }) => {
       };
       const res = await fetch('/api/create-ticket', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-HC-Secret': HC_API_SECRET },
         body: JSON.stringify(payload),
       });
       const data = await res.json().catch(() => ({}));
@@ -1952,7 +1966,7 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
     setTranslating(true);
     fetch('/api/translate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-HC-Secret': HC_API_SECRET },
       body: JSON.stringify({ text: rawContent, target: 'bn' }),
     })
       .then(r => r.json())
@@ -2172,7 +2186,7 @@ const SearchView = ({ query, navigate, lang, onOpenTicket, allArticles, categori
       }));
       const res = await fetch('/api/ai-search', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-HC-Secret': HC_API_SECRET },
         body: JSON.stringify({ query, lang, articles: topArticles }),
       });
       const data = await res.json();

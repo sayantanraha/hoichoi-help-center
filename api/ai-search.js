@@ -3,16 +3,19 @@
 // Receives query + top matching articles from the frontend, calls GPT-4o Mini,
 // returns a structured step-by-step answer with source indices.
 
+const { setCors, checkSecret, rateLimit } = require('./_shared');
+
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  setCors(req, res);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (!checkSecret(req, res)) return;
+  if (!rateLimit(req, res, 30, 5 * 60 * 1000)) return; // 30 req / 5 min per IP
 
   const { query, lang = 'en', articles = [] } = req.body || {};
-  if (!query || query.trim().length < 3) return res.status(400).json({ error: 'Query too short' });
-  if (articles.length === 0) return res.status(400).json({ error: 'No articles provided' });
+  if (!query || query.trim().length < 3)              return res.status(400).json({ error: 'Query too short' });
+  if (query.trim().length > 500)                      return res.status(400).json({ error: 'Query too long' });
+  if (!Array.isArray(articles) || articles.length === 0) return res.status(400).json({ error: 'No articles provided' });
 
   const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
   if (!OPENAI_API_KEY) return res.status(500).json({ error: 'AI not configured' });
@@ -23,7 +26,7 @@ module.exports = async function handler(req, res) {
   // Use top 3 articles, 500 chars each — enough context, fewer tokens = faster
   const articleContext = articles.slice(0, 3).map((a, i) => {
     const title   = lang === 'bn' ? (a.titleBn || a.title || '') : (a.title || '');
-    const content = stripHtml(a.content).slice(0, 500);
+    const content = stripHtml(String(a.content || '')).slice(0, 500);
     return `[${i}] ${title}\n${content}`;
   }).join('\n\n---\n\n');
 

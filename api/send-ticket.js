@@ -4,13 +4,14 @@
 // Sends a formatted email via Brevo to support@hoichoi.tv
 // Reply-To is set to the user's email so agents can reply directly
 
+const { setCors, checkSecret, rateLimit } = require('./_shared');
+
 module.exports = async function handler(req, res) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  setCors(req, res);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (!checkSecret(req, res)) return;
+  if (!rateLimit(req, res, 10, 5 * 60 * 1000)) return; // 10 ticket submissions / 5 min per IP
 
   const {
     name, email, phone, category, subcategory,

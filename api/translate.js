@@ -3,15 +3,18 @@
 // Body: { text: string, target: string }
 // Returns: { translated: string }
 
+const { setCors, checkSecret, rateLimit } = require('./_shared');
+
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  setCors(req, res);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (!checkSecret(req, res)) return;
+  if (!rateLimit(req, res, 60, 5 * 60 * 1000)) return; // 60 req / 5 min per IP
 
   const { text, target = 'bn' } = req.body || {};
-  if (!text) return res.status(400).json({ error: 'Missing text' });
+  if (!text)                         return res.status(400).json({ error: 'Missing text' });
+  if (String(text).length > 2000)    return res.status(400).json({ error: 'Text too long' });
 
   const API_KEY = process.env.GOOGLE_TRANSLATE_API_KEY;
   if (!API_KEY) return res.status(500).json({ error: 'Translation service not configured' });
