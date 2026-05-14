@@ -28,7 +28,7 @@
     --topbar-bg: #FFFFFF; --hover: rgba(0,0,0,0.04);
     --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04);
     --shadow-md: 0 4px 16px rgba(0,0,0,0.1); --shadow-lg: 0 8px 40px rgba(0,0,0,0.18);
-    --accent: #d20820; --accent2: #a0060f;
+    --accent: #d20820; --accent2: #a0060f; --link: #d20820;
     --accent-dark: #d44060;
     --hc-gradient: linear-gradient(135deg, #d20820, #6d0550);
     --hc-gradient-h: linear-gradient(90deg, #d20820, #6d0550);
@@ -41,7 +41,7 @@
     --topbar-bg: transparent; --hover: rgba(255,255,255,0.05);
     --shadow: 0 1px 4px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
     --shadow-md: 0 4px 24px rgba(0,0,0,0.5); --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
-    --accent: #ff3347; --accent2: #d20820;
+    --accent: #ff3347; --accent2: #d20820; --link: #c060aa;
   }
   * { font-family: 'Inter', sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
   html { overscroll-behavior: none; }
@@ -1605,7 +1605,7 @@ const inlineHtml = (line) => _purify(
       if (!isExternal && !/^#/.test(href)) return txt;
       const url = isExternal ? href : `#article/${href}/`;
       const attrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
-      return `<a href="${url}"${attrs} style="color:var(--accent);text-decoration:underline;text-underline-offset:3px;font-weight:500">${txt}</a>`;
+      return `<a href="${url}"${attrs} style="color:var(--link);text-decoration:underline;text-underline-offset:3px;font-weight:500">${txt}</a>`;
     })
 );
 
