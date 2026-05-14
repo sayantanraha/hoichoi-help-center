@@ -84,7 +84,7 @@
   [data-theme="dark"] .dislike-btn:hover, [data-theme="dark"] .dislike-active { background: rgba(220,38,38,0.15) !important; }
   .video-card:hover .play-overlay { opacity: 1; }
   .play-overlay { opacity: 0; transition: opacity 0.2s; }
-  .hc-link { color: var(--link); text-decoration: underline; text-underline-offset: 3px; font-weight: 500; }
+  .article-prose a { color: var(--link); text-decoration: underline; text-underline-offset: 3px; font-weight: 500; }
   .search-input:focus, .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--accent) !important; box-shadow: none; }
   [data-theme="dark"] .search-input:focus, [data-theme="dark"] .form-input:focus, [data-theme="dark"] .form-select:focus, [data-theme="dark"] .form-textarea:focus { border-color: rgba(229,9,20,0.5) !important; }
   /* Nugget chat bubble — hoichoi logo fills full circle */
@@ -1606,7 +1606,7 @@ const inlineHtml = (line) => _purify(
       if (!isExternal && !/^#/.test(href)) return txt;
       const url = isExternal ? href : `#article/${href}/`;
       const attrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
-      return `<a href="${url}"${attrs} class="hc-link">${txt}</a>`;
+      return `<a href="${url}"${attrs}>${txt}</a>`;
     })
 );
 
@@ -2140,7 +2140,7 @@ const ArticleView = ({ articleId, catId, navigate, lang, onOpenTicket, allArticl
                 <span className="spin" style={{ width: 16, height: 16, border: '2px solid var(--border)', borderTopColor: 'var(--accent)', borderRadius: '50%', display: 'inline-block', flexShrink: 0 }} />
                 {S.translating}
               </div>
-            : <div>{renderContent(lang === 'bn' && translatedContent ? translatedContent : content?.content)}</div>
+            : <div className="article-prose">{renderContent(lang === 'bn' && translatedContent ? translatedContent : content?.content)}</div>
           }
           <ArticleFeedback articleId={articleId} initialLikes={articleMeta.likes || 0} initialDislikes={articleMeta.dislikes || 0} lang={lang} />
         </div>
