@@ -9,5 +9,8 @@
     { "src": "/api/(.*)", "dest": "/api/$1.js" },
     { "src": "/admin", "dest": "/admin.html" },
     { "src": "/(.*)", "dest": "/index.html" }
+  ],
+  "crons": [
+    { "path": "/api/error-digest", "schedule": "0 6 * * *" }
   ]
 }
