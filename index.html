@@ -2539,7 +2539,7 @@ const AiAnswerView = ({ query, navigate, lang, onOpenTicket, allArticles, catego
     (async () => {
       try {
         const topArticles = articles.map(a => ({ id: a.id, title: a.title, titleBn: a.titleBn || '', content: (a.content || '').slice(0, 1500) }));
-        const res  = await fetch('/api/ai-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query, lang, articles: topArticles }) });
+        const res  = await fetch('/api/ai-search', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-HC-Secret': HC_API_SECRET }, body: JSON.stringify({ query, lang, articles: topArticles }) });
         const data = await res.json();
         if (cancelled) return;
         if (!res.ok) { if (window._logApiError) window._logApiError('/api/ai-search', res.status, data.error || 'AI search failed'); throw new Error(data.error || 'AI search failed'); }
