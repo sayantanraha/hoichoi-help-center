@@ -1672,16 +1672,21 @@ const prefixMatch = (term, text) => {
 const scoreArticles = (terms, allArticles) => {
   const scored = [];
   for (const a of allArticles) {
-    const titleL  = (a.title   || '').toLowerCase();
-    const titleBn = (a.titleBn || '').toLowerCase();
-    const bodyL   = (a.content || '').toLowerCase();
+    const titleL    = (a.title   || '').toLowerCase();
+    const titleBn   = (a.titleBn || '').toLowerCase();
+    const bodyL     = (a.content || '').toLowerCase();
+    const keywordsL = Array.isArray(a.keywords) ? a.keywords.join(' ').toLowerCase() : '';
     let score = 0;
     for (const t of terms) {
-      const titleExact  = titleL.includes(t) || titleBn.includes(t);
-      const titlePrefix = !titleExact && (prefixMatch(t, titleL) || prefixMatch(t, titleBn));
-      const bodyExact   = bodyL.includes(t);
-      const bodyPrefix  = !bodyExact && prefixMatch(t, bodyL);
-      score += (titleExact ? 10 : 0) + (titlePrefix ? 6 : 0) + (bodyExact ? 1 : 0) + (bodyPrefix ? 0.5 : 0);
+      const titleExact    = titleL.includes(t) || titleBn.includes(t);
+      const titlePrefix   = !titleExact && (prefixMatch(t, titleL) || prefixMatch(t, titleBn));
+      const kwExact       = !titleExact && keywordsL.includes(t);
+      const kwPrefix      = !kwExact && !titleExact && prefixMatch(t, keywordsL);
+      const bodyExact     = bodyL.includes(t);
+      const bodyPrefix    = !bodyExact && prefixMatch(t, bodyL);
+      score += (titleExact ? 10 : 0) + (titlePrefix ? 6 : 0)
+             + (kwExact    ? 10 : 0) + (kwPrefix    ? 6 : 0)
+             + (bodyExact  ?  1 : 0) + (bodyPrefix  ? 0.5 : 0);
     }
     if (score === 0) continue;
     scored.push({ ...a, catId: (a.categories && a.categories[0]) || a.categoryId || a.category, _score: score });
