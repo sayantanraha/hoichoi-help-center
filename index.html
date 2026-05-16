@@ -1179,14 +1179,13 @@ const ArticleFeedback = ({ articleId, initialLikes, initialDislikes, lang = 'en'
           <textarea value={feedback} onChange={e => setFeedback(e.target.value)}
             placeholder={S.feedbackPlaceholder}
             rows={3} className="form-textarea" style={{ maxWidth: 480 }} />
-          <div className="flex gap-2 mt-2">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 12 }}>
             <button onClick={submitFeedback} disabled={!reason}
-              className="btn-primary px-4 py-2 rounded-lg text-sm font-medium"
-              style={{ opacity: reason ? 1 : 0.45, cursor: reason ? 'pointer' : 'not-allowed' }}>
+              style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: reason ? 'var(--hc-gradient)' : 'var(--border)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: reason ? 'pointer' : 'not-allowed', transition: 'opacity 0.15s', opacity: reason ? 1 : 0.5 }}>
               {S.submitFeedback}
             </button>
             <button onClick={() => { setSubmitted(true); setShowFeedback(false); }}
-              style={{ color: 'var(--text-3)', background: 'transparent', border: 'none', fontSize: 13, cursor: 'pointer' }}>
+              style={{ background: 'none', border: 'none', color: 'var(--text-3)', fontSize: 13, cursor: 'pointer', padding: '8px 4px' }}>
               {S.skipFeedback}
             </button>
           </div>
