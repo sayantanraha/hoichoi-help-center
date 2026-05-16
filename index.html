@@ -76,7 +76,7 @@
   }
   .category-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
   .article-card:hover { background: var(--hover); }
-  .like-btn, .dislike-btn { transition: all 160ms var(--ease-out, ease); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .like-btn, .dislike-btn { background: var(--surface2); color: var(--text-2); border-color: var(--border); transition: all 160ms var(--ease-out, ease); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
   .like-btn:hover { background: #DCFCE7 !important; color: #16A34A !important; border-color: #16A34A !important; box-shadow: 0 2px 8px rgba(22,163,74,0.15); }
   .dislike-btn:hover { background: #FEE2E2 !important; color: #DC2626 !important; border-color: #DC2626 !important; box-shadow: 0 2px 8px rgba(220,38,38,0.15); }
   .like-active { background: #DCFCE7 !important; color: #16A34A !important; border-color: #16A34A !important; }
@@ -1130,14 +1130,12 @@ const ArticleFeedback = ({ articleId, initialLikes, initialDislikes, lang = 'en'
       <p style={{ color: 'var(--text-2)', fontSize: 14, fontWeight: 500, marginBottom: 12 }}>{S.wasHelpful}</p>
       <div className="flex items-center gap-3 flex-wrap">
         <button onClick={() => handleVote('like')}
-          className={`like-btn flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium cursor-pointer transition-all ${vote === 'like' ? 'like-active' : ''}`}
-          style={{ background: 'var(--surface2)', color: 'var(--text-2)', borderColor: 'var(--border)' }}>
+          className={`like-btn flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium cursor-pointer transition-all ${vote === 'like' ? 'like-active' : ''}`}>
           <Icon name="thumbUp" size={15} /> {S.yesHelped}
           <span style={{ color: 'var(--text-3)', marginLeft: 2 }}>({likes})</span>
         </button>
         <button onClick={() => handleVote('dislike')}
-          className={`dislike-btn flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium cursor-pointer transition-all ${vote === 'dislike' ? 'dislike-active' : ''}`}
-          style={{ background: 'var(--surface2)', color: 'var(--text-2)', borderColor: 'var(--border)' }}>
+          className={`dislike-btn flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium cursor-pointer transition-all ${vote === 'dislike' ? 'dislike-active' : ''}`}>
           <Icon name="thumbDown" size={15} /> {S.notReally}
           <span style={{ color: 'var(--text-3)', marginLeft: 2 }}>({dislikes})</span>
         </button>
