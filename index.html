@@ -76,12 +76,16 @@
   }
   .category-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
   .article-card:hover { background: var(--hover); }
-  .like-btn:hover { background: #DCFCE7; color: #16A34A; border-color: #16A34A; }
-  .dislike-btn:hover { background: #FEE2E2; color: #DC2626; border-color: #DC2626; }
+  .like-btn, .dislike-btn { transition: all 160ms var(--ease-out, ease); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .like-btn:hover { background: #DCFCE7 !important; color: #16A34A !important; border-color: #16A34A !important; box-shadow: 0 2px 8px rgba(22,163,74,0.15); }
+  .dislike-btn:hover { background: #FEE2E2 !important; color: #DC2626 !important; border-color: #DC2626 !important; box-shadow: 0 2px 8px rgba(220,38,38,0.15); }
   .like-active { background: #DCFCE7 !important; color: #16A34A !important; border-color: #16A34A !important; }
   .dislike-active { background: #FEE2E2 !important; color: #DC2626 !important; border-color: #DC2626 !important; }
-  [data-theme="dark"] .like-btn:hover, [data-theme="dark"] .like-active { background: rgba(22,163,74,0.15) !important; }
-  [data-theme="dark"] .dislike-btn:hover, [data-theme="dark"] .dislike-active { background: rgba(220,38,38,0.15) !important; }
+  [data-theme="dark"] .like-btn, [data-theme="dark"] .dislike-btn { background: rgba(255,255,255,0.07) !important; border-color: rgba(255,255,255,0.14) !important; color: var(--text-1) !important; box-shadow: 0 1px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); }
+  [data-theme="dark"] .like-btn:hover { background: rgba(22,163,74,0.18) !important; border-color: rgba(22,163,74,0.45) !important; color: #6EE7B7 !important; box-shadow: 0 2px 10px rgba(22,163,74,0.2); }
+  [data-theme="dark"] .dislike-btn:hover { background: rgba(220,38,38,0.15) !important; border-color: rgba(220,38,38,0.4) !important; color: #FCA5A5 !important; box-shadow: 0 2px 10px rgba(220,38,38,0.2); }
+  [data-theme="dark"] .like-active { background: rgba(22,163,74,0.18) !important; border-color: rgba(22,163,74,0.45) !important; color: #6EE7B7 !important; }
+  [data-theme="dark"] .dislike-active { background: rgba(220,38,38,0.15) !important; border-color: rgba(220,38,38,0.4) !important; color: #FCA5A5 !important; }
   .video-card:hover .play-overlay { opacity: 1; }
   .play-overlay { opacity: 0; transition: opacity 0.2s; }
   .article-prose a { color: var(--link); text-decoration: underline; text-underline-offset: 3px; font-weight: 500; }
