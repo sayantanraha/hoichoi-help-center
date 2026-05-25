@@ -1,0 +1,40 @@
+{
+  "name": "@hoichoi/help-center-cli",
+  "version": "0.0.1",
+  "description": "Command-line interface for hoichoi Help Center — read articles, run AI search, submit tickets, fetch feedback, monitor errors.",
+  "type": "module",
+  "bin": {
+    "hc": "./bin/hc"
+  },
+  "main": "./src/index.js",
+  "files": [
+    "bin",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "hc": "node ./bin/hc"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "picocolors": "^1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sayantanraha/hoichoi-help-center.git",
+    "directory": "cli"
+  },
+  "keywords": [
+    "hoichoi",
+    "help-center",
+    "cli",
+    "cx",
+    "support"
+  ],
+  "author": "hoichoi CX team",
+  "license": "UNLICENSED",
+  "private": true
+}
