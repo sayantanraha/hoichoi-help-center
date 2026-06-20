@@ -1,5 +1,5 @@
 // POST /api/translate
-// Translates text via Langbly (Google Translate v2 compatible)
+// Translates article content to Bengali via GPT-4o Mini
 // Body: { text: string, target: string }
 // Returns: { translated: string }
 
@@ -14,29 +14,50 @@ module.exports = async function handler(req, res) {
 
   const { text, target = 'bn' } = req.body || {};
   if (!text)                         return res.status(400).json({ error: 'Missing text' });
-  if (String(text).length > 2000)    return res.status(400).json({ error: 'Text too long' });
+  if (String(text).length > 4000)    return res.status(400).json({ error: 'Text too long' });
 
-  const API_KEY = process.env.GOOGLE_TRANSLATE_API_KEY;
-  if (!API_KEY) return res.status(500).json({ error: 'Translation service not configured' });
+  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+  if (!OPENAI_API_KEY) return res.status(500).json({ error: 'Translation service not configured' });
+
+  const langName = target === 'bn' ? 'Bengali' : target;
 
   try {
-    const response = await fetch('https://api.langbly.com/language/translate/v2', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ q: text, target, format: 'text' }),
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: `You are a professional translator. Translate the following help center article content to ${langName}.
+Rules:
+- Preserve all formatting markers exactly: **, 1., -, ---, ![alt](url), [!info], [!warning], [!tip]
+- Keep brand names, app names, and technical terms in English (e.g. hoichoi, Smart TV, bKash, UPI, OTP, Google, Apple)
+- Keep URLs unchanged
+- Return ONLY the translated text, nothing else`,
+          },
+          {
+            role: 'user',
+            content: text,
+          },
+        ],
+        max_tokens: 2000,
+        temperature: 0.1,
+      }),
     });
 
     if (!response.ok) {
       const err = await response.text();
-      console.error('Langbly error:', response.status, err);
+      console.error('OpenAI translate error:', response.status, err);
       return res.status(502).json({ error: 'Translation failed' });
     }
 
     const data = await response.json();
-    const translated = data.data?.translations?.[0]?.translatedText;
+    const translated = data.choices?.[0]?.message?.content?.trim();
     if (!translated) return res.status(502).json({ error: 'No translation returned' });
 
     return res.status(200).json({ translated });

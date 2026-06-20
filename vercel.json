@@ -1,14 +1,12 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "index.html", "use": "@vercel/static" },
-    { "src": "admin.html", "use": "@vercel/static" },
-    { "src": "api/*.js", "use": "@vercel/node", "config": { "maxDuration": 10 } }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1.js" },
-    { "src": "/admin", "dest": "/admin.html" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "buildCommand": "vite build",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/*.js": { "maxDuration": 10 }
+  },
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "crons": [
     { "path": "/api/error-digest", "schedule": "0 6 * * *" }

@@ -303,7 +303,13 @@ Revert to `if false` after bulk operations. Regular Support Hub writes go throug
 
 ---
 
-## 11. Key Rules / Lessons Learned
+## 11. Preview Panel Warning
+
+**Never mention the Launch preview panel for Help Center work.** The preview panel in this project context opens the OTP Dashboard (the `fresh-mcp-test` parent project dev server), NOT the Help Center. Help Center changes are verified by pushing to GitHub → Vercel auto-deploys to `https://hoichoi-help-center.vercel.app` (also live at `https://help.hoichoi.tv`).
+
+---
+
+## 12. Key Rules / Lessons Learned
 
 1. **Never re-declare variables in the same function scope** — duplicate `const isAdmin` in CX Intelligence caused a Babel SyntaxError → blank page. Always check for existing declarations before adding new ones.
 2. **Always push Help Center from its own repo** — `fresh-mcp-test/help-center/` is a nested git repo. Pushing from the parent (`fresh-mcp-test/`) does nothing for the Help Center.
