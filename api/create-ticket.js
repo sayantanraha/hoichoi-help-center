@@ -64,6 +64,8 @@ module.exports = async function handler(req, res) {
         fd.append('Created_by_id',        email);
         fd.append('created_by_client_id', '1');
         fd.append('priority',             'MEDIUM');
+        // Flags this as a Help Center form ticket so Nugget's AI email bot auto-handles it (per Nugget team)
+        fd.append('cf_form_created_ticket', 'Yes');
         fd.append('userInfo',             JSON.stringify({ uid: email, displayName: name, email: email }));
         fd.append('attachment_files[]',   blob, attachment.name);
 
@@ -86,6 +88,8 @@ module.exports = async function handler(req, res) {
           created_by_id:        email,
           created_by_client_id: 1,
           priority:             'MEDIUM',
+          // Flags this as a Help Center form ticket so Nugget's AI email bot auto-handles it (per Nugget team)
+          cf_form_created_ticket: 'Yes',
           userInfo:             { uid: email, displayName: name, email: email },
         };
 
